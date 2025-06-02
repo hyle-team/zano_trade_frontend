@@ -1,0 +1,9 @@
+.dex__notifications_wrapper {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}

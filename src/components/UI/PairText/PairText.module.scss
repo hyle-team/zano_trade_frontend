@@ -1,0 +1,13 @@
+.pair__text {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+
+	> div {
+		display: flex;
+
+		> p:first-child {
+			color: var(--font-dimmed-color);
+		}
+	}
+}

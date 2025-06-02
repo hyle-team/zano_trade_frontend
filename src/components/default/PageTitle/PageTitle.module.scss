@@ -1,0 +1,24 @@
+.page_title {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 30px;
+
+	> div {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	@media screen and (max-width: 600px) {
+		flex-direction: column-reverse;
+		align-items: normal;
+		gap: 40px;
+
+		button {
+			padding-top: 13px;
+			padding-bottom: 13px;
+		}
+	}
+}

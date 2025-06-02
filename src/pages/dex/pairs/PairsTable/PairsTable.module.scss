@@ -1,0 +1,142 @@
+$table-radius: 10px;
+
+.table {
+	width: 100%;
+	font-size: 14px;
+	color: white;
+	border-spacing: 0 1px;
+
+	thead {
+		background-color: var(--table-header-bg);
+	}
+
+	@media screen and (max-width: 865px) {
+		display: none;
+	}
+}
+
+.header_row {
+	color: var(--table-header-font-color);
+	text-align: left;
+	opacity: 0.8;
+	user-select: none;
+
+	th {
+		font-size: 14px;
+
+		&:first-child {
+			border-top-left-radius: $table-radius;
+		}
+
+		&:last-child {
+			border-top-right-radius: $table-radius;
+		}
+	}
+}
+
+.header_column_row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+
+	font-size: 14px;
+
+	svg {
+		g {
+			path {
+				fill-opacity: 0.9;
+			}
+		}
+	}
+}
+
+.header_cell {
+	padding: 10px 20px;
+	height: 40px;
+	border: none;
+	min-height: 40px;
+}
+
+.body_row {
+	background-color: var(--table-bg-color);
+	border-top-right-radius: $table-radius;
+}
+
+.body_cell {
+	padding: 15px 20px;
+	border-bottom: 1px solid var(--delimiter-color);
+}
+
+.coefficient_cell {
+	font-size: 16px;
+	font-weight: 500;
+}
+
+.pair_cell {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+
+	.currency_name {
+		display: flex;
+		align-items: center;
+
+		font-size: 16px;
+		font-weight: 500;
+
+		max-width: 150px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: inline-block;
+
+		span:nth-child(3) {
+			color: var(--table-header-font-color);
+		}
+	}
+
+	> img {
+		width: 18px;
+		height: 18px;
+		background: var(--icon-bg-color);
+		border-radius: 50%;
+	}
+}
+
+.price_cell {
+	display: flex;
+	flex-direction: column;
+	gap: '3px';
+
+	.text {
+		font-size: 16px;
+		font-weight: 400;
+		color: var(--font-main-color);
+	}
+
+	.sub_text {
+		font-size: 12px;
+		font-weight: 400;
+		color: var(--table-header-font-color);
+	}
+}
+
+.button_cell {
+	display: flex;
+	justify-content: flex-end;
+
+	.trade_button {
+		background-color: transparent;
+		color: var(--font-main-color);
+		padding: 10px 40px;
+		border-radius: 10px;
+		transition: background 0.2s;
+		cursor: pointer;
+		border: 2px solid rgba(31, 143, 235, 1);
+		user-select: none;
+
+		&:hover {
+			background-color: var(--table-button-bg-hover);
+		}
+	}
+}

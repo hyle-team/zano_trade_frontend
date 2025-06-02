@@ -1,0 +1,398 @@
+.main {
+	.history__btn {
+		height: 54px;
+		padding: 0 12px;
+
+		> div {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		@media screen and (max-width: 550px) {
+			height: 48px;
+
+			p {
+				font-size: 15px;
+			}
+
+			img {
+				scale: 0.8;
+			}
+		}
+	}
+
+	.swap__panel__wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 80px;
+
+		.swap__items__wrapper {
+			width: 100%;
+			display: flex;
+			gap: 40px;
+
+			.swap__item {
+				width: 100%;
+				padding: 40px;
+				border: 2px solid #1f8feb;
+				border-radius: 15px;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				gap: 20px;
+				cursor: pointer;
+
+				&:hover {
+					background-color: rgba(255, 255, 255, 0.1);
+				}
+
+				> div:first-child {
+					display: flex;
+					gap: 15px;
+
+					> div:first-child {
+						width: 48px;
+						height: 48px;
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						background-color: var(--icon-bg-color);
+						border-radius: 100px;
+
+						img {
+							display: flex;
+						}
+					}
+
+					> div:last-child {
+						display: flex;
+						flex-direction: column;
+
+						h5 {
+							font-weight: 500;
+						}
+
+						> div {
+							display: flex;
+							gap: 20px;
+
+							> h6 {
+								color: var(--font-dimmed-color);
+							}
+						}
+					}
+				}
+
+				> .curve__chart {
+					width: 100%;
+					height: 72px;
+				}
+			}
+
+			@media screen and (max-width: 1400px) {
+				flex-wrap: wrap;
+				justify-content: center;
+
+				.swap__item {
+					max-width: 500px;
+				}
+			}
+
+			@media screen and (max-width: 1250px) {
+				.swap__item {
+					max-width: 400px;
+				}
+			}
+
+			@media screen and (max-width: 900px) {
+				.swap__item {
+					max-width: 500px;
+				}
+			}
+
+			@media screen and (max-width: 600px) {
+				.swap__item {
+					width: 100%;
+				}
+			}
+
+			@media screen and (max-width: 415px) {
+				.swap__item {
+					padding: 20px;
+
+					.swap__item__description {
+						h5 {
+							font-size: 18px;
+						}
+
+						> div {
+							flex-direction: column;
+							gap: 3px !important;
+						}
+					}
+				}
+			}
+		}
+
+		.swap__process__wrapper {
+			width: 70%;
+			display: flex;
+			flex-direction: column;
+			gap: 60px;
+			position: relative;
+
+			.progress__bar__wrapper {
+				padding-top: 47px;
+				padding-bottom: 15px;
+
+				.progress__bar__background {
+					width: 100%;
+					height: 4px;
+					background: var(--slider-bg-color);
+					border-radius: 100px;
+					position: relative;
+
+					.progress__bar__markers {
+						> div {
+							width: 34px;
+							height: 34px;
+							background: var(--slider-bg-color);
+							position: absolute;
+							border-radius: 50%;
+							transform: translateY(-50%);
+							top: 2px;
+							z-index: 2;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+
+							> h6:last-child {
+								position: absolute;
+								top: -32px;
+								color: var(--font-dimmed-color);
+							}
+
+							&:last-child {
+								right: 0;
+							}
+
+							&:nth-child(2) {
+								transform: translate(-50%, -50%);
+								left: 50%;
+							}
+
+							&.marker__selected {
+								background: #1f8feb;
+
+								> h6:first-child {
+									color: #fff;
+								}
+
+								> h6:last-child {
+									color: var(--font-main-color);
+								}
+							}
+						}
+					}
+
+					.progress__bar__filled {
+						width: 0%;
+						height: 4px;
+						background: #1f8feb;
+						position: absolute;
+						top: 0;
+						border-radius: 100px;
+					}
+				}
+			}
+
+			.swap__input__panel {
+				width: 100%;
+				display: flex;
+				gap: 40px;
+
+				.swap__inputs__wrapper {
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+					gap: 20px;
+
+					> div:first-child {
+						display: flex;
+						gap: 40px;
+						align-items: flex-end;
+
+						.swap__labeled__input {
+							width: 100%;
+							display: flex;
+							flex-direction: column;
+							gap: 8px;
+
+							> div {
+								position: relative;
+
+								> input {
+									width: 100%;
+									height: 54px;
+									padding-right: max(50%, 170px);
+								}
+
+								.swap__input__dropdown {
+									height: 100%;
+									width: 45%;
+									min-width: 158px;
+									padding-top: 0px;
+									padding-bottom: 0px;
+									position: absolute;
+									top: 0;
+									right: 0;
+									border-left: 2px solid var(--delimiter-color);
+									border-radius: 0;
+
+									> :first-child {
+										width: 100%;
+										border-bottom-left-radius: 0;
+										border-top-left-radius: 0;
+									}
+								}
+							}
+
+							h6 {
+								color: var(--font-dimmed-color);
+							}
+						}
+
+						.exchange__icon {
+							width: 54px;
+							min-width: 54px;
+							height: 54px;
+							border-radius: 50%;
+							background: var(--dimmed-btn-bg);
+							display: flex;
+							justify-content: center;
+							align-items: center;
+
+							svg {
+								display: flex;
+							}
+						}
+					}
+
+					> div:last-child {
+						display: flex;
+						gap: 21px;
+
+						p {
+							font-weight: 400;
+							color: var(--font-dimmed-color);
+
+							span {
+								color: #16d1d6;
+							}
+						}
+					}
+				}
+
+				.swap__button__wrapper {
+					width: 250px;
+					min-width: 250px;
+					margin-top: 30px;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					gap: 20px;
+
+					button {
+						padding-left: 0;
+						padding-right: 0;
+						width: 100%;
+						height: 54px;
+					}
+
+					> div {
+						width: 100%;
+						height: 54px;
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						gap: 10px;
+						background-color: var(--swap-btn-bg);
+						border-radius: 10px;
+
+						.swap__button__preloader {
+							width: 20px;
+							height: 20px;
+							display: flex;
+						}
+
+						.swap__button__ready {
+							color: #16d1d6;
+						}
+					}
+				}
+			}
+
+			@media screen and (max-width: 1600px) {
+				width: 85%;
+			}
+
+			@media screen and (max-width: 1350px) {
+				.swap__input__panel {
+					.swap__button__wrapper {
+						width: 180px;
+						min-width: 180px;
+					}
+				}
+			}
+
+			@media screen and (max-width: 1260px) {
+				.swap__input__panel {
+					flex-direction: column;
+
+					.swap__inputs__wrapper {
+						> div:first-child {
+							flex-direction: column;
+							align-items: center;
+							gap: 10px;
+
+							> div:first-child {
+								margin-bottom: 15px;
+							}
+						}
+					}
+
+					.swap__button__wrapper {
+						width: 100%;
+						margin-top: 0;
+					}
+				}
+			}
+
+			@media screen and (max-width: 425px) {
+				width: 100%;
+
+				.progress__bar__markers {
+					> div {
+						> h6:last-child {
+							font-size: 14px;
+						}
+					}
+
+					> div:first-child {
+						> h6:last-child {
+							left: 0;
+						}
+					}
+
+					> div:last-child {
+						> h6:last-child {
+							right: 0;
+						}
+					}
+				}
+			}
+		}
+	}
+}

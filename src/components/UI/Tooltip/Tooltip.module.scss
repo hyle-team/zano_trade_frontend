@@ -1,0 +1,22 @@
+.tooltip {
+	padding: 13px 20px;
+	background: var(--switch-bg-color);
+	position: relative;
+	border-radius: 5px;
+	white-space: nowrap;
+	z-index: 3;
+
+	p {
+		font-weight: 500;
+	}
+
+	.tooltip__arrow {
+		width: 10px;
+		height: 10px;
+		position: absolute;
+		top: 0px;
+		left: 50%;
+		transform: translate(-50%, -50%) rotate(45deg);
+		background-color: var(--switch-bg-color);
+	}
+}

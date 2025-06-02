@@ -1,0 +1,106 @@
+.main {
+	padding: 0;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	height: 100dvh;
+
+	&__logo {
+		display: block;
+		margin-inline: auto;
+		margin-top: 20px;
+	}
+
+	&__bgText {
+		position: absolute;
+		left: 50%;
+		top: calc(50% - 40px);
+		transform: translate(-50%, -50%);
+		font-size: 160px;
+		font-weight: 800;
+		color: transparent;
+		background: linear-gradient(180deg, #07216b 0%, rgba(7, 33, 107, 0) 100%);
+		background-clip: text;
+
+		@media screen and (max-width: 1280px) {
+			font-size: 120px;
+		}
+
+		@media screen and (max-width: 940px) {
+			top: calc(50% - 50px);
+			font-size: 100px;
+		}
+
+		@media screen and (max-width: 780px) {
+			display: none;
+		}
+	}
+
+	&__content {
+		z-index: 3;
+		position: relative;
+		margin-top: auto;
+		margin-bottom: auto;
+		text-align: center;
+
+		&_title {
+			font-weight: 700;
+			font-size: 48px;
+
+			span {
+				font-size: 48px;
+				font-weight: 700;
+				color: transparent;
+				background: radial-gradient(100% 188.88% at 0% 0%, #16d1d6 0%, #274cff 100%);
+				background-clip: text;
+			}
+
+			@media screen and (max-width: 720px) {
+				font-size: 38px;
+
+				span {
+					font-size: 38px;
+				}
+			}
+
+			@media screen and (max-width: 360px) {
+				font-size: 32px;
+
+				span {
+					font-size: 32px;
+				}
+			}
+		}
+
+		&_info {
+			margin-top: 12px;
+			color: #ffffffbf;
+			font-size: 21px;
+			font-weight: 500;
+		}
+
+		&_social {
+			margin: 0 auto;
+			margin-top: 20px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 12px;
+			max-width: max-content;
+
+			a {
+				transition: 0.4s background-color ease;
+				display: grid;
+				place-content: center;
+				border-radius: 10px;
+				width: 48px;
+				height: 48px;
+				background-color: #ffffff1a;
+
+				&:hover {
+					background-color: #ffffff4d;
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,33 @@
+.button {
+	padding: 16px 40px;
+	color: #ffffff;
+	font-weight: 500;
+	font-size: 18px;
+	border-radius: 10px;
+	cursor: pointer;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: default !important;
+		pointer-events: none;
+	}
+}
+
+.transparent {
+	background-color: #ffffff00 !important;
+	border: 2px solid #1f8feb;
+	border-radius: 10px;
+	color: var(--font-main-color);
+
+	&:hover {
+		background-color: var(--button-bordered-hover) !important;
+	}
+}
+
+.btn__no_border {
+	border: 0;
+}

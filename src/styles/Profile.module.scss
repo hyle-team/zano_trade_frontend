@@ -1,0 +1,126 @@
+.main {
+	> :first-child {
+		width: 100%;
+		padding-bottom: 40px;
+		border-bottom: 1px solid var(--delimiter-color);
+	}
+
+	.profile__title__description {
+		font-weight: 600;
+		color: var(--font-dimmed-color);
+	}
+
+	.profile__content {
+		display: flex;
+		flex-direction: column;
+		gap: 40px;
+
+		> div:first-child {
+			padding-top: 40px !important;
+		}
+
+		.profile__state_filters {
+			display: flex;
+			gap: 40px;
+			overflow: auto;
+
+			padding-top: 40px;
+			padding-bottom: 10px;
+
+			> div {
+				position: relative;
+
+				.profile__filters__notification {
+					position: absolute;
+					transform: translate(50%, -50%);
+					top: -5px;
+					right: -10px;
+				}
+
+				a {
+					font-weight: 600;
+					position: relative;
+					white-space: nowrap;
+
+					transition: none;
+
+					&.selected {
+						color: #ffffff;
+						cursor: auto;
+
+						&::after {
+							content: '';
+							position: absolute;
+							top: 100%;
+							left: 0;
+							width: 100%;
+							height: 2px;
+							background-color: #ffffff;
+						}
+					}
+				}
+			}
+		}
+
+		.profile__other_filters {
+			display: flex;
+			gap: 40px;
+
+			> :first-child {
+				> :first-child {
+					padding-top: 0;
+					padding-bottom: 0;
+					height: 54px;
+				}
+			}
+
+			> :last-child {
+				width: 330px;
+				height: 54px;
+			}
+
+			.profile__filter {
+				height: 54px;
+				padding: 0 15px;
+				background-color: #11316b;
+				border-radius: 10px;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				cursor: pointer;
+
+				&:hover {
+					background-color: #1d3b72;
+				}
+			}
+
+			.profile__buy_sell__filter {
+				width: 254px;
+			}
+
+			.profile__date__filter {
+				width: 330px;
+
+				img {
+					opacity: 0.6;
+				}
+			}
+
+			@media screen and (max-width: 730px) {
+				flex-direction: column;
+				gap: 20px;
+
+				> div {
+					> :first-child {
+						height: 48px !important;
+					}
+				}
+
+				> * {
+					width: 100% !important;
+					height: 48px !important;
+				}
+			}
+		}
+	}
+}

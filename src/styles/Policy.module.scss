@@ -1,0 +1,38 @@
+.main {
+	.policy__title__description {
+		font-weight: 600;
+		color: var(--font-dimmed-color);
+	}
+
+	.policy__content {
+		> * {
+			margin-bottom: 20px;
+
+			&:last-child {
+				margin: 0;
+			}
+		}
+
+		p {
+			line-height: 150%;
+		}
+
+		p,
+		span,
+		li {
+			color: var(--font-dimmed-color);
+		}
+
+		ul {
+			list-style-position: inside;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+
+			// li {
+			//     margin-bottom: 10px;
+			//     background-position: 0 0;
+			// }
+		}
+	}
+}

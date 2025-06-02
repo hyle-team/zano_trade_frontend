@@ -1,0 +1,206 @@
+.create_offer__popup {
+	width: 640px;
+	display: flex;
+	flex-direction: column;
+	padding: 40px;
+	position: relative;
+	top: 10%;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: var(--window-bg-color);
+	border-radius: 10px;
+
+	.create_offer__deposit {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+
+		h6 {
+			color: var(--font-dimmed-color);
+		}
+	}
+
+	> div:first-child {
+		padding-bottom: 30px;
+		display: flex;
+		justify-content: space-between;
+		border-bottom: 1px solid var(--delimiter-color);
+
+		img {
+			cursor: pointer;
+		}
+	}
+
+	> div:nth-child(2) {
+		padding-top: 30px;
+		display: flex;
+		flex-direction: column;
+		gap: 30px;
+
+		.create_offer__pay,
+		.create_offer__receive,
+		.create_offer__price {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+
+			h6 {
+				color: var(--font-dimmed-color);
+			}
+
+			> :nth-child(2) {
+				width: 100%;
+				height: 54px;
+
+				> :first-child {
+					width: 100%;
+				}
+			}
+		}
+
+		.create_offer__filters {
+			h6 {
+				color: rgba(255, 255, 255, 0.7);
+			}
+
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+		}
+
+		.create_offer__comment {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+
+			textarea {
+				padding: 16px;
+				width: 100% !important;
+				height: 160px;
+				resize: none;
+				background-color: var(--bordered-input-bg);
+				border: 1px solid var(--window-border-color);
+				border-radius: 8px;
+			}
+
+			textarea::placeholder {
+				color: var(--font-dimmed-color);
+			}
+		}
+
+		.create_offer__buttons {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+
+			div {
+				display: flex;
+				gap: 20px;
+
+				> * {
+					width: 100%;
+				}
+
+				button:first-child {
+					background-color: #16d1d6;
+
+					&:hover {
+						background-color: #45dade;
+					}
+				}
+			}
+
+			p {
+				color: var(--font-dimmed-color);
+				font-size: 14px;
+			}
+		}
+
+		.create_offer__parameters {
+			display: flex;
+			gap: 20px;
+
+			> * {
+				width: 100%;
+			}
+		}
+	}
+
+	@media screen and (max-width: 680px) {
+		width: 100%;
+
+		.create_offer__buttons button {
+			padding-top: 13px;
+			padding-bottom: 13px;
+		}
+	}
+
+	@media screen and (max-width: 520px) {
+		.create_offer__parameters {
+			flex-direction: column;
+		}
+	}
+
+	@media screen and (max-width: 470px) {
+		padding: 40px 20px;
+
+		.create_offer__buttons > div {
+			flex-direction: column;
+		}
+	}
+}
+
+.windowed_inputs__wrapper {
+	padding: 2px;
+	border-radius: 10px;
+
+	.windowed_inputs {
+		padding: 20px;
+		border-radius: 8px;
+		background-color: var(--window-bg-color);
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+
+		.windowed_inputs__title {
+			display: flex;
+			gap: 10px;
+		}
+
+		.windowed_inputs__pair {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+
+			> p {
+				font-weight: 700;
+				color: var(--font-dimmed-color);
+			}
+
+			> div {
+				position: relative;
+
+				input {
+					width: 100%;
+					padding: 15px;
+					padding-right: 75px;
+				}
+
+				p {
+					position: absolute;
+					transform: translateY(-50%);
+					top: 50%;
+					right: 15px;
+				}
+			}
+		}
+	}
+
+	&.blue {
+		background: radial-gradient(100% 188.88% at 0% 0%, #16d1d6 0%, #274cff 100%);
+	}
+
+	&.grey {
+		background: var(--delimiter-color);
+	}
+}

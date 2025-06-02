@@ -1,0 +1,80 @@
+.title__wrapper {
+	width: 100%;
+	margin-bottom: 40px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border-radius: 30px;
+	text-align: center;
+	gap: 20px;
+
+	> button {
+		padding-top: 0;
+		padding-bottom: 0;
+		height: 54px;
+	}
+
+	> :first-child {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+
+		.desktop__description {
+			max-width: 850px;
+			font-size: 18px;
+			font-weight: 500;
+			color: var(--font-dimmed-color);
+
+			@media (max-width: 768px) {
+				display: none;
+			}
+		}
+	}
+
+	.mobile__description {
+		display: none;
+		font-size: 18px;
+		font-weight: 400;
+		color: var(--font-dimmed-color);
+
+		@media (max-width: 768px) {
+			display: block;
+		}
+
+		@media (max-width: 375px) {
+			display: block;
+			max-width: 280px;
+			margin: 0 auto;
+		}
+	}
+
+	.learn_more__button {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 5px;
+		user-select: none;
+		cursor: pointer;
+
+		p {
+			font-size: 18px;
+			color: rgba(31, 143, 235, 1);
+		}
+
+		svg:not(.stroked) * {
+			fill: transparent;
+		}
+	}
+
+	.connect__button {
+		height: 54px;
+	}
+
+	@media screen and (max-width: 550px) {
+		margin-bottom: 40px;
+
+		.connect__button {
+			height: 48px;
+		}
+	}
+}

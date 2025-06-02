@@ -1,0 +1,31 @@
+.orders-buy-sell-switch {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background-color: transparent !important;
+	cursor: pointer;
+
+	&:hover {
+		opacity: 0.7;
+	}
+
+	> p {
+		font-size: 16px;
+		font-weight: 600;
+		color: #16d1d6;
+	}
+
+	> svg > * {
+		fill: transparent;
+	}
+
+	&.orders-buy-sell-switch_sell {
+		> p {
+			color: #ff6767;
+		}
+
+		> svg > * {
+			stroke: #ff6767;
+		}
+	}
+}

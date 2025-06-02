@@ -1,0 +1,247 @@
+.table {
+	display: flex;
+	flex-direction: column;
+
+	> thead {
+		width: 100%;
+
+		> tr {
+			width: 100%;
+			padding: 10px 20px;
+			display: flex;
+			background-color: var(--table-thead-bg);
+			border-top-left-radius: 10px;
+			border-top-right-radius: 10px;
+
+			> th {
+				width: 100%;
+				text-align: start;
+
+				@media screen and (max-width: 1600px) {
+					&:first-child {
+						max-width: 140px;
+					}
+
+					&:nth-child(4) {
+						max-width: 120px;
+					}
+				}
+
+				a {
+					font-weight: 700;
+					font-size: 14px;
+					color: var(--table-th-color);
+				}
+			}
+		}
+	}
+
+	> tbody {
+		width: 100%;
+
+		> tr {
+			width: 100%;
+			padding: 20px;
+			display: flex;
+			gap: 20px;
+			border-bottom: 1px solid var(--delimiter-color);
+			background-color: var(--table-tbody-bg);
+
+			&:last-child {
+				border-bottom: none;
+				border-bottom-left-radius: 10px;
+				border-bottom-right-radius: 10px;
+			}
+
+			> td {
+				min-width: 0;
+				width: 100%;
+				display: flex;
+				align-items: center;
+				position: relative;
+				margin-left: -20px;
+
+				&:first-child {
+					margin-left: 0;
+				}
+
+				.table__tooltip {
+					position: absolute;
+					top: calc(100% + 5px);
+					left: 50%;
+					transform: translateX(-50%);
+				}
+
+				> p {
+					width: 100%;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+
+					.price {
+						display: block;
+						margin-top: 6px;
+						opacity: 70%;
+						font-weight: 400;
+						font-size: 14px;
+					}
+				}
+
+				@media screen and (max-width: 1600px) {
+					&:first-child {
+						max-width: 140px;
+					}
+
+					&:nth-child(4) {
+						max-width: 120px;
+					}
+				}
+
+				.type__marker {
+					width: 58px;
+					height: 30px;
+					border: 2px solid white;
+					border-radius: 50px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+
+					h6 {
+						font-size: 14px;
+						font-weight: 400;
+					}
+
+					&.marker__buy {
+						border-color: #16d1d6;
+
+						h6 {
+							color: #16d1d6;
+						}
+					}
+
+					&.marker__sell {
+						border-color: #ff6767;
+
+						h6 {
+							color: #ff6767;
+						}
+					}
+				}
+
+				.delete__button {
+					height: 54px;
+					width: 54px;
+					padding: 0;
+					background: var(--dimmed-btn-bg);
+
+					&:hover {
+						background: var(--dimmed-btn-hover);
+					}
+				}
+
+				.table__header__mobile {
+					display: none;
+				}
+
+				&.table__delete {
+					justify-content: flex-end;
+				}
+			}
+		}
+	}
+
+	@media screen and (max-width: 1500px) {
+		> thead {
+			display: none;
+
+			td {
+				max-width: none !important;
+			}
+		}
+
+		> tbody {
+			> tr {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: space-between;
+				gap: 20px;
+				position: relative;
+
+				&:first-child {
+					border-top-left-radius: 10px;
+					border-top-right-radius: 10px;
+				}
+
+				> td {
+					margin-left: 0;
+					width: auto;
+					flex-direction: column;
+					align-items: flex-start;
+					max-width: none !important;
+					gap: 15px;
+
+					.table__header__mobile {
+						display: block;
+						color: var(--font-dimmed-color);
+						font-weight: 700;
+					}
+
+					&:first-child {
+						width: 100%;
+					}
+
+					&:nth-child(2) {
+						width: auto;
+						position: absolute;
+						left: 140px;
+
+						p {
+							text-align: center;
+						}
+
+						@media screen and (max-width: 400px) {
+							left: 120px;
+						}
+
+						@media screen and (max-width: 350px) {
+							left: 100px;
+						}
+					}
+
+					&.table__delete {
+						width: auto;
+						position: absolute;
+						right: 20px;
+
+						button {
+							height: 40px !important;
+							width: 40px !important;
+
+							img {
+								scale: 0.8;
+							}
+						}
+					}
+
+					h6 {
+						color: var(--font-dimmed-color);
+					}
+				}
+			}
+		}
+	}
+}
+
+.orders__table__message {
+	width: 100%;
+	height: 500px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	justify-content: center;
+	align-items: center;
+
+	p {
+		color: var(--font-dimmed-color);
+	}
+}

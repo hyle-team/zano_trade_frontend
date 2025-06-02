@@ -1,0 +1,618 @@
+[
+	{
+		"timestamp": "1358960400000",
+		"shadow_top": 2320.26,
+		"shadow_bottom": 2320.26,
+		"body_first": 2287.3,
+		"body_second": 2362.94
+	},
+	{
+		"timestamp": "1359046800000",
+		"shadow_top": 2300,
+		"shadow_bottom": 2291.3,
+		"body_first": 2288.26,
+		"body_second": 2308.38
+	},
+	{
+		"timestamp": "1359306000000",
+		"shadow_top": 2295.35,
+		"shadow_bottom": 2346.5,
+		"body_first": 2295.35,
+		"body_second": 2346.92
+	},
+	{
+		"timestamp": "1359392400000",
+		"shadow_top": 2347.22,
+		"shadow_bottom": 2358.98,
+		"body_first": 2337.35,
+		"body_second": 2363.8
+	},
+	{
+		"timestamp": "1359478800000",
+		"shadow_top": 2360.75,
+		"shadow_bottom": 2382.48,
+		"body_first": 2347.89,
+		"body_second": 2383.76
+	},
+	{
+		"timestamp": "1359565200000",
+		"shadow_top": 2383.43,
+		"shadow_bottom": 2385.42,
+		"body_first": 2371.23,
+		"body_second": 2391.82
+	},
+	{
+		"timestamp": "1359651600000",
+		"shadow_top": 2377.41,
+		"shadow_bottom": 2419.02,
+		"body_first": 2369.57,
+		"body_second": 2421.15
+	},
+	{
+		"timestamp": "1359910800000",
+		"shadow_top": 2425.92,
+		"shadow_bottom": 2428.15,
+		"body_first": 2417.58,
+		"body_second": 2440.38
+	},
+	{
+		"timestamp": "1359997200000",
+		"shadow_top": 2411,
+		"shadow_bottom": 2433.13,
+		"body_first": 2403.3,
+		"body_second": 2437.42
+	},
+	{
+		"timestamp": "1360083600000",
+		"shadow_top": 2432.68,
+		"shadow_bottom": 2434.48,
+		"body_first": 2427.7,
+		"body_second": 2441.73
+	},
+	{
+		"timestamp": "1360170000000",
+		"shadow_top": 2430.69,
+		"shadow_bottom": 2418.53,
+		"body_first": 2394.22,
+		"body_second": 2433.89
+	},
+	{
+		"timestamp": "1360256400000",
+		"shadow_top": 2416.62,
+		"shadow_bottom": 2432.4,
+		"body_first": 2414.4,
+		"body_second": 2443.03
+	},
+	{
+		"timestamp": "1361120400000",
+		"shadow_top": 2441.91,
+		"shadow_bottom": 2421.56,
+		"body_first": 2415.43,
+		"body_second": 2444.8
+	},
+	{
+		"timestamp": "1361206800000",
+		"shadow_top": 2420.26,
+		"shadow_bottom": 2382.91,
+		"body_first": 2373.53,
+		"body_second": 2427.07
+	},
+	{
+		"timestamp": "1361293200000",
+		"shadow_top": 2383.49,
+		"shadow_bottom": 2397.18,
+		"body_first": 2370.61,
+		"body_second": 2397.94
+	},
+	{
+		"timestamp": "1361379600000",
+		"shadow_top": 2378.82,
+		"shadow_bottom": 2325.95,
+		"body_first": 2309.17,
+		"body_second": 2378.82
+	},
+	{
+		"timestamp": "1361466000000",
+		"shadow_top": 2322.94,
+		"shadow_bottom": 2314.16,
+		"body_first": 2308.76,
+		"body_second": 2330.88
+	},
+	{
+		"timestamp": "1361725200000",
+		"shadow_top": 2320.62,
+		"shadow_bottom": 2325.82,
+		"body_first": 2315.01,
+		"body_second": 2338.78
+	},
+	{
+		"timestamp": "1361811600000",
+		"shadow_top": 2313.74,
+		"shadow_bottom": 2293.34,
+		"body_first": 2289.89,
+		"body_second": 2340.71
+	},
+	{
+		"timestamp": "1361898000000",
+		"shadow_top": 2297.77,
+		"shadow_bottom": 2313.22,
+		"body_first": 2292.03,
+		"body_second": 2324.63
+	},
+	{
+		"timestamp": "1361984400000",
+		"shadow_top": 2322.32,
+		"shadow_bottom": 2365.59,
+		"body_first": 2308.92,
+		"body_second": 2366.16
+	},
+	{
+		"timestamp": "1362070800000",
+		"shadow_top": 2364.54,
+		"shadow_bottom": 2359.51,
+		"body_first": 2330.86,
+		"body_second": 2369.65
+	},
+	{
+		"timestamp": "1362330000000",
+		"shadow_top": 2332.08,
+		"shadow_bottom": 2273.4,
+		"body_first": 2259.25,
+		"body_second": 2333.54
+	},
+	{
+		"timestamp": "1362416400000",
+		"shadow_top": 2274.81,
+		"shadow_bottom": 2326.31,
+		"body_first": 2270.1,
+		"body_second": 2328.14
+	},
+	{
+		"timestamp": "1362502800000",
+		"shadow_top": 2333.61,
+		"shadow_bottom": 2347.18,
+		"body_first": 2321.6,
+		"body_second": 2351.44
+	},
+	{
+		"timestamp": "1362589200000",
+		"shadow_top": 2340.44,
+		"shadow_bottom": 2324.29,
+		"body_first": 2304.27,
+		"body_second": 2352.02
+	},
+	{
+		"timestamp": "1362675600000",
+		"shadow_top": 2326.42,
+		"shadow_bottom": 2318.61,
+		"body_first": 2314.59,
+		"body_second": 2333.67
+	},
+	{
+		"timestamp": "1362934800000",
+		"shadow_top": 2314.68,
+		"shadow_bottom": 2310.59,
+		"body_first": 2296.58,
+		"body_second": 2320.96
+	},
+	{
+		"timestamp": "1363021200000",
+		"shadow_top": 2309.16,
+		"shadow_bottom": 2286.6,
+		"body_first": 2264.83,
+		"body_second": 2333.29
+	},
+	{
+		"timestamp": "1363107600000",
+		"shadow_top": 2282.17,
+		"shadow_bottom": 2263.97,
+		"body_first": 2253.25,
+		"body_second": 2286.33
+	},
+	{
+		"timestamp": "1363194000000",
+		"shadow_top": 2255.77,
+		"shadow_bottom": 2270.28,
+		"body_first": 2253.31,
+		"body_second": 2276.22
+	},
+	{
+		"timestamp": "1363280400000",
+		"shadow_top": 2269.31,
+		"shadow_bottom": 2278.4,
+		"body_first": 2250,
+		"body_second": 2312.08
+	},
+	{
+		"timestamp": "1363539600000",
+		"shadow_top": 2267.29,
+		"shadow_bottom": 2240.02,
+		"body_first": 2239.21,
+		"body_second": 2276.05
+	},
+	{
+		"timestamp": "1363626000000",
+		"shadow_top": 2244.26,
+		"shadow_bottom": 2257.43,
+		"body_first": 2232.02,
+		"body_second": 2261.31
+	},
+	{
+		"timestamp": "1363712400000",
+		"shadow_top": 2257.74,
+		"shadow_bottom": 2317.37,
+		"body_first": 2257.42,
+		"body_second": 2317.86
+	},
+	{
+		"timestamp": "1363798800000",
+		"shadow_top": 2318.21,
+		"shadow_bottom": 2324.24,
+		"body_first": 2311.6,
+		"body_second": 2330.81
+	},
+	{
+		"timestamp": "1363885200000",
+		"shadow_top": 2321.4,
+		"shadow_bottom": 2328.28,
+		"body_first": 2314.97,
+		"body_second": 2332
+	},
+	{
+		"timestamp": "1364144400000",
+		"shadow_top": 2334.74,
+		"shadow_bottom": 2326.72,
+		"body_first": 2319.91,
+		"body_second": 2344.89
+	},
+	{
+		"timestamp": "1364230800000",
+		"shadow_top": 2318.58,
+		"shadow_bottom": 2297.67,
+		"body_first": 2281.12,
+		"body_second": 2319.99
+	},
+	{
+		"timestamp": "1364317200000",
+		"shadow_top": 2299.38,
+		"shadow_bottom": 2301.26,
+		"body_first": 2289,
+		"body_second": 2323.48
+	},
+	{
+		"timestamp": "1364403600000",
+		"shadow_top": 2273.55,
+		"shadow_bottom": 2236.3,
+		"body_first": 2232.91,
+		"body_second": 2273.55
+	},
+	{
+		"timestamp": "1364490000000",
+		"shadow_top": 2238.49,
+		"shadow_bottom": 2236.62,
+		"body_first": 2228.81,
+		"body_second": 2246.87
+	},
+	{
+		"timestamp": "1364749200000",
+		"shadow_top": 2229.46,
+		"shadow_bottom": 2234.4,
+		"body_first": 2227.31,
+		"body_second": 2243.95
+	},
+	{
+		"timestamp": "1364835600000",
+		"shadow_top": 2234.9,
+		"shadow_bottom": 2227.74,
+		"body_first": 2220.44,
+		"body_second": 2253.42
+	},
+	{
+		"timestamp": "1364922000000",
+		"shadow_top": 2232.69,
+		"shadow_bottom": 2225.29,
+		"body_first": 2217.25,
+		"body_second": 2241.34
+	},
+	{
+		"timestamp": "1365354000000",
+		"shadow_top": 2196.24,
+		"shadow_bottom": 2211.59,
+		"body_first": 2180.67,
+		"body_second": 2212.59
+	},
+	{
+		"timestamp": "1365440400000",
+		"shadow_top": 2215.47,
+		"shadow_bottom": 2225.77,
+		"body_first": 2215.47,
+		"body_second": 2234.73
+	},
+	{
+		"timestamp": "1365526800000",
+		"shadow_top": 2224.93,
+		"shadow_bottom": 2226.13,
+		"body_first": 2212.56,
+		"body_second": 2233.04
+	},
+	{
+		"timestamp": "1365613200000",
+		"shadow_top": 2236.98,
+		"shadow_bottom": 2219.55,
+		"body_first": 2217.26,
+		"body_second": 2242.48
+	},
+	{
+		"timestamp": "1365699600000",
+		"shadow_top": 2218.09,
+		"shadow_bottom": 2206.78,
+		"body_first": 2204.44,
+		"body_second": 2226.26
+	},
+	{
+		"timestamp": "1365958800000",
+		"shadow_top": 2199.91,
+		"shadow_bottom": 2181.94,
+		"body_first": 2177.39,
+		"body_second": 2204.99
+	},
+	{
+		"timestamp": "1366045200000",
+		"shadow_top": 2169.63,
+		"shadow_bottom": 2194.85,
+		"body_first": 2165.78,
+		"body_second": 2196.43
+	},
+	{
+		"timestamp": "1366131600000",
+		"shadow_top": 2195.03,
+		"shadow_bottom": 2193.8,
+		"body_first": 2178.47,
+		"body_second": 2197.51
+	},
+	{
+		"timestamp": "1366218000000",
+		"shadow_top": 2181.82,
+		"shadow_bottom": 2197.6,
+		"body_first": 2175.44,
+		"body_second": 2206.03
+	},
+	{
+		"timestamp": "1366304400000",
+		"shadow_top": 2201.12,
+		"shadow_bottom": 2244.64,
+		"body_first": 2200.58,
+		"body_second": 2250.11
+	},
+	{
+		"timestamp": "1366563600000",
+		"shadow_top": 2236.4,
+		"shadow_bottom": 2242.17,
+		"body_first": 2232.26,
+		"body_second": 2245.12
+	},
+	{
+		"timestamp": "1366650000000",
+		"shadow_top": 2242.62,
+		"shadow_bottom": 2184.54,
+		"body_first": 2182.81,
+		"body_second": 2242.62
+	},
+	{
+		"timestamp": "1366736400000",
+		"shadow_top": 2187.35,
+		"shadow_bottom": 2218.32,
+		"body_first": 2184.11,
+		"body_second": 2226.12
+	},
+	{
+		"timestamp": "1366822800000",
+		"shadow_top": 2213.19,
+		"shadow_bottom": 2199.31,
+		"body_first": 2191.85,
+		"body_second": 2224.63
+	},
+	{
+		"timestamp": "1366909200000",
+		"shadow_top": 2203.89,
+		"shadow_bottom": 2177.91,
+		"body_first": 2173.86,
+		"body_second": 2210.58
+	},
+	{
+		"timestamp": "1367427600000",
+		"shadow_top": 2170.78,
+		"shadow_bottom": 2174.12,
+		"body_first": 2161.14,
+		"body_second": 2179.65
+	},
+	{
+		"timestamp": "1367514000000",
+		"shadow_top": 2179.05,
+		"shadow_bottom": 2205.5,
+		"body_first": 2179.05,
+		"body_second": 2222.81
+	},
+	{
+		"timestamp": "1367773200000",
+		"shadow_top": 2212.5,
+		"shadow_bottom": 2231.17,
+		"body_first": 2212.5,
+		"body_second": 2236.07
+	},
+	{
+		"timestamp": "1367859600000",
+		"shadow_top": 2227.86,
+		"shadow_bottom": 2235.57,
+		"body_first": 2219.44,
+		"body_second": 2240.26
+	},
+	{
+		"timestamp": "1367946000000",
+		"shadow_top": 2242.39,
+		"shadow_bottom": 2246.3,
+		"body_first": 2235.42,
+		"body_second": 2255.21
+	},
+	{
+		"timestamp": "1368032400000",
+		"shadow_top": 2246.96,
+		"shadow_bottom": 2232.97,
+		"body_first": 2221.38,
+		"body_second": 2247.86
+	},
+	{
+		"timestamp": "1368118800000",
+		"shadow_top": 2228.82,
+		"shadow_bottom": 2246.83,
+		"body_first": 2225.81,
+		"body_second": 2247.67
+	},
+	{
+		"timestamp": "1368378000000",
+		"shadow_top": 2247.68,
+		"shadow_bottom": 2241.92,
+		"body_first": 2231.36,
+		"body_second": 2250.85
+	},
+	{
+		"timestamp": "1368464400000",
+		"shadow_top": 2238.9,
+		"shadow_bottom": 2217.01,
+		"body_first": 2205.87,
+		"body_second": 2239.93
+	},
+	{
+		"timestamp": "1368550800000",
+		"shadow_top": 2217.09,
+		"shadow_bottom": 2224.8,
+		"body_first": 2213.58,
+		"body_second": 2225.19
+	},
+	{
+		"timestamp": "1368637200000",
+		"shadow_top": 2221.34,
+		"shadow_bottom": 2251.81,
+		"body_first": 2210.77,
+		"body_second": 2252.87
+	},
+	{
+		"timestamp": "1368723600000",
+		"shadow_top": 2249.81,
+		"shadow_bottom": 2282.87,
+		"body_first": 2248.41,
+		"body_second": 2288.09
+	},
+	{
+		"timestamp": "1368982800000",
+		"shadow_top": 2286.33,
+		"shadow_bottom": 2299.99,
+		"body_first": 2281.9,
+		"body_second": 2309.39
+	},
+	{
+		"timestamp": "1369069200000",
+		"shadow_top": 2297.11,
+		"shadow_bottom": 2305.11,
+		"body_first": 2290.12,
+		"body_second": 2305.3
+	},
+	{
+		"timestamp": "1369155600000",
+		"shadow_top": 2303.75,
+		"shadow_bottom": 2302.4,
+		"body_first": 2292.43,
+		"body_second": 2314.18
+	},
+	{
+		"timestamp": "1369242000000",
+		"shadow_top": 2293.81,
+		"shadow_bottom": 2275.67,
+		"body_first": 2274.1,
+		"body_second": 2304.95
+	},
+	{
+		"timestamp": "1369328400000",
+		"shadow_top": 2281.45,
+		"shadow_bottom": 2288.53,
+		"body_first": 2270.25,
+		"body_second": 2292.59
+	},
+	{
+		"timestamp": "1369587600000",
+		"shadow_top": 2286.66,
+		"shadow_bottom": 2293.08,
+		"body_first": 2283.94,
+		"body_second": 2301.7
+	},
+	{
+		"timestamp": "1369674000000",
+		"shadow_top": 2293.4,
+		"shadow_bottom": 2321.32,
+		"body_first": 2281.47,
+		"body_second": 2322.1
+	},
+	{
+		"timestamp": "1369760400000",
+		"shadow_top": 2323.54,
+		"shadow_bottom": 2324.02,
+		"body_first": 2321.17,
+		"body_second": 2334.33
+	},
+	{
+		"timestamp": "1369846800000",
+		"shadow_top": 2316.25,
+		"shadow_bottom": 2317.75,
+		"body_first": 2310.49,
+		"body_second": 2325.72
+	},
+	{
+		"timestamp": "1369933200000",
+		"shadow_top": 2320.74,
+		"shadow_bottom": 2300.59,
+		"body_first": 2299.37,
+		"body_second": 2325.53
+	},
+	{
+		"timestamp": "1370192400000",
+		"shadow_top": 2300.21,
+		"shadow_bottom": 2299.25,
+		"body_first": 2294.11,
+		"body_second": 2313.43
+	},
+	{
+		"timestamp": "1370278800000",
+		"shadow_top": 2297.1,
+		"shadow_bottom": 2272.42,
+		"body_first": 2264.76,
+		"body_second": 2297.1
+	},
+	{
+		"timestamp": "1370365200000",
+		"shadow_top": 2270.71,
+		"shadow_bottom": 2270.93,
+		"body_first": 2260.87,
+		"body_second": 2276.86
+	},
+	{
+		"timestamp": "1370451600000",
+		"shadow_top": 2264.43,
+		"shadow_bottom": 2242.11,
+		"body_first": 2240.07,
+		"body_second": 2266.69
+	},
+	{
+		"timestamp": "1370538000000",
+		"shadow_top": 2242.26,
+		"shadow_bottom": 2210.9,
+		"body_first": 2205.07,
+		"body_second": 2250.63
+	},
+	{
+		"timestamp": "1371056400000",
+		"shadow_top": 2790.1,
+		"shadow_bottom": 2148.35,
+		"body_first": 2126.22,
+		"body_second": 100.1
+	}
+]

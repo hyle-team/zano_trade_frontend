@@ -1,0 +1,145 @@
+.dropdown__wrapper {
+	position: relative;
+	width: 100%;
+
+	p {
+		font-weight: 500;
+	}
+
+	.dropdown__row {
+		padding: 16px 15px;
+		display: flex;
+		align-items: center;
+
+		&.dropdown__content__row {
+			max-height: 54px;
+		}
+
+		background-color: var(--dropdown-bg-color);
+		cursor: pointer;
+
+		> div {
+			width: 100%;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 5px;
+		}
+
+		&.row_header {
+			background-color: var(--row-header-bg);
+			height: 100%;
+
+			&:hover {
+				background-color: var(--row-header-bg);
+			}
+
+			&.opened {
+				.dropdown__arrow {
+					transform: rotateX(180deg);
+				}
+			}
+		}
+
+		&.header__self_contained {
+			background-color: var(--dropdown-bg-color);
+			border-radius: 10px;
+
+			&.opened {
+				border-radius: 10px 10px 0 0;
+			}
+
+			&:hover {
+				background-color: var(--dropdown-bg-hover);
+			}
+		}
+
+		.dropdown__item {
+			display: flex;
+			align-items: center;
+
+			img {
+				width: 100%;
+				height: 100%;
+				margin-right: 6px;
+			}
+		}
+
+		&:hover {
+			background-color: var(--dropdown-bg-hover);
+		}
+	}
+
+	.dropdown__menu {
+		left: 0;
+		z-index: 1;
+
+		&.self_contained {
+			width: 100%;
+			position: absolute;
+			overflow: hidden;
+			border-radius: 0 0 10px 10px;
+		}
+
+		.dropdown__row {
+			border-top: 1px solid var(--delimiter-color);
+
+			&.row__disabled {
+				cursor: default;
+				opacity: 0.5;
+
+				&:hover {
+					background-color: #11316b;
+				}
+			}
+
+			&:last-child {
+				border-bottom: 1px solid var(--delimiter-color);
+			}
+
+			&.dropdown__search__row {
+				cursor: auto;
+
+				&:hover {
+					background-color: var(--dropdown-bg-hover);
+				}
+			}
+
+			.dropdown__search {
+				width: 100%;
+				position: relative;
+
+				.dropdown__search_input {
+					width: 100%;
+					height: 54px;
+					padding-left: 45px;
+				}
+
+				.dropdown__search_icon {
+					position: absolute;
+					transform: translate(0, -50%);
+					top: 50%;
+					left: 15px;
+				}
+			}
+
+			.dropdown__star {
+				&:hover {
+					opacity: 0.5;
+				}
+
+				svg.selected {
+					path {
+						fill-opacity: 1;
+						fill: #1f8feb;
+					}
+				}
+			}
+		}
+
+		.dropdown__list {
+			overflow: overlay;
+			background: var(--dropdown-bg-color);
+		}
+	}
+}

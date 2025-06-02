@@ -1,0 +1,253 @@
+.process__content {
+	width: 100%;
+
+	> :first-child {
+		border-bottom: 1px solid var(--delimiter-color);
+	}
+
+	> * {
+		padding: 40px 0;
+
+		&:first-child {
+			padding-top: 0;
+		}
+
+		&:last-child {
+			padding-bottom: 0;
+		}
+	}
+
+	.process__header__details {
+		display: flex;
+		gap: 40px;
+
+		> div {
+			display: flex;
+			gap: 20px;
+
+			> :first-child {
+				font-weight: 700;
+				color: var(--font-dimmed-color);
+			}
+		}
+	}
+
+	@media screen and (max-width: 450px) {
+		.process__header__details {
+			> * {
+				flex-direction: column;
+				gap: 10px !important;
+			}
+		}
+	}
+
+	// .process__content__header {
+	//     display: flex;
+	//     justify-content: space-between;
+	//     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+	//     > div:first-child {
+	//         display: flex;
+	//         flex-direction: column;
+	//         gap: 10px;
+	//     }
+
+	//     @media screen and (max-width: 700px) {
+	//         flex-direction: column-reverse;
+	//         gap: 40px;
+	//     }
+	// }
+
+	.process__content__menu {
+		display: flex;
+		gap: 40px;
+
+		> div:first-child {
+			display: flex;
+			flex-direction: column;
+			gap: 40px;
+		}
+	}
+
+	.process__content__params {
+		display: flex;
+		gap: 140px;
+
+		@media screen and (max-width: 1530px) {
+			gap: 100px;
+		}
+
+		@media screen and (max-width: 650px) {
+			gap: 70px;
+		}
+
+		@media screen and (max-width: 575px) {
+			flex-direction: column;
+			gap: 20px;
+		}
+
+		.content__params__title {
+			font-weight: 700;
+			color: var(--font-dimmed-color);
+			margin-bottom: 10px;
+		}
+
+		.content__params__value {
+			font-size: 24px;
+			font-weight: 600;
+
+			&.content__params__amount {
+				color: #45dade;
+			}
+		}
+	}
+
+	.process__content__comment {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+
+		h6 {
+			color: var(--font-dimmed-color);
+		}
+	}
+
+	.process__deposit__wrapper {
+		display: flex;
+
+		.process__content__deposit {
+			border-radius: 10px;
+			padding: 2px;
+			background: radial-gradient(100% 188.88% at 0% 0%, #16d1d6 0%, #274cff 100%);
+			min-width: 410px;
+
+			> div {
+				padding: 20px;
+				background-color: var(--window-bg-color);
+				border-radius: 8px;
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+
+				> p {
+					line-height: 139%;
+				}
+
+				> div {
+					display: flex;
+					flex-direction: column;
+					gap: 10px;
+
+					> p {
+						font-weight: 700;
+						color: var(--font-dimmed-color);
+					}
+
+					> div {
+						display: flex;
+						align-items: center;
+						gap: 12px;
+
+						> p {
+							font-size: 24px;
+							font-weight: 600;
+						}
+					}
+
+					&:first-child {
+						display: flex;
+						flex-direction: row;
+						gap: 10px;
+
+						h6 {
+							font-weight: 700;
+							color: var(--font-dimmed-color);
+						}
+					}
+				}
+
+				button {
+					padding-right: 58px;
+					padding-left: 58px;
+
+					background-color: #16d1d6;
+
+					&:hover {
+						background: #45dade;
+					}
+
+					&.deposit__cancel__btn {
+						background: var(--dimmed-btn-bg);
+
+						&:hover {
+							background: var(--dimmed-btn-hover);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.process__content__advices {
+		padding: 40px;
+		background: var(--advices-bg-color);
+		border-radius: 10px;
+		border: 1px solid rgba(12, 12, 58, 0.1);
+
+		h6 {
+			margin-bottom: 20px;
+			color: var(--font-dimmed-color);
+		}
+
+		ol {
+			list-style-position: inside;
+
+			li {
+				margin-bottom: 10px;
+
+				&:last-child {
+					margin: 0;
+				}
+			}
+		}
+	}
+
+	.window {
+		padding: 40px;
+
+		@media screen and (max-width: 450px) {
+			padding: 20px;
+
+			> div {
+				padding: 20px;
+			}
+		}
+	}
+
+	@media screen and (max-width: 1375px) {
+		.process__content__menu {
+			flex-direction: column;
+
+			> :last-child {
+				width: 100%;
+				min-width: 0;
+			}
+		}
+
+		.process__header__details {
+			flex-direction: column;
+			gap: 20px;
+		}
+	}
+
+	@media screen and (max-width: 500px) {
+		.process__content__deposit {
+			width: 100%;
+			min-width: 0 !important;
+
+			button {
+				padding: 13px 45px !important;
+			}
+		}
+	}
+}

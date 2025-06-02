@@ -1,0 +1,111 @@
+.main {
+	.user__header {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		@media screen and (max-width: 550px) {
+			flex-direction: column-reverse;
+
+			button {
+				width: 100%;
+				margin-bottom: 50px;
+				padding-top: 13px;
+				padding-bottom: 13px;
+			}
+		}
+	}
+
+	.user__characteristics {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 40px 80px;
+
+		// > * {
+		//     margin-right: 82px;
+
+		//     &:last-child {
+		//         margin: 0;
+		//     }
+		// }
+	}
+
+	.user__characteristic {
+		// width: 250px;
+		display: flex;
+		flex-direction: column;
+
+		> * {
+			margin-bottom: 10px;
+
+			&:last-child {
+				margin: 0;
+			}
+		}
+
+		.characteristic__title__wrapper {
+			display: flex;
+			align-items: center;
+
+			.user__characteristic__title {
+				color: rgba(255, 255, 255, 0.7);
+				margin-right: 7px;
+			}
+
+			img {
+				height: 18px;
+				width: auto;
+				cursor: pointer;
+			}
+		}
+
+		.user__characteristic__value {
+			font-weight: 600;
+			font-size: 24px;
+		}
+
+		.user__characteristic__deals {
+			display: flex;
+
+			p {
+				font-weight: 500;
+			}
+
+			:first-child {
+				margin-right: 20px;
+				color: #45dade;
+			}
+
+			:last-child {
+				color: #ff6767;
+			}
+		}
+
+		@media screen and (max-width: 1300px) {
+			width: 270px;
+		}
+	}
+
+	.user__active_orders {
+		> h4 {
+			margin-bottom: 40px;
+		}
+
+		.user__buying {
+			> h4 {
+				margin-bottom: 40px;
+				color: #45dade;
+				font-size: 21px;
+			}
+		}
+
+		.user__selling {
+			> h4 {
+				margin-bottom: 40px;
+				color: #ff6767;
+				font-size: 21px;
+			}
+		}
+	}
+}

@@ -1,0 +1,505 @@
+.main {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	overflow-x: hidden;
+
+	.history__btn {
+		height: 54px;
+		padding: 0 12px;
+
+		> div {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		@media screen and (max-width: 550px) {
+			height: 48px;
+
+			p {
+				font-size: 15px;
+			}
+
+			img {
+				scale: 0.8;
+			}
+		}
+	}
+
+	.dex__charts__wrapper {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 20px;
+
+		.dex__preloader {
+			height: 200px;
+		}
+
+		.dex__header {
+			width: 100%;
+		}
+
+		.dex__row {
+			display: flex;
+			flex-direction: row;
+			width: 100%;
+			align-items: center;
+			justify-content: space-between;
+
+			@media screen and (max-width: 565px) {
+				justify-content: center;
+				gap: 10px;
+			}
+		}
+
+		.dex__row_modile {
+			display: none;
+			margin-top: 15px;
+			justify-content: center;
+
+			.dex__toggle_block-wrapper {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 8px;
+
+				svg {
+					width: 20px;
+					height: 20px;
+				}
+
+				svg:not(.stroked) * {
+					fill: transparent;
+				}
+
+				p {
+					font-size: 14px;
+				}
+			}
+
+			@media screen and (max-width: 565px) {
+				display: flex;
+			}
+		}
+
+		.dex__icon-filter {
+			display: none;
+
+			@media screen and (max-width: 865px) {
+				display: block;
+			}
+		}
+
+		.dex__action-block {
+			display: flex;
+			align-items: center;
+			gap: 20px;
+
+			.refresh_button {
+				padding: 12px 11px 11px 11px;
+				background-color: var(--button-bordered-hover);
+				border-radius: 10px;
+				height: 42px;
+				width: 42px;
+
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				cursor: pointer;
+
+				&:hover {
+					background-color: var(--dimmed-btn-hover);
+				}
+			}
+
+			.refresh_button-refetch {
+				padding: 12px 11px 11px 11px;
+				background-color: var(--button-bordered-hover);
+				border-radius: 10px;
+				height: 42px;
+				width: 42px;
+
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				cursor: pointer;
+
+				svg {
+					animation: rotate 1s linear infinite;
+				}
+			}
+
+			.sort_dropdown {
+				width: 240px;
+				height: 42px;
+
+				> div:nth-child(1) {
+					border-radius: 10px;
+					padding: 11px 20px;
+
+					> div {
+						> div p {
+							font-size: 14px;
+							font-weight: 500;
+						}
+					}
+
+					svg {
+						margin-top: 2px;
+
+						path {
+							stroke: var(--font-main-color);
+						}
+					}
+
+					svg:not(.stroked) * {
+						fill: transparent;
+					}
+				}
+
+				> div:nth-child(2) {
+					> div {
+						> div {
+							padding: 11px 20px;
+
+							> div {
+								p {
+									font-size: 14px;
+									font-weight: 500;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			@media screen and (max-width: 865px) {
+				display: none;
+			}
+		}
+
+		@keyframes rotate {
+			from {
+				transform: rotate(0deg);
+			}
+
+			to {
+				transform: rotate(-360deg);
+			}
+		}
+
+		.dex__filter-button {
+			display: none;
+
+			padding: 11px;
+			border-radius: 10px;
+			background-color: var(--dropdown-bg-color);
+			max-height: 42px;
+			cursor: pointer;
+
+			svg:not(.stroked) * {
+				fill: transparent;
+			}
+
+			svg {
+				g {
+					path {
+						stroke: var(--font-main-color);
+					}
+				}
+			}
+
+			&:hover {
+				background-color: var(--dimmed-btn-hover);
+			}
+
+			@media screen and (max-width: 865px) {
+				display: block;
+			}
+		}
+
+		.dex__input-block {
+			display: flex;
+			align-items: center;
+			gap: 20px;
+
+			.dex__input-block-wrapper {
+				max-width: 386px;
+				display: flex;
+				flex-direction: row;
+				gap: 20px;
+
+				.input_wrapper {
+					padding: 13px;
+					max-width: 240px;
+					max-height: 42px;
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					gap: 10px;
+					border: 1px solid var(--window-border-color);
+					border-radius: 10px;
+
+					.input {
+						padding: 0;
+						max-width: 185px;
+						background-color: transparent;
+						font-size: 14px;
+					}
+				}
+			}
+
+			.dex__toggle_block-wrapper {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 8px;
+
+				svg {
+					width: 20px;
+					height: 20px;
+				}
+
+				svg:not(.stroked) * {
+					fill: transparent;
+				}
+
+				p {
+					font-size: 14px;
+				}
+
+				@media screen and (max-width: 565px) {
+					display: none;
+				}
+			}
+		}
+
+		.dex__input_whitelist {
+			height: fit-content;
+			padding: 16px 20px;
+			background: var(--dex-panel-bg);
+			border-radius: 10px;
+			display: flex;
+			align-items: center;
+
+			.whitelist_info {
+				cursor: pointer;
+				position: relative;
+				display: flex;
+
+				.tooltip_colored {
+					background-color: var(--dex-panel-tooltip);
+				}
+
+				.info__tooltip {
+					display: none;
+					width: 226px;
+					padding: 15px;
+					position: absolute;
+					top: calc(100% + 10px);
+					left: 50%;
+					transform: translateX(-50%);
+
+					> p {
+						width: 100%;
+						font-size: 16px;
+						text-wrap: wrap;
+					}
+				}
+
+				svg:not(.stroked) * {
+					fill: transparent;
+				}
+
+				&:hover {
+					.info__tooltip {
+						display: block;
+					}
+				}
+			}
+
+			> p {
+				margin-right: 6px;
+			}
+
+			> input {
+				margin-left: 33px;
+				height: 18px;
+				width: 18px;
+				cursor: pointer;
+			}
+		}
+
+		.dex__input__wrapper {
+			display: flex;
+			width: 100%;
+			border-bottom: 1px solid var(--window-border-color);
+		}
+
+		.dex__charts {
+			width: 100%;
+			display: grid;
+			align-items: center;
+			justify-content: center;
+			grid-template-columns: repeat(auto-fill, 400px);
+			grid-gap: 40px;
+
+			.dex__currency__pair {
+				position: relative;
+				width: 400px;
+				height: 198px;
+				padding: 40px;
+				border: 2px solid #1f8feb;
+				border-radius: 15px;
+				cursor: pointer;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+
+				&:hover:not(:has(.currency__pair__badges:hover)) {
+					background-color: rgba(255, 255, 255, 0.1);
+				}
+
+				.currency__pair__badges {
+					z-index: 10;
+					display: flex;
+					align-items: center;
+					gap: 8px;
+					position: absolute;
+					top: 10px;
+					right: 10px;
+
+					.currency__pair__badges_item {
+						position: relative;
+
+						.tooltip_colored {
+							background-color: var(--dex-panel-tooltip);
+						}
+
+						.tooltip {
+							display: none;
+							padding: 15px;
+							position: absolute;
+							top: calc(100% + 10px);
+							left: 50%;
+							transform: translateX(-50%);
+
+							> p {
+								width: 100%;
+								font-size: 16px;
+								text-wrap: wrap;
+							}
+						}
+
+						&:hover {
+							.tooltip {
+								display: block;
+							}
+
+							> svg > * {
+								opacity: 1;
+							}
+						}
+					}
+				}
+
+				> .curve__chart {
+					display: block;
+					width: 100%;
+					height: 50px;
+				}
+
+				.currency__pair__content {
+					display: flex;
+					align-items: center;
+					gap: 15px;
+
+					> div:first-child {
+						width: 48px;
+						height: 48px;
+						padding: 10px;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						background: var(--icon-bg-color);
+						border-radius: 50%;
+
+						> img {
+							width: auto;
+							height: 100%;
+						}
+					}
+
+					> div:last-child {
+						height: 48px;
+						display: flex;
+						flex-direction: column;
+						justify-content: space-between;
+
+						h5 {
+							font-weight: 500;
+						}
+
+						p:last-child {
+							font-size: 18px;
+							font-weight: 600;
+
+							.second_currency__pair {
+								font-weight: 400;
+							}
+						}
+
+						.second_currency__pair {
+							color: var(--font-dimmed-color);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@media screen and (max-width: 1325px) {
+		.dex__charts__wrapper {
+			.dex__input__wrapper {
+				width: 100%;
+
+				.dex__pair__input {
+					width: 100%;
+				}
+			}
+		}
+	}
+
+	@media screen and (max-width: 550px) {
+		.dex__charts__wrapper {
+			.dex__input-block {
+				flex-direction: column;
+			}
+
+			.dex__input__wrapper {
+				.dex__pair__input {
+					font-size: 18px;
+				}
+			}
+		}
+	}
+
+	@media screen and (max-width: 455px) {
+		.dex__charts__wrapper {
+			.dex__charts {
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+
+				.dex__currency__pair {
+					width: 100%;
+					height: 178px;
+					padding: 20px;
+				}
+			}
+		}
+	}
+}

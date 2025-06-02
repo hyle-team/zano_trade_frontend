@@ -1,0 +1,382 @@
+.header {
+	height: 80px;
+	padding: 0 100px;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-bottom: 1px solid var(--delimiter-color);
+	background-color: var(--main-bg-color);
+	z-index: 1;
+	position: relative;
+
+	.header__logo {
+		display: flex;
+		width: 202px;
+		height: 40px;
+
+		> a {
+			display: flex;
+		}
+	}
+
+	.header__desktop__navigation {
+		position: absolute;
+		transform: translateX(-50%);
+		left: 50%;
+
+		@media screen and (max-width: 1760px) {
+			display: none;
+		}
+	}
+
+	.header__menu {
+		display: flex;
+		flex-direction: column;
+
+		.header__account__btn {
+			width: 54px;
+			height: 54px;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.theme__btn__wrapper {
+			position: relative;
+
+			.theme__tooltip {
+				position: absolute;
+				border-radius: 5px;
+				transform: translate(-50%, 100%);
+				bottom: -15px;
+				left: 50%;
+			}
+
+			.theme__btn {
+				width: 54px;
+				min-width: 54px;
+				height: 54px;
+				padding: 0;
+			}
+		}
+
+		.header__login {
+			width: 100%;
+			display: flex;
+			gap: 10px;
+			transition: none;
+		}
+
+		.burger__tablet__btn {
+			display: none;
+
+			@media screen and (max-width: 1760px) {
+				display: flex;
+			}
+
+			@media screen and (max-width: 900px) {
+				display: none;
+			}
+		}
+
+		.header__account {
+			display: flex;
+			align-items: center;
+			gap: 40px;
+			transition: none;
+
+			.header__account__wrapper {
+				display: flex;
+				align-items: center;
+
+				.header__button__wrapper {
+					position: relative;
+
+					> .offers__tooltip {
+						padding: 13px 20px;
+						position: absolute;
+						background: #11316b;
+						border-radius: 5px;
+						white-space: nowrap;
+						transform: translate(-50%, 100%);
+						bottom: -15px;
+						left: 50%;
+					}
+
+					.offers__notification__wrapper {
+						position: absolute;
+						transform: translate(50%, -50%);
+						top: 3px;
+						right: 3px;
+					}
+				}
+			}
+
+			.header__account__panel {
+				display: flex;
+				gap: 10px;
+			}
+
+			.header__account__info {
+				margin-right: 15px;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: 5px;
+
+				:first-child {
+					font-weight: 500;
+				}
+
+				:last-child {
+					font-size: 14px;
+					color: var(--font-dimmed-color);
+				}
+			}
+
+			.header__currency__wrapper {
+				position: relative;
+
+				.header__currency__check {
+					height: 54px;
+					padding: 0 15px;
+					display: flex;
+					align-items: center;
+					gap: 35px;
+					justify-content: space-between;
+					background-color: var(--switch-bg-color);
+					border-radius: 10px;
+
+					&.currency__check__opened {
+						background-color: var(--switch-bg-hover);
+						border-radius: 10px 10px 0 0;
+					}
+
+					&.currency__check__openable {
+						&:hover {
+							background-color: var(--switch-bg-hover);
+						}
+
+						cursor: pointer;
+					}
+				}
+
+				.currency__check__menu,
+				.header__currency__check {
+					.currency__check__row {
+						display: flex;
+						align-items: center;
+						position: relative;
+
+						.currency__check__tooltip {
+							position: absolute;
+							top: calc(100% + 10px);
+							left: 50px;
+							transform: translateX(-50%);
+						}
+					}
+
+					svg {
+						cursor: pointer;
+					}
+
+					.currency__check__icon {
+						height: 19px;
+						width: 19px;
+						margin-right: 6px;
+						display: flex;
+						justify-content: center;
+					}
+
+					.currency__title {
+						display: flex;
+						gap: 5px;
+
+						> span {
+							max-width: 100px;
+							overflow: hidden;
+							text-overflow: ellipsis;
+						}
+					}
+				}
+
+				.currency__check__menu {
+					width: 100%;
+					padding: 16px;
+					position: absolute;
+					top: 100%;
+					left: 0;
+					background-color: #273666;
+					border-radius: 0 0 10px 10px;
+					display: flex;
+					flex-direction: column;
+					gap: 20px;
+					border-top: 1px solid rgba(255, 255, 255, 0.1);
+				}
+			}
+		}
+
+		&.header__menu__mobile {
+			.header__account,
+			.header__login {
+				padding: 20px;
+
+				@media screen and (min-width: 900px) {
+					display: none;
+				}
+			}
+		}
+	}
+
+	.header__burger {
+		padding: 0;
+		width: 48px;
+		height: 48px;
+		display: none;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		border: 2px solid #1f8feb;
+		border-radius: 10px;
+		cursor: pointer;
+		transition: none;
+
+		> svg {
+			scale: 0.8;
+		}
+
+		> div {
+			width: 24px;
+			height: 2px;
+			margin-bottom: 6px;
+			border-radius: 1px;
+			background-color: #ffffff;
+
+			&:last-child {
+				margin: 0;
+			}
+		}
+
+		&:hover {
+			background: rgba(255, 255, 255, 0.1);
+		}
+	}
+
+	.header__account__mobile {
+		width: 100%;
+		display: flex;
+		position: absolute;
+		top: calc(100% + 1px);
+		left: 0;
+		background-color: var(--main-bg-color);
+		max-height: 200px;
+		overflow: hidden;
+
+		> div {
+			width: 100%;
+		}
+
+		button {
+			width: 100%;
+			padding-top: 13px;
+			padding-bottom: 13px;
+		}
+
+		@media screen and (min-width: 900px) {
+			max-height: 340px;
+		}
+	}
+
+	@media screen and (max-width: 1060px) {
+		padding-right: 20px;
+		padding-left: 20px;
+	}
+
+	@media screen and (max-width: 900px) {
+		height: 94px;
+
+		.header__menu {
+			.theme__btn__wrapper {
+				.theme__tooltip {
+					display: none;
+				}
+			}
+		}
+
+		.header__login {
+			button {
+				height: 48px !important;
+
+				&:first-child {
+					width: 48px !important;
+					min-width: 48px !important;
+				}
+
+				img {
+					scale: 0.8;
+				}
+			}
+		}
+
+		.header__logo {
+			img {
+				height: 40px;
+				width: auto;
+			}
+		}
+
+		.header__burger {
+			display: flex;
+		}
+
+		.header__menu {
+			width: 100%;
+			display: none;
+			justify-content: flex-end;
+
+			&.header__menu__mobile {
+				display: flex;
+			}
+		}
+
+		.header__menu {
+			.header__account {
+				width: 100%;
+				flex-direction: column-reverse;
+				align-items: flex-end;
+				gap: 20px;
+
+				.header__currency__wrapper {
+					width: 100%;
+				}
+			}
+
+			.header__account__btn {
+				width: 48px !important;
+				min-width: 48px !important;
+				height: 48px !important;
+
+				img {
+					scale: 0.8333;
+				}
+			}
+		}
+
+		.header__account__mobile {
+			max-height: 320px;
+		}
+	}
+}
+
+.header__blur__block {
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: #0000004c;
+	z-index: 1;
+	transform: all 0;
+}

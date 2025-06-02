@@ -1,0 +1,70 @@
+.marketplace__pagination {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 10px;
+
+	.pagination__arrow_btn {
+		min-width: 54px;
+	}
+
+	button {
+		width: 54px;
+		height: 54px;
+		padding: 0;
+		font-weight: 500;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		&:hover {
+			background-color: #1f8feb;
+		}
+
+		img {
+			width: 10px;
+			height: auto;
+
+			&.reversed_img {
+				transform: scaleX(-1);
+			}
+		}
+	}
+
+	p {
+		margin: 0 10px;
+	}
+
+	@media screen and (max-width: 525px) {
+		.hiding__first {
+			display: none;
+		}
+	}
+
+	@media screen and (max-width: 450px) {
+		.hiding__second {
+			display: none;
+		}
+
+		button {
+			width: auto;
+			height: 48px;
+			padding: 0 13px;
+		}
+
+		.pagination__arrow_btn {
+			min-width: 48px;
+		}
+
+		p {
+			margin: 0;
+		}
+	}
+
+	@media screen and (max-width: 370px) {
+		.hiding__third {
+			display: none;
+		}
+	}
+}

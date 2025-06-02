@@ -1,0 +1,96 @@
+.main {
+	display: flex;
+	flex-direction: column;
+
+	.orders__title {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+
+		h1 {
+			font-size: 24px;
+			font-weight: 600;
+		}
+
+		p {
+			font-weight: 400;
+			font-size: 18px;
+			opacity: 80%;
+		}
+	}
+
+	.orders__content {
+		display: flex;
+		flex-direction: column;
+		gap: 40px;
+
+		.orders__nav {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			@media screen and (max-width: 1180px) {
+				flex-direction: column;
+				gap: 20px;
+				align-items: start;
+			}
+		}
+
+		> :first-child {
+			padding-top: 20px;
+		}
+
+		.orders__filters_wrapper {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 10px;
+
+			@media screen and (max-width: 600px) {
+				width: 100%;
+			}
+
+			@media screen and (max-width: 1400px) {
+				button {
+					display: none;
+				}
+			}
+		}
+
+		.orders__filters {
+			display: flex;
+			gap: 10px;
+			flex-wrap: wrap;
+
+			> * {
+				height: 54px;
+			}
+
+			.orders__pair__filter {
+				width: 180px;
+			}
+
+			.orders__buy_sell__filter {
+				width: 180px;
+			}
+
+			> :last-child {
+				width: 330px;
+			}
+
+			@media screen and (max-width: 600px) {
+				width: 100%;
+				flex-direction: column;
+
+				> * {
+					width: 100% !important;
+					height: 48px;
+
+					> :first-child {
+						height: 48px;
+					}
+				}
+			}
+		}
+	}
+}

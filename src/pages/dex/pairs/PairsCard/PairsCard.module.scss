@@ -1,0 +1,131 @@
+.card {
+	display: flex;
+	flex-direction: column;
+
+	.card__header {
+		padding: 10px 12px;
+		display: flex;
+		flex-direction: row;
+		gap: 8px;
+
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
+		background-color: var(--table-header-bg);
+
+		.currency_name {
+			display: flex;
+			align-items: center;
+			flex-direction: row;
+
+			font-size: 16px;
+			font-weight: 500;
+
+			span:nth-child(3) {
+				color: var(--table-header-font-color);
+			}
+		}
+
+		> img {
+			width: 18px;
+			height: 18px;
+			background: var(--icon-bg-color);
+			border-radius: 50%;
+		}
+	}
+
+	.card__body {
+		padding: 10px 12px;
+		background-color: var(--table-bg-color);
+		border-bottom-left-radius: 10px;
+		border-bottom-right-radius: 10px;
+
+		.card__body_wrapper {
+			display: flex;
+			flex-direction: row;
+			gap: 24px;
+			justify-content: space-between;
+		}
+
+		.card__body_row {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			gap: 47px;
+		}
+
+		.card__body_column {
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+
+			p {
+				font-size: 12px;
+				font-weight: 700;
+				opacity: 0.8;
+			}
+
+			.card__body_column_content {
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+
+				.card__body_column_price {
+					span:nth-child(1) {
+						font-size: 14px;
+						font-weight: 400;
+						color: var(--font-main-color);
+					}
+
+					span:nth-child(2) {
+						font-size: 14px;
+						font-weight: 500;
+					}
+				}
+
+				span:nth-child(1) {
+					font-size: 14px;
+					font-weight: 400;
+					color: var(--font-main-color);
+				}
+
+				span:nth-child(2) {
+					font-size: 12px;
+					font-weight: 400;
+					color: var(--table-header-font-color);
+				}
+			}
+		}
+	}
+
+	.card__button_wrapper {
+		display: flex;
+		align-items: end;
+
+		.card__button {
+			border-radius: 8px;
+			background-color: transparent;
+			transition: background 0.2s;
+			cursor: pointer;
+			border: 2px solid rgba(31, 143, 235, 1);
+			height: 24px;
+			width: 24px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			svg:not(.stroked) * {
+				fill: transparent;
+			}
+
+			svg {
+				path {
+					stroke: var(--font-main-color);
+				}
+			}
+
+			&:hover {
+				background-color: var(--table-button-bg-hover);
+			}
+		}
+	}
+}

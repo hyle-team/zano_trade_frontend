@@ -1,0 +1,291 @@
+.profile_table {
+	table {
+		display: flex;
+		flex-direction: column;
+
+		thead {
+			width: 100%;
+
+			> tr {
+				width: 100%;
+				display: flex;
+				padding: 40px 0;
+				border-width: 1px 0px;
+				border-style: solid;
+				border-color: var(--delimiter-color);
+
+				> th {
+					width: 100%;
+					display: flex;
+				}
+			}
+		}
+
+		tbody {
+			width: 100%;
+
+			> tr {
+				width: 100%;
+				padding: 40px 0;
+				display: flex;
+				align-items: center;
+				border-bottom: 1px solid var(--delimiter-color);
+
+				> td {
+					width: 100%;
+					display: flex;
+
+					.profile__header__mobile {
+						display: none;
+					}
+
+					.profile_table__date {
+						text-align: center;
+					}
+
+					.profile__row__price {
+						span {
+							font-size: 24px;
+							font-weight: 600;
+						}
+					}
+
+					&:last-child {
+						justify-content: flex-end;
+
+						.profile_table__buttons {
+							display: flex;
+							gap: 20px;
+
+							button {
+								padding: 0 40px;
+								height: 54px;
+
+								&.row__button__iconed {
+									padding: 0;
+									height: 54px;
+									width: 54px;
+									background-color: var(--dimmed-btn-bg);
+
+									&:hover {
+										background-color: var(--dimmed-btn-hover);
+									}
+								}
+							}
+						}
+					}
+
+					.type__marker {
+						width: 82px;
+						height: 40px;
+						border: 2px solid white;
+						border-radius: 10px;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+
+						&.marker__buy {
+							border-color: #16d1d6;
+
+							h6 {
+								color: #16d1d6;
+							}
+						}
+
+						&.marker__sell {
+							border-color: #ff6767;
+
+							h6 {
+								color: #ff6767;
+							}
+						}
+					}
+
+					.row__button__wrapper {
+						position: relative;
+
+						.row__button__notification {
+							position: absolute;
+							transform: translate(50%, -50%);
+							top: 0;
+							right: 0;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.profile__table__message {
+		width: 100%;
+		height: 500px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		> div {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 20px;
+		}
+
+		p {
+			color: var(--font-dimmed-color);
+		}
+	}
+
+	@media screen and (max-width: 1700px) {
+		table {
+			thead,
+			tbody {
+				> tr {
+					> th,
+					td {
+						&:nth-child(1) {
+							width: 140px;
+							min-width: 140px;
+						}
+
+						&:nth-child(2) {
+							width: 160px;
+							min-width: 160px;
+						}
+
+						&:nth-child(3) {
+							width: 220px;
+							min-width: 220px;
+						}
+
+						&:nth-child(4) {
+							width: 160px;
+							min-width: 160px;
+						}
+
+						&:nth-child(5) {
+							p:first-child {
+								width: 50px !important;
+							}
+						}
+
+						&:nth-child(6) {
+							p:first-child {
+								width: 65px !important;
+							}
+						}
+
+						.profile__row__price {
+							span {
+								font-size: 18px;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@media screen and (max-width: 1500px) {
+		table {
+			thead {
+				display: none;
+			}
+
+			tbody {
+				> tr {
+					flex-wrap: wrap;
+					gap: 20px;
+					position: relative;
+					justify-content: space-between;
+
+					> td {
+						width: auto;
+						display: flex;
+						flex-direction: column;
+						gap: 10px;
+
+						.profile__header__mobile {
+							display: flex;
+						}
+
+						.profile__row__price {
+							span {
+								font-size: 24px;
+							}
+						}
+
+						&:first-child {
+							width: 100%;
+						}
+
+						&:nth-child(2) {
+							position: absolute;
+							top: 47px;
+							left: 102px;
+
+							p {
+								white-space: nowrap;
+
+								br {
+									display: none;
+								}
+							}
+						}
+
+						&:nth-child(3) {
+							width: 100%;
+						}
+
+						&:last-child {
+							position: absolute;
+							top: 67px;
+							right: 0;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@media screen and (max-width: 650px) {
+		table {
+			> tbody {
+				> tr {
+					flex-direction: column;
+					align-items: flex-start;
+
+					> td {
+						width: 100%;
+
+						&:last-child {
+							position: initial;
+
+							.row__button__wrapper {
+								width: 100%;
+
+								button {
+									height: 48px !important;
+									width: 100%;
+								}
+							}
+
+							.profile_table__buttons {
+								.row__button__iconed {
+									height: 48px !important;
+									width: 48px !important;
+									min-width: 48px;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@media screen and (max-width: 400px) {
+		.profile_table__date {
+			font-size: 16px;
+		}
+	}
+}

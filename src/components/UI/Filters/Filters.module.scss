@@ -1,0 +1,327 @@
+.filters,
+.filters__popup {
+	width: 100%;
+	display: flex;
+	gap: 40px;
+
+	button,
+	input {
+		height: 100%;
+	}
+
+	.filters__switch {
+		display: flex;
+		background-color: var(--switch-bg-color);
+		border-radius: 10px;
+
+		&:hover {
+			background-color: var(--switch-bg-hover);
+		}
+
+		button {
+			padding: 0 48px;
+			color: #ffffff;
+
+			&:hover {
+				background-color: #1f8feb;
+			}
+
+			&.btn_unselected {
+				background-color: transparent;
+
+				color: var(--font-main-color);
+
+				&:hover {
+					background-color: transparent;
+				}
+			}
+		}
+	}
+
+	.filters__limit__select {
+		padding: 0 15px;
+		display: flex;
+		align-items: center;
+		background-color: #11316b;
+		border-radius: 10px;
+		cursor: pointer;
+
+		> div {
+			width: 224px;
+			display: flex;
+			justify-content: space-between;
+
+			> div {
+				display: flex;
+				align-items: center;
+
+				img {
+					margin-right: 6px;
+				}
+			}
+		}
+	}
+
+	.filters__for {
+		display: flex;
+		align-items: center;
+
+		p {
+			color: rgba(255, 255, 255, 0.7);
+		}
+	}
+
+	.filters__price__wrapper {
+		position: relative;
+
+		> div {
+			> :first-child {
+				border-bottom-left-radius: 0;
+				border-top-left-radius: 0;
+			}
+		}
+
+		> input {
+			width: 400px;
+			padding: 0 15px;
+			padding-right: 70%;
+		}
+
+		.filters__price__dropdown {
+			height: 100%;
+			min-width: 165px;
+			position: absolute;
+			top: 0;
+			right: 0;
+
+			border-left: 2px solid var(--delimiter-color);
+			border-radius: 0 10px 10px 0;
+		}
+	}
+}
+
+.filters {
+	@media screen and (max-width: 1500px) {
+		flex-wrap: wrap;
+		gap: 20px 0;
+	}
+
+	@media screen and (max-width: 1500px) {
+		flex-direction: column;
+
+		// button, input {
+		//     height: 48px;
+		// }
+
+		> * {
+			width: 100% !important;
+			// height: 48px;
+		}
+
+		.filters__dropdown {
+			// height: 48px;
+
+			> :first-child {
+				width: 100% !important;
+			}
+		}
+
+		.filters__price__wrapper {
+			width: 100%;
+
+			> input {
+				width: 100%;
+				padding-right: 65%;
+			}
+		}
+
+		.filters__for {
+			height: auto;
+			justify-content: center;
+		}
+
+		.filters__switch {
+			button {
+				width: 50%;
+			}
+		}
+
+		.filters__price__dropdown {
+			width: 60% !important;
+
+			> :first-child {
+				width: 100% !important;
+			}
+		}
+
+		.filters__buttons {
+			width: auto !important;
+			gap: 20px;
+
+			> button:last-child {
+				min-width: 55px;
+			}
+		}
+	}
+
+	@media screen and (max-width: 550px) {
+		> div:first-child {
+			> * {
+				height: 48px !important;
+			}
+
+			flex-direction: column;
+		}
+
+		> div:last-child {
+			> * {
+				height: 48px !important;
+			}
+
+			flex-direction: column;
+
+			.filters__update_button {
+				max-width: 48px;
+				min-width: 0;
+			}
+		}
+	}
+
+	> div:first-child {
+		display: flex;
+		gap: 20px;
+
+		> * {
+			height: 55px;
+		}
+
+		> div:last-child {
+			width: 100%;
+		}
+	}
+
+	> div:last-child {
+		display: flex;
+		width: 100%;
+		gap: 20px;
+	}
+
+	.filters__buttons {
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+		height: 55px;
+
+		.filters__search_button {
+			padding: 0 32px;
+		}
+
+		.filters__update_button {
+			padding: 0 12px;
+			display: flex;
+			align-items: center;
+			background-color: var(--dimmed-btn-bg);
+
+			img {
+				width: 100%;
+				height: auto;
+			}
+
+			&:hover {
+				background-color: var(--dimmed-btn-hover);
+			}
+		}
+	}
+}
+
+.filters__popup {
+	flex-direction: column;
+	gap: 20px;
+
+	> * {
+		width: 100%;
+	}
+
+	> div:first-child {
+		display: flex;
+		flex-direction: column;
+		gap: 30px;
+
+		> * {
+			height: 55px;
+		}
+
+		> div:last-child {
+			width: 100%;
+		}
+	}
+
+	> div:last-child {
+		height: 55px;
+
+		> * {
+			height: 55px;
+		}
+	}
+
+	button {
+		width: 100%;
+	}
+
+	.filters__dropdown {
+		> :first-child {
+			width: 100%;
+		}
+	}
+
+	.filters__price__wrapper {
+		> input {
+			width: 100%;
+			padding-right: 55%;
+		}
+
+		.filters__price__dropdown {
+			width: 50%;
+
+			> :first-child {
+				width: 100%;
+			}
+		}
+	}
+
+	.filters__for {
+		height: auto;
+		justify-content: center;
+	}
+
+	.filters__switch {
+		background: #273666;
+	}
+
+	@media screen and (max-width: 680px) {
+		button,
+		input {
+			height: 48px;
+		}
+
+		> div:first-child {
+			> * {
+				height: 48px;
+			}
+		}
+
+		> div:last-child {
+			> * {
+				height: 48px;
+			}
+		}
+
+		.filters__price__dropdown {
+			height: 48px;
+
+			> :first-child {
+				height: 48px;
+			}
+		}
+	}
+}

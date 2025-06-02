@@ -1,0 +1,279 @@
+* {
+	padding: 0;
+	margin: 0;
+	border: none;
+	outline: none;
+	box-sizing: border-box;
+	color: var(--font-main-color);
+	font-size: 18px;
+	transition: all 0.3s;
+	background-clip: border-box;
+	-webkit-tap-highlight-color: transparent;
+}
+
+#__next {
+	width: 100%;
+	max-width: 2200px;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+html,
+body {
+	scroll-behavior: smooth;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	background-color: var(--main-bg-color);
+}
+
+main {
+	width: 100%;
+	padding: 80px 100px;
+
+	&.with-separators {
+		> * {
+			padding: 40px 0;
+			border-bottom: 1px solid var(--delimiter-color);
+
+			&:first-child {
+				padding-top: 0;
+			}
+
+			&:last-child {
+				padding-bottom: 0;
+				border-bottom: none;
+			}
+		}
+	}
+
+	@media screen and (max-width: 1060px) {
+		padding-right: 20px;
+		padding-left: 20px;
+	}
+}
+
+p {
+	color: var(--font-main-color);
+}
+
+a {
+	color: #1f8feb;
+	text-decoration: none;
+
+	&:hover {
+		color: #4ca5ef;
+	}
+}
+
+.bold {
+	font-weight: 700;
+}
+
+.underline {
+	text-decoration: underline;
+}
+
+.italics {
+	font-style: italic;
+}
+
+.disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+button {
+	background-color: #1f8feb;
+
+	&:hover {
+		background-color: #4ca5ef;
+	}
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: var(--font-main-color);
+	font-weight: 600;
+}
+
+h1,
+h1 > * {
+	color: var(--font-main-color);
+	font-size: 48px;
+}
+
+h2 {
+	font-size: 36px;
+}
+
+h3 {
+	font-size: 32px;
+}
+
+h4 {
+	font-size: 24px;
+}
+
+h5 {
+	font-size: 21px;
+}
+
+h6 {
+	font-size: 18px;
+}
+
+.blue-text {
+	background: radial-gradient(150% 300% at 0% 0%, #16d1d6 0%, #274cff 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+svg {
+	&:not(.stroked) {
+		* {
+			fill: var(--font-main-color);
+		}
+
+		&.dimmed {
+			* {
+				fill: var(--font-dimmed-color);
+			}
+		}
+	}
+
+	&.stroked {
+		* {
+			stroke: var(--font-main-color);
+		}
+
+		&.dimmed {
+			* {
+				stroke: var(--font-dimmed-color);
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 700px) {
+	h1,
+	h1 > * {
+		font-size: 32px;
+	}
+}
+
+.no-scroll::-webkit-scrollbar {
+	display: none;
+}
+
+.custom-scroll::-webkit-scrollbar {
+	width: 5px;
+	border: 8.5px solid transparent;
+
+	background-color: transparent;
+	background-clip: padding-box;
+	border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+	background-clip: padding-box;
+	border-radius: 12px;
+	background-color: rgba(31, 143, 235, 1);
+}
+
+.dropdown-scroll::-webkit-scrollbar {
+	width: 15px;
+
+	// border: 8.5px solid transparent;
+
+	background-color: transparent;
+	background-clip: padding-box;
+	border-radius: 10px;
+}
+
+.dropdown-scroll::-webkit-scrollbar-thumb {
+	width: 3px;
+	background-clip: content-box;
+	border: 5px solid transparent;
+	// border-top: 15px;
+	// border-bottom: 15px;
+	border-radius: 50px;
+	background-color: #a0adc4;
+}
+
+.dropdown-scroll::-webkit-scrollbar-track {
+	margin: 10px;
+}
+
+.dropdown-scroll::-webkit-scrollbar-track-piece:start {
+	background: transparent;
+}
+
+.dropdown-scroll::-webkit-scrollbar-track-piece:end {
+	background: transparent;
+}
+
+.orders-scroll::-webkit-scrollbar {
+	width: 6px;
+
+	background-color: transparent;
+	background-clip: padding-box;
+}
+
+.orders-scroll::-webkit-scrollbar-thumb {
+	width: 3px;
+	background-clip: content-box;
+	border-radius: 50px;
+	background-color: #a0adc4;
+}
+
+.orders-scroll::-webkit-scrollbar-track {
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 5px;
+}
+
+.ant-modal-content,
+.ant-modal-header {
+	background-color: var(--alert-bg) !important;
+	color: #ffffff !important;
+}
+
+.ant-modal-title,
+.ant-modal-body p {
+	color: var(--font-main-color) !important;
+}
+
+.ant-switch {
+	min-width: 38px !important;
+	background-color: var(--switch-disabled-bg-color) !important;
+
+	.ant-switch-handle::before {
+		background-color: #a0aec0 !important;
+	}
+}
+
+.ant-switch-checked {
+	background-color: var(--switch-bg-color) !important;
+
+	.ant-switch-handle::before {
+		background-color: #1f8feb !important;
+	}
+}

@@ -1,0 +1,10 @@
+.empty_link {
+	cursor: auto;
+	font-size: 18px;
+	font-weight: 700;
+	color: var(--font-dimmed-color);
+
+	&:hover {
+		color: var(--font-dimmed-color);
+	}
+}

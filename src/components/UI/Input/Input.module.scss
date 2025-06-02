@@ -1,0 +1,30 @@
+.input {
+	&:disabled {
+		opacity: 0.5;
+	}
+}
+
+.input__default {
+	padding: 0 15px;
+	background-color: var(--dropdown-bg-color);
+	border-radius: 10px;
+
+	&::placeholder {
+		color: var(--font-dimmed-color);
+	}
+
+	&:focus {
+		background-color: var(--dropdown-bg-hover);
+	}
+}
+
+.input__bordered {
+	padding: 0 15px;
+	background-color: var(--bordered-input-bg);
+	border: 1px solid var(--window-border-color);
+	border-radius: 8px;
+
+	&::placeholder {
+		color: var(--font-dimmed-color);
+	}
+}

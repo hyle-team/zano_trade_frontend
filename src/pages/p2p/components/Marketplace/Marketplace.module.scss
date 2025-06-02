@@ -1,0 +1,59 @@
+.marketplace {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 40px;
+
+	> div:first-child {
+		width: 100%;
+		// margin-bottom: 40px;
+		display: flex;
+		gap: 20px;
+
+		// .filters__buttons {
+		//     display: flex;
+		//     justify-content: space-between;
+		//     width: 100%;
+
+		//     button {
+		//         height: 55px;
+		//     }
+
+		//     .filters__search_button {
+		//         padding: 0 32px;
+		//     }
+
+		//     .filters__update_button {
+		//         padding: 0 12px;
+		//         display: flex;
+		//         align-items: center;
+		//         background-color: rgba(255, 255, 255, 0.1);
+
+		//         img {
+		//             width: 100%;
+		//             height: auto;
+		//         }
+
+		//         &:hover {
+		//             background-color: rgba(255, 255, 255, 0.3);
+		//         }
+		//     }
+		// }
+
+		@media screen and (max-width: 1500px) {
+			flex-direction: column;
+			max-width: 700px;
+
+			// .filters__buttons {
+			//     button {
+			//         height: 48px;
+			//     }
+
+			//     .filters__update_button {
+			//         width: 48px;
+			//     }
+			// }
+		}
+	}
+}

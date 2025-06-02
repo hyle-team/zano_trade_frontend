@@ -1,0 +1,146 @@
+.main {
+	.title__auth__buttons {
+		display: flex;
+		gap: 20px;
+
+		button {
+			position: relative;
+		}
+
+		.offers__notification__wrapper {
+			position: absolute;
+			top: 0;
+			right: 0;
+			transform: translate(50%, -50%);
+		}
+
+		button {
+			padding: 0 14px;
+			height: 54px;
+
+			> div {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+		}
+
+		@media screen and (max-width: 550px) {
+			button {
+				height: 48px;
+
+				> div {
+					gap: 8px;
+
+					p {
+						font-size: 15px;
+					}
+
+					img {
+						scale: 0.8;
+					}
+				}
+			}
+		}
+	}
+
+	.cards__wrapper {
+		width: 100%;
+		display: flex;
+		margin-bottom: 40px;
+		justify-content: space-between;
+		gap: 40px;
+
+		@media screen and (max-width: 1500px) {
+			> :last-child {
+				display: none;
+			}
+		}
+
+		@media screen and (max-width: 1100px) {
+			justify-content: center;
+			gap: 20px;
+			max-width: 900px;
+			margin: 0 auto;
+			margin-bottom: 40px;
+		}
+
+		@media screen and (max-width: 580px) {
+			> :nth-child(3) {
+				display: none;
+			}
+		}
+
+		@media screen and (max-width: 400px) {
+			flex-direction: row;
+		}
+	}
+
+	.home__card {
+		padding: 2px;
+		width: 400px;
+		height: 150px;
+		background: radial-gradient(100% 188.88% at 0% 0%, #16d1d6 0%, #274cff 100%)
+			/* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
+		border-radius: 15px;
+
+		> div {
+			height: 100%;
+			width: 100%;
+			padding-top: 40px;
+			padding-bottom: 45px;
+			background-color: var(--main-bg-color);
+			border-radius: 13px;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			align-items: center;
+
+			.home__card__title {
+				color: var(--font-dimmed-color);
+				font-weight: 700;
+				font-size: 18px;
+				text-align: center;
+			}
+
+			.home__card__value {
+				font-weight: 500;
+				font-size: 36px;
+				text-align: center;
+			}
+		}
+
+		@media screen and (max-width: 580px) {
+			width: 100%;
+
+			> div {
+				padding: 16px 0 !important;
+
+				.home__card__title {
+					max-width: 70px;
+				}
+
+				.home__card__value {
+					font-size: 20px !important;
+				}
+			}
+		}
+
+		@media screen and (max-width: 1100px) {
+			height: 100px;
+
+			> div {
+				padding: 20px 0;
+
+				.home__card__title {
+					font-size: 14px;
+					// max-width: 70px;
+				}
+
+				.home__card__value {
+					font-size: 24px;
+				}
+			}
+		}
+	}
+}
