@@ -784,14 +784,14 @@ function Trading() {
 					{e.isInstant && <BadgeStatus />}
 					{(state.wallet?.connected && state.wallet?.alias ? state.wallet?.alias : '')
 						?.length > 12 && (
-						<Tooltip
-							className={styles.table__tooltip_right}
-							arrowClass={styles.table__tooltip_arrow}
-							shown={showTooltip}
-						>
-							{state.wallet?.connected && state.wallet?.alias}
-						</Tooltip>
-					)}
+							<Tooltip
+								className={styles.table__tooltip_right}
+								arrowClass={styles.table__tooltip_arrow}
+								shown={showTooltip}
+							>
+								{state.wallet?.connected && state.wallet?.alias}
+							</Tooltip>
+						)}
 					{/* High volume */}
 					{/* <BadgeStatus type="high" /> */}
 				</td>
@@ -1071,13 +1071,13 @@ function Trading() {
 											pairData.first_currency?.name &&
 											pairData.second_currency?.name
 										) ? (
-												'...'
-											) : (
-												<>
-													{firstCurrencyName}
-													<span>/{secondCurrencyName}</span>
-												</>
-											)}
+											'...'
+										) : (
+											<>
+												{firstCurrencyName}
+												<span>/{secondCurrencyName}</span>
+											</>
+										)}
 									</p>
 									<div className={styles.trading__currency__rate}>
 										<p>
@@ -1172,6 +1172,7 @@ function Trading() {
 							totalValid,
 							totalUsd,
 							scrollToOrderList,
+							updateUserOrders
 						})}
 					</div>
 					<div className={styles.trading__chart__wrapper}>

@@ -23,6 +23,7 @@ interface InputPanelItemProps {
 	totalValid: boolean;
 	totalUsd: string | undefined;
 	scrollToOrderList: () => void;
+	updateUserOrders: () => void;
 }
 
 export default InputPanelItemProps;

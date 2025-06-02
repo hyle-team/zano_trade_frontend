@@ -68,6 +68,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 		totalValid,
 		totalUsd,
 		scrollToOrderList,
+		updateUserOrders
 	} = props;
 
 	const [creatingState, setCreatingState] = useState(false);
@@ -162,6 +163,8 @@ function InputPanelItem(props: InputPanelItemProps) {
 				setAlertSubtitle('');
 			}, 3000);
 		}
+
+		updateUserOrders();
 	}
 
 	function onRangeInput(e: ChangeEvent<HTMLInputElement>) {
