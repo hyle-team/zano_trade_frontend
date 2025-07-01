@@ -29,7 +29,7 @@
 		"func-names": "off",
 		"consistent-return": "off",
 		"no-restricted-syntax": "off",
-		"indent": ["error", "tab"],
+		"@typescript-eslint/indent": ["error", "tab"],
 		"class-methods-use-this": "off",
 		"@typescript-eslint/no-unused-vars": [
 			"warn",
