@@ -100,16 +100,16 @@ function CandleChart(props: CandleChartProps) {
 			const monthsDecrement = 52 * 7 * 24 * hr1;
 
 			switch (props.period) {
-			case '1h':
-				return date - hoursDecrement;
-			case '1d':
-				return date - daysDecrement;
-			case '1w':
-				return date - weeksDecrement;
-			case '1m':
-				return date - monthsDecrement;
-			default:
-				return date - hr1;
+				case '1h':
+					return date - hoursDecrement;
+				case '1d':
+					return date - daysDecrement;
+				case '1w':
+					return date - weeksDecrement;
+				case '1m':
+					return date - monthsDecrement;
+				default:
+					return date - hr1;
 			}
 		})();
 

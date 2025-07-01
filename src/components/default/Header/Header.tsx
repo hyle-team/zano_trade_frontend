@@ -60,12 +60,12 @@ function Header() {
 
 	const getIcon = (ticker: string) => {
 		switch (ticker) {
-		case 'WBTC':
-			return bitcoinWhiteIcon;
-		case 'WETH':
-			return ethWhiteIcon;
-		default:
-			return customWhiteIcon;
+			case 'WBTC':
+				return bitcoinWhiteIcon;
+			case 'WETH':
+				return ethWhiteIcon;
+			default:
+				return customWhiteIcon;
 		}
 	};
 
