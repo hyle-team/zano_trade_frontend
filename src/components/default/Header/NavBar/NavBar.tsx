@@ -37,10 +37,7 @@ function NavBar(props: NavBarProps) {
 		}
 
 		return (
-			<Link
-				href={href}
-				className={linkClass}
-			>
+			<Link href={href} className={linkClass}>
 				<Img />
 				<h6>{title}</h6>
 				<NotificationIndicator count={notifications} />

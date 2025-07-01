@@ -53,7 +53,7 @@ function CandleChart(props: CandleChartProps) {
 				}));
 
 				for (const decimal of decimals) {
-					 if (decimal.value !== undefined) {
+					if (decimal.value !== undefined) {
 						if (decimal.value.lessThan(0.00001)) {
 							e[decimal.index] = 0;
 						}
@@ -150,7 +150,7 @@ function CandleChart(props: CandleChartProps) {
 					show: true,
 					type: 'line',
 					label: {
-						formatter: (params: {value: string}) => timestampToString(params.value),
+						formatter: (params: { value: string }) => timestampToString(params.value),
 						backgroundColor: '#4A90E2',
 						color: '#ffffff',
 					},
@@ -163,7 +163,7 @@ function CandleChart(props: CandleChartProps) {
 				scale: true,
 				splitArea: { show: false },
 				min: 0,
-				max: (value: {max: string}) => new Decimal(value.max).mul(1.1).toNumber(),
+				max: (value: { max: string }) => new Decimal(value.max).mul(1.1).toNumber(),
 				axisPointer: {
 					show: true,
 					type: 'line',

@@ -8,6 +8,7 @@
 		"build": "next build",
 		"start": "next start -p 30289",
 		"lint": "next lint",
+		"lint:fix": "eslint . --fix",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
 		"prepare": "husky"

@@ -66,10 +66,7 @@ function Pagination(props: PaginationProps) {
 
 				result.push(generateButton(i, i === props.value, hiding));
 			}
-			result.push(
-				<p key={nanoid(16)}>...</p>,
-				generateButton(props.totalPages, false)
-			);
+			result.push(<p key={nanoid(16)}>...</p>, generateButton(props.totalPages, false));
 		} else if (props.value >= props.totalPages - 2) {
 			result.push(generateButton(1, false), <p key={nanoid(16)}>...</p>);
 			for (let i = props.totalPages - 4; i <= props.totalPages; i += 1) {

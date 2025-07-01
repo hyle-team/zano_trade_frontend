@@ -112,7 +112,8 @@ function ProfileTable(props: ProfileTableProps) {
 				<td>
 					<EmptyLink className={styles.profile__header__mobile}>Price</EmptyLink>
 					<p className={styles.profile__row__price}>
-						<span>{params.offerData.price}</span> {params.offerData.target_currency?.name}
+						<span>{params.offerData.price}</span>{' '}
+						{params.offerData.target_currency?.name}
 					</p>
 				</td>
 				<td>

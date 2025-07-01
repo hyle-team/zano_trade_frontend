@@ -54,18 +54,17 @@ function Profile() {
 	function getFilterFunction(code: 'chats' | 'active' | 'finished') {
 		if (code === 'finished') {
 			return (e: UserChatData) => e.status === 'finished';
-		} if (code === 'active') {
+		}
+		if (code === 'active') {
 			return (e: UserChatData) =>
 				e.status !== 'finished' &&
-      ((e.owner_deposit && e.owner_deposit !== 'default') ||
-        (e.opponent_deposit && e.opponent_deposit !== 'default'));
-		} 
+				((e.owner_deposit && e.owner_deposit !== 'default') ||
+					(e.opponent_deposit && e.opponent_deposit !== 'default'));
+		}
 		return (e: UserChatData) =>
 			(e.owner_deposit === null || e.owner_deposit === 'default') &&
-      (e.opponent_deposit === null || e.opponent_deposit === 'default');
-  
+			(e.opponent_deposit === null || e.opponent_deposit === 'default');
 	}
-
 
 	const [notificationsAmount, setNotificationsAmount] = useState({
 		chats: 0,

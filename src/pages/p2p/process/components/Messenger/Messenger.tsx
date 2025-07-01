@@ -249,7 +249,7 @@ function Messenger(props: MessengerProps) {
 			<div className={styles.messenger__panel + (messageLoading ? ' disabled' : '')}>
 				<Input
 					disabled={!!finishState}
-					onKeyDown={e => e.keyCode === 13 && createMessage()}
+					onKeyDown={(e) => e.keyCode === 13 && createMessage()}
 					value={msgInputState}
 					onInput={(e) => setMsgInputState(e.target.value)}
 					bordered={true}

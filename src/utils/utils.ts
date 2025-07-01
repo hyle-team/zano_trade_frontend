@@ -53,7 +53,8 @@ export const canvasResize = (inputCanvas: HTMLCanvasElement) => {
 		const devicePixelRatio = window.devicePixelRatio || 1;
 
 		const backingStorePixel =
-			(ctx as unknown as { webkitBackingStorePixelRatio?: number })?.webkitBackingStorePixelRatio ||
+			(ctx as unknown as { webkitBackingStorePixelRatio?: number })
+				?.webkitBackingStorePixelRatio ||
 			(ctx as unknown as { mozBackingStorePixelRatio?: number })?.mozBackingStorePixelRatio ||
 			(ctx as unknown as { msBackingStorePixelRatio?: number })?.msBackingStorePixelRatio ||
 			(ctx as unknown as { oBackingStorePixelRatio?: number })?.oBackingStorePixelRatio ||

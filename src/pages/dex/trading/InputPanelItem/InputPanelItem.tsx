@@ -68,7 +68,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 		totalValid,
 		totalUsd,
 		scrollToOrderList,
-		updateUserOrders
+		updateUserOrders,
 	} = props;
 
 	const [creatingState, setCreatingState] = useState(false);

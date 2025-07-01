@@ -38,7 +38,7 @@ const reducer = (state: ContextState, action: ContextAction): ContextState => {
 
 export const Store = createContext<ContextValue>({
 	state: initialState,
-	dispatch: () => undefined, 
+	dispatch: () => undefined,
 });
 export const StoreProvider = (props: { children: ReactNode }) => {
 	const [state, dispatch] = useReducer(reducer, initialState);

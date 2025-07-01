@@ -3,40 +3,40 @@ import { GetUserResData } from '../responses/user/GetUserRes';
 import { GetConfigResData } from '../responses/config/GetConfigRes';
 
 export interface Asset {
-    name: string;
-    ticker: string;
-    assetId: string;
-    decimalPoint: number;
-    balance: string;
-    unlockedBalance: string;
+	name: string;
+	ticker: string;
+	assetId: string;
+	decimalPoint: number;
+	balance: string;
+	unlockedBalance: string;
 }
 
 export interface Transfer {
-    amount: string;
-    assetId: string;
-    incoming: boolean;
+	amount: string;
+	assetId: string;
+	incoming: boolean;
 }
 
 export interface Transaction {
-    isConfirmed: boolean;
-    txHash: string;
-    blobSize: number;
-    timestamp: number;
-    height: number;
-    paymentId: string;
-    comment: string;
-    fee: string;
-    isInitiator: boolean;
-    transfers: Transfer[];
+	isConfirmed: boolean;
+	txHash: string;
+	blobSize: number;
+	timestamp: number;
+	height: number;
+	paymentId: string;
+	comment: string;
+	fee: string;
+	isInitiator: boolean;
+	transfers: Transfer[];
 }
 
 interface WalletState {
-    address: string;
-    alias: string;
-    balance: string;
-    assets: Asset[];
-    transactions: Transaction[];
-	connected: boolean
+	address: string;
+	alias: string;
+	balance: string;
+	assets: Asset[];
+	transactions: Transaction[];
+	connected: boolean;
 }
 
 type UserState = GetUserResData | null;
@@ -75,7 +75,7 @@ type ContextAction =
 	| {
 			type: 'CLOSED_NOTIFICATIONS_UPDATED';
 			payload: number[];
-	  };	
+	  };
 
 interface ContextValue {
 	state: ContextState;

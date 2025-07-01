@@ -4,7 +4,7 @@ import { ReactComponent as DeleteIcon } from '@/assets/images/UI/delete.svg';
 import { ReactComponent as NoOffersIcon } from '@/assets/images/UI/no_offers.svg';
 import EmptyLink from '@/components/UI/EmptyLink/EmptyLink';
 import { notationToString, toStandardDateString } from '@/utils/utils';
-import { cancelOrder, getUserOrders, } from '@/utils/methods';
+import { cancelOrder, getUserOrders } from '@/utils/methods';
 import OrdersTableProps from '@/interfaces/props/pages/dex/orders/OrdersTable/OrdersTableProps';
 import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
 import Decimal from 'decimal.js';

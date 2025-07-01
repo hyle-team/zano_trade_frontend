@@ -28,12 +28,12 @@ interface DateState {
 }
 
 interface CurrencyType {
-  name: string;
+	name: string;
 }
 
 interface PairType {
-  id: string | number; 
-  first_currency: CurrencyType;
+	id: string | number;
+	first_currency: CurrencyType;
 }
 
 const AdminPanel: React.FC = () => {
@@ -79,7 +79,7 @@ const AdminPanel: React.FC = () => {
 			if (response.data.success) {
 				const fetchedAdmins = response.data.data;
 				setAdmins(
-					fetchedAdmins.map((admin: {alias: string, isOwner: boolean, id: string}) => ({
+					fetchedAdmins.map((admin: { alias: string; isOwner: boolean; id: string }) => ({
 						alias: admin.alias,
 						isOwner: admin.isOwner,
 						key: admin.id,
@@ -185,7 +185,7 @@ const AdminPanel: React.FC = () => {
 			if (data.success) {
 				fetchAdmins();
 			}
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			message.error({
 				content:
