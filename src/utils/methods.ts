@@ -26,11 +26,7 @@ import GetPairsPagesAmountRes from '@/interfaces/responses/dex/GetPairsPagesAmou
 import { PairSortOption } from '@/interfaces/enum/pair';
 
 export async function getUser(): Promise<ErrorRes | GetUserRes> {
-	return axios
-		.post('/api/user/get-user', {
-			token: sessionStorage.getItem('token'),
-		})
-		.then((res) => res.data);
+	return axios.post('/api/user/get-user', {}, { withCredentials: true }).then((res) => res.data);
 }
 
 export async function getConfig(): Promise<ErrorRes | GetConfigRes> {
@@ -41,21 +37,27 @@ export async function updateOffer(
 	offerData: UpdateOfferData,
 ): Promise<ErrorRes | { success: true }> {
 	return axios
-		.post('/api/offers/update', {
-			token: sessionStorage.getItem('token'),
-			offerData,
-		})
+		.post(
+			'/api/offers/update',
+			{
+				offerData,
+			},
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 
 export async function deleteOffer(number: string): Promise<ErrorRes | { success: true }> {
 	return axios
-		.post('/api/offers/delete', {
-			token: sessionStorage.getItem('token'),
-			offerData: {
-				number: number ?? null,
+		.post(
+			'/api/offers/delete',
+			{
+				offerData: {
+					number: number ?? null,
+				},
 			},
-		})
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 
@@ -126,10 +128,13 @@ export async function sendFavouriteCurrencies(
 	currs: string[],
 ): Promise<ErrorRes | { success: true }> {
 	return axios
-		.post('/api/user/set-favourite-currencies', {
-			token: sessionStorage.getItem('token'),
-			data: currs,
-		})
+		.post(
+			'/api/user/set-favourite-currencies',
+			{
+				data: currs,
+			},
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 
@@ -139,31 +144,35 @@ export async function createChat(
 	receive: string,
 ): Promise<ErrorRes | { success: true; data: number }> {
 	return axios
-		.post('/api/chats/create', {
-			token: sessionStorage.getItem('token'),
-			number,
-			chatData: {
-				pay,
-				receive,
+		.post(
+			'/api/chats/create',
+			{
+				number,
+				chatData: {
+					pay,
+					receive,
+				},
 			},
-		})
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 
 export async function getChat(id: string): Promise<ErrorRes | GetChatRes> {
 	return axios
-		.post('/api/chats/get-chat', {
-			token: sessionStorage.getItem('token'),
-			id,
-		})
+		.post(
+			'/api/chats/get-chat',
+			{
+				id,
+			},
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 
 export async function getAllChats(): Promise<ErrorRes | GetAllChatsRes> {
 	return axios
-		.post('/api/chats/get-all-chats', {
-			token: sessionStorage.getItem('token'),
-		})
+		.post('/api/chats/get-all-chats', {}, { withCredentials: true })
 		.then((res) => res.data);
 }
 
@@ -171,10 +180,13 @@ export async function deleteChat(
 	id: string,
 ): Promise<ErrorRes | { success: true; data?: undefined }> {
 	return axios
-		.post('/api/chats/delete-chat', {
-			token: sessionStorage.getItem('token'),
-			id,
-		})
+		.post(
+			'/api/chats/delete-chat',
+			{
+				id,
+			},
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 
@@ -218,10 +230,13 @@ export async function createOrder(
 	orderData: CreateOrderData,
 ): Promise<ErrorRes | { success: true; data: { immediateMatch: boolean } }> {
 	return axios
-		.post('/api/orders/create', {
-			token: sessionStorage.getItem('token'),
-			orderData,
-		})
+		.post(
+			'/api/orders/create',
+			{
+				orderData,
+			},
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 
@@ -235,27 +250,29 @@ export async function getOrdersPage(pairId: string): Promise<ErrorRes | GetOrder
 
 export async function getUserOrdersPage(pairId: string): Promise<ErrorRes | GetUserOrdersPageRes> {
 	return axios
-		.post('/api/orders/get-user-page', {
-			token: sessionStorage.getItem('token'),
-			pairId,
-		})
+		.post(
+			'/api/orders/get-user-page',
+			{
+				pairId,
+			},
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 
 export async function getUserOrders(): Promise<ErrorRes | GetUserOrdersRes> {
-	return axios
-		.post('/api/orders/get', {
-			token: sessionStorage.getItem('token'),
-		})
-		.then((res) => res.data);
+	return axios.post('/api/orders/get', {}, { withCredentials: true }).then((res) => res.data);
 }
 
 export async function cancelOrder(id: string): Promise<ErrorRes | { success: true }> {
 	return axios
-		.post('/api/orders/cancel', {
-			token: sessionStorage.getItem('token'),
-			orderId: id,
-		})
+		.post(
+			'/api/orders/cancel',
+			{
+				orderId: id,
+			},
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 
@@ -289,10 +306,13 @@ export async function getPairStats(pairId: string): Promise<ErrorRes | GetPairSt
 
 export async function applyOrder(orderData: ApplyOrderData): Promise<ErrorRes | { success: true }> {
 	return axios
-		.post('/api/orders/apply-order', {
-			token: sessionStorage.getItem('token'),
-			orderData,
-		})
+		.post(
+			'/api/orders/apply-order',
+			{
+				orderData,
+			},
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 
@@ -300,10 +320,13 @@ export async function confirmTransaction(
 	transactionId: string,
 ): Promise<ErrorRes | { success: true }> {
 	return axios
-		.post('/api/transactions/confirm', {
-			transactionId,
-			token: sessionStorage.getItem('token'),
-		})
+		.post(
+			'/api/transactions/confirm',
+			{
+				transactionId,
+			},
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 
@@ -312,11 +335,14 @@ export async function getChatChunk(
 	chunkNumber: number,
 ): Promise<ErrorRes | GetChatChunkRes> {
 	return axios
-		.post('/api/chats/get-chat-chunk', {
-			token: sessionStorage.getItem('token'),
-			id: chatId,
-			chunkNumber,
-		})
+		.post(
+			'/api/chats/get-chat-chunk',
+			{
+				id: chatId,
+				chunkNumber,
+			},
+			{ withCredentials: true },
+		)
 		.then((res) => res.data);
 }
 

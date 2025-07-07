@@ -7,8 +7,9 @@ import sha256 from 'sha256';
 function useUpdateUser() {
 	const { state, dispatch } = useContext(Store);
 	async function fetchUser() {
-		if (!sessionStorage.getItem('token')) return false;
-		return getUser().then((result) => {
+		try {
+			const result = await getUser();
+
 			if (!result.success) return false;
 
 			if (sha256(JSON.stringify(state.user)) !== sha256(JSON.stringify(result.data))) {
@@ -16,7 +17,10 @@ function useUpdateUser() {
 			}
 
 			return true;
-		});
+		} catch (error) {
+			console.error('Failed to fetch user', error);
+			return false;
+		}
 	}
 	return fetchUser;
 }

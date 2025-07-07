@@ -13,15 +13,28 @@ export default function NotificationPopups() {
 	const [notificationOrders, setNotificationOrders] = useState<OrderDataWithPair[]>([]);
 
 	useEffect(() => {
-		const token = sessionStorage.getItem('token');
+		const checkAuthAndEmit = async () => {
+			try {
+				const res = await fetch('/api/check-auth', {
+					method: 'POST',
+					credentials: 'include',
+				});
 
-		if (token) {
-			socket.emit('in-dex-notifications', { token });
+				const data = await res.json();
 
-			return () => {
-				socket.emit('out-dex-notifications', { token });
-			};
-		}
+				if (data.success) {
+					socket.emit('in-dex-notifications', {});
+
+					return () => {
+						socket.emit('out-dex-notifications', {});
+					};
+				}
+			} catch (error) {
+				console.error('Auth check failed:', error);
+			}
+		};
+
+		checkAuthAndEmit();
 	}, [state.user?.address]);
 
 	useEffect(() => {

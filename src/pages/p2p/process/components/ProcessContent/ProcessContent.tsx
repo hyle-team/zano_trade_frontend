@@ -42,29 +42,37 @@ function ProcessContent() {
 	const isBuyer = !!chatData && isOwner === (chatData.type === 'sell');
 
 	useEffect(() => {
-		socket.emit('join', {
-			token: sessionStorage.getItem('token') || null,
-			chat_id: router.query.id,
-		});
-		console.log('Connected to socket');
+		const joinSocket = async () => {
+			try {
+				const res = await fetch('/api/check-auth', {
+					method: 'POST',
+					credentials: 'include',
+				});
+				const data = await res.json();
 
-		socket.on('check-connection', () => {
-			socket.emit('submit-watched', {
-				token: sessionStorage.getItem('token') || null,
-				chat_id: router.query.id,
-			});
-		});
+				if (!data.success) return;
 
-		return () => {
-			console.log('Socket left');
+				const chat_id = router.query.id;
 
-			socket.off('check-connection');
+				socket.emit('join', { chat_id });
 
-			socket.emit('leave', {
-				token: sessionStorage.getItem('token') || null,
-				chat_id: router.query.id,
-			});
+				console.log('Connected to socket');
+
+				socket.on('check-connection', () => {
+					socket.emit('submit-watched', { chat_id });
+				});
+
+				return () => {
+					console.log('Socket left');
+					socket.off('check-connection');
+					socket.emit('leave', { chat_id });
+				};
+			} catch (e) {
+				console.error('Socket auth failed', e);
+			}
 		};
+
+		joinSocket();
 	}, []);
 
 	const [sellerState, setSellerState] = useState<DepositState>(null); // default, deposit, confirmed, canceled
@@ -150,12 +158,23 @@ function ProcessContent() {
 		}
 	}, [chatData]);
 
-	function changeDepositState(depositState: DepositState) {
-		socket.emit('change-deposit', {
-			token: sessionStorage.getItem('token'),
-			chat_id: router.query.id,
-			deposit_state: depositState,
-		});
+	async function changeDepositState(depositState: DepositState) {
+		try {
+			const res = await fetch('/api/check-auth', {
+				method: 'POST',
+				credentials: 'include',
+			});
+			const data = await res.json();
+
+			if (!data.success) return;
+
+			socket.emit('change-deposit', {
+				chat_id: router.query.id,
+				deposit_state: depositState,
+			});
+		} catch (error) {
+			console.error('Auth check failed in changeDepositState', error);
+		}
 	}
 
 	const youPay = `${parseFloat((chatData?.pay || 0).toFixed(9)) || '...'} ${
@@ -334,19 +353,19 @@ function ProcessContent() {
 								)}
 								{!finishState &&
 									(myState === 'deposit' || myState === 'canceled') && (
-									<Button onClick={() => changeDepositState('confirmed')}>
+										<Button onClick={() => changeDepositState('confirmed')}>
 											Confirm funds received
-									</Button>
-								)}
+										</Button>
+									)}
 								{!finishState &&
 									(myState === 'deposit' || myState === 'confirmed') && (
-									<Button
-										onClick={() => changeDepositState('canceled')}
-										className={styles.deposit__cancel__btn}
-									>
+										<Button
+											onClick={() => changeDepositState('canceled')}
+											className={styles.deposit__cancel__btn}
+										>
 											Cancel funds and return deposit
-									</Button>
-								)}
+										</Button>
+									)}
 								{finishState === 'confirmed' && (
 									<p style={{ color: '#16D1D6' }}>
 										The offer finished successfully.

@@ -475,13 +475,13 @@ function Offers(props) {
 							)}
 							{props.categoryState !== 'finished' &&
 								props.categoryState !== 'active' && (
-								<Button
-									className={rowStyles.row__button__iconed}
-									onClick={removeOffer}
-								>
-									<img src={deleteIcon} alt="delete" />
-								</Button>
-							)}
+									<Button
+										className={rowStyles.row__button__iconed}
+										onClick={removeOffer}
+									>
+										<img src={deleteIcon} alt="delete" />
+									</Button>
+								)}
 						</div>
 					)}
 

@@ -225,7 +225,8 @@ function Trading() {
 		const fetchConnections = async () => {
 			const filteredAddresses = ordersHistory?.map((e) => e?.user?.address);
 			if (!filteredAddresses.length) return;
-			const response = await fetch('https://messenger.zano.org/api/get-addresses', {
+
+			const response = await fetch('/api/get-addresses', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -236,6 +237,8 @@ function Trading() {
 			});
 
 			const data = await response.json();
+			console.log('MATRIX SUKA', data);
+
 			setMatrixAddresses(data.addresses);
 		};
 
@@ -1038,8 +1041,8 @@ function Trading() {
 	const pairRateUsd =
 		pairStats?.rate !== undefined && secondAssetUsdPrice !== undefined
 			? new Decimal(pairStats.rate)
-				.mul(secondAssetUsdPrice)
-				.toFixed(pairStats.rate < 0.1 ? 6 : 2)
+					.mul(secondAssetUsdPrice)
+					.toFixed(pairStats.rate < 0.1 ? 6 : 2)
 			: undefined;
 
 	const scrollToOrderList = () => {
@@ -1071,13 +1074,13 @@ function Trading() {
 											pairData.first_currency?.name &&
 											pairData.second_currency?.name
 										) ? (
-												'...'
-											) : (
-												<>
-													{firstCurrencyName}
-													<span>/{secondCurrencyName}</span>
-												</>
-											)}
+											'...'
+										) : (
+											<>
+												{firstCurrencyName}
+												<span>/{secondCurrencyName}</span>
+											</>
+										)}
 									</p>
 									<div className={styles.trading__currency__rate}>
 										<p>
