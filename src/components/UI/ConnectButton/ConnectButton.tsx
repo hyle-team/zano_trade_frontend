@@ -65,6 +65,7 @@ function ConnectButton(props: ConnectButtonProps) {
 
 			const result = await fetch('/api/auth', {
 				method: 'POST',
+				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -90,8 +91,6 @@ function ConnectButton(props: ConnectButtonProps) {
 					nonce,
 				});
 			}
-
-			sessionStorage.setItem('token', result?.data);
 
 			updateWalletState(dispatch, { ...walletData, connected: true });
 

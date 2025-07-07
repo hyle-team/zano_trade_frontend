@@ -52,8 +52,16 @@ function Header() {
 		setMenuState(false);
 	}, [width]);
 
-	function logout() {
-		sessionStorage.removeItem('token');
+	async function logout() {
+		try {
+			await fetch('/api/logout', {
+				method: 'POST',
+				credentials: 'include',
+			});
+		} catch (error) {
+			console.error('Logout error:', error);
+		}
+
 		setWalletCredentials(undefined);
 		updateWalletState(dispatch, null);
 	}
@@ -248,15 +256,28 @@ function Header() {
 	}
 
 	useEffect(() => {
-		const token = sessionStorage.getItem('token');
+		const checkAuthAndEmit = async () => {
+			try {
+				const res = await fetch('/api/check-auth', {
+					method: 'POST',
+					credentials: 'include',
+				});
 
-		if (token) {
-			socket.emit('in-dex-notifications', { token });
+				const data = await res.json();
 
-			return () => {
-				socket.emit('out-dex-notifications', { token });
-			};
-		}
+				if (data.success) {
+					socket.emit('in-dex-notifications', {});
+
+					return () => {
+						socket.emit('out-dex-notifications', {});
+					};
+				}
+			} catch (error) {
+				console.error('Auth check failed:', error);
+			}
+		};
+
+		checkAuthAndEmit();
 	}, [state.user?.address]);
 
 	const [activeNotifications, setActiveNotifications] = useState(

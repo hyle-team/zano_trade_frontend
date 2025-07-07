@@ -1,6 +1,40 @@
 /** @type {import('next').NextConfig} */
+const isDev = process.env.NODE_ENV !== 'production';
+
 const nextConfig = {
 	reactStrictMode: true,
+	async headers() {
+		return [
+			{
+				source: '/(.*)',
+				headers: [
+					{
+						key: 'Content-Security-Policy',
+						value: [
+							"default-src 'self'",
+							`script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
+							"style-src 'self' 'unsafe-inline'",
+							"img-src 'self' data:",
+							"font-src 'self' data:",
+							"connect-src 'self' https://trade.zano.org ws: wss:",
+						].join('; '),
+					},
+					{
+						key: 'X-Frame-Options',
+						value: 'DENY',
+					},
+					{
+						key: 'X-Content-Type-Options',
+						value: 'nosniff',
+					},
+					{
+						key: 'Strict-Transport-Security',
+						value: 'max-age=31536000; includeSubDomains',
+					},
+				],
+			},
+		];
+	},
 	async redirects() {
 		return [
 			{

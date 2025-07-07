@@ -60,7 +60,6 @@ function Messenger(props: MessengerProps) {
 
 		if (msgInputState && msgInputState.length <= 10000) {
 			socket.emit('create-message', {
-				token: sessionStorage.getItem('token'),
 				chat_id: props.chatId,
 				message: {
 					text: msgInputState,
@@ -70,14 +69,19 @@ function Messenger(props: MessengerProps) {
 
 		if (!!uploadedImages.length && uploadedImages.length <= 3) {
 			for (const image of uploadedImages) {
-				socket.emit('create-message', {
-					token: sessionStorage.getItem('token'),
-					chat_id: props.chatId,
-					message: {
-						type: 'img',
-						url: image,
+				socket.emit(
+					'create-message',
+					{
+						chat_id: props.chatId,
+						message: {
+							type: 'img',
+							url: image,
+						},
 					},
-				});
+					{
+						withCredentials: true,
+					},
+				);
 				await new Promise<void>((resolve) => {
 					setTimeout(() => {
 						resolve();
