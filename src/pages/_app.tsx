@@ -61,21 +61,23 @@ function App(data: AppProps & { config?: GetConfigResData }) {
 App.getInitialProps = async (context: AppContext) => {
 	try {
 		const pageProps = await NextApp.getInitialProps(context);
+
 		if (!context.ctx.req) return pageProps;
 
-		const { host } = context.ctx.req.headers;
-		const allowedHosts = ['trade.zano.org', 'localhost:3000', process.env.ALLOWED_HOST].filter(
-			Boolean,
-		);
+		const configRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/config`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			credentials: 'include',
+		});
 
-		if (!host || !allowedHosts.includes(host)) {
-			console.error(`Blocked request from disallowed host: ${host}`);
+		if (!configRes.ok) {
+			console.error(`Failed to fetch config: ${configRes.status}`);
 			return pageProps;
 		}
 
-		const configData = (await fetch(`http://${host}/api/config`, {
-			credentials: 'include',
-		}).then((res) => res.json())) as GetConfigRes;
+		const configData = (await configRes.json()) as GetConfigRes;
 
 		return {
 			...pageProps,
