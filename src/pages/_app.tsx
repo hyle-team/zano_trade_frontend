@@ -61,22 +61,30 @@ function App(data: AppProps & { config?: GetConfigResData }) {
 App.getInitialProps = async (context: AppContext) => {
 	try {
 		const pageProps = await NextApp.getInitialProps(context);
+
 		if (!context.ctx.req) return pageProps;
 
-		const { host } = context.ctx.req.headers;
-		const configData = (await fetch(`http://${host}/api/config`).then((res) =>
-			res.json(),
-		)) as GetConfigRes;
+		const configRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/config`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			credentials: 'include',
+		});
+
+		if (!configRes.ok) {
+			console.error(`Failed to fetch config: ${configRes.status}`);
+			return pageProps;
+		}
+
+		const configData = (await configRes.json()) as GetConfigRes;
 
 		return {
 			...pageProps,
 			config: configData.data,
 		};
 	} catch (error) {
-		console.log(
-			`Unable to fetch config data from http://${context?.ctx?.req?.headers?.host}/api/config`,
-		);
-		console.log(error);
+		console.error('Unable to fetch config data:', error);
 
 		return NextApp.getInitialProps(context);
 	}
