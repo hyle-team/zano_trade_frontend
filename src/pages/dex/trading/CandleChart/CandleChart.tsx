@@ -33,37 +33,31 @@ function CandleChart(props: CandleChartProps) {
 	}
 
 	function prepareCandles() {
-		const candles = (TESTING_MODE ? (testCandles as CandleRow[]) : props.candles)
+		const rawCandles = TESTING_MODE ? (testCandles as CandleRow[]) : props.candles;
+
+		const cleaned = rawCandles
 			.map((candle) => {
-				const result = [
-					parseInt(candle.timestamp, 10),
-					candle.shadow_top || 0,
-					candle.shadow_bottom || 0,
-					candle.body_first || 0,
-					candle.body_second || 0,
-				];
+				const timestamp = parseInt(candle.timestamp, 10);
+				if (!timestamp) return null;
 
-				return result as ResultCandle;
+				const open = new Decimal(candle.body_first || 0);
+				const close = new Decimal(candle.body_second || 0);
+				const low = new Decimal(candle.shadow_bottom || 0);
+				const high = new Decimal(candle.shadow_top || 0);
+
+				const sanitize = (v: Decimal) => (v.lessThan(0.0000001) ? 0 : v.toNumber());
+
+				return [
+					timestamp,
+					sanitize(open),
+					sanitize(close),
+					sanitize(low),
+					sanitize(high),
+				] as ResultCandle;
 			})
-			.filter((e) => e[0])
-			.map((e) => {
-				const decimals = e.map((el, i) => ({
-					value: i !== 0 ? new Decimal(el) : undefined,
-					index: i,
-				}));
+			.filter((e): e is ResultCandle => !!e);
 
-				for (const decimal of decimals) {
-					if (decimal.value !== undefined) {
-						if (decimal.value.lessThan(0.00001)) {
-							e[decimal.index] = 0;
-						}
-					}
-				}
-
-				return e;
-			});
-
-		return candles;
+		return cleaned;
 	}
 
 	useEffect(() => {
@@ -199,11 +193,11 @@ function CandleChart(props: CandleChartProps) {
 						borderColor0: downBorderColor,
 					},
 					barWidth: '75%',
-					dimensions: ['date', 'highest', 'lowest', 'open', 'close'],
-					encode: {
-						x: 'date',
-						y: ['open', 'close', 'highest', 'lowest'],
-					},
+					// dimensions: ['date', 'highest', 'lowest', 'open', 'close'],
+					// encode: {
+					// 	x: 'date',
+					// 	y: ['open', 'close', 'highest', 'lowest'],
+					// },
 					large: true,
 					largeThreshold: 2000000,
 				},
@@ -226,7 +220,6 @@ function CandleChart(props: CandleChartProps) {
 				notMerge={true}
 				ref={chartRef}
 			/>
-
 			{!candles?.length && isLoaded && <h1>[ Low volume ]</h1>}
 		</div>
 	);

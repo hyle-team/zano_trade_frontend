@@ -334,19 +334,19 @@ function ProcessContent() {
 								)}
 								{!finishState &&
 									(myState === 'deposit' || myState === 'canceled') && (
-									<Button onClick={() => changeDepositState('confirmed')}>
+										<Button onClick={() => changeDepositState('confirmed')}>
 											Confirm funds received
-									</Button>
-								)}
+										</Button>
+									)}
 								{!finishState &&
 									(myState === 'deposit' || myState === 'confirmed') && (
-									<Button
-										onClick={() => changeDepositState('canceled')}
-										className={styles.deposit__cancel__btn}
-									>
+										<Button
+											onClick={() => changeDepositState('canceled')}
+											className={styles.deposit__cancel__btn}
+										>
 											Cancel funds and return deposit
-									</Button>
-								)}
+										</Button>
+									)}
 								{finishState === 'confirmed' && (
 									<p style={{ color: '#16D1D6' }}>
 										The offer finished successfully.

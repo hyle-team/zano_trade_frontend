@@ -56,6 +56,7 @@ import LightningImg from '@/assets/images/UI/lightning.png';
 import RocketImg from '@/assets/images/UI/rocket.png';
 import { ReactComponent as ConnectionIcon } from '@/assets/images/UI/connection.svg';
 import Image from 'next/image';
+import MatrixAddressesType from '@/interfaces/common/MatrixAddresses';
 import CandleChart from './CandleChart/CandleChart';
 import OrdersBuySellSwitch from './OrdersBuySellSwitch/OrdersBuySellSwitch';
 import InputPanelItem from './InputPanelItem/InputPanelItem';
@@ -137,7 +138,7 @@ function Trading() {
 
 	const [alertSubtitle, setAlertSubtitle] = useState<string>('');
 
-	const [matrixAddresses, setMatrixAddresses] = useState([]);
+	const [matrixAddresses, setMatrixAddresses] = useState<MatrixAddressesType[]>([]);
 
 	async function updateOrders() {
 		setOrdersLoading(true);
@@ -205,10 +206,7 @@ function Trading() {
 
 	// Detect registered addresses
 	const hasConnection = (address: string) =>
-		matrixAddresses.some(
-			(item: { address: string; registered: boolean }) =>
-				item.address === address && item.registered,
-		);
+		matrixAddresses.some((item) => item.address === address && item.registered);
 
 	const filteredOrdersHistory = ordersHistory
 		?.filter((e) => e.type === ordersBuySell.code)
@@ -1038,8 +1036,8 @@ function Trading() {
 	const pairRateUsd =
 		pairStats?.rate !== undefined && secondAssetUsdPrice !== undefined
 			? new Decimal(pairStats.rate)
-				.mul(secondAssetUsdPrice)
-				.toFixed(pairStats.rate < 0.1 ? 6 : 2)
+					.mul(secondAssetUsdPrice)
+					.toFixed(pairStats.rate < 0.1 ? 6 : 2)
 			: undefined;
 
 	const scrollToOrderList = () => {
@@ -1071,13 +1069,13 @@ function Trading() {
 											pairData.first_currency?.name &&
 											pairData.second_currency?.name
 										) ? (
-												'...'
-											) : (
-												<>
-													{firstCurrencyName}
-													<span>/{secondCurrencyName}</span>
-												</>
-											)}
+											'...'
+										) : (
+											<>
+												{firstCurrencyName}
+												<span>/{secondCurrencyName}</span>
+											</>
+										)}
 									</p>
 									<div className={styles.trading__currency__rate}>
 										<p>
