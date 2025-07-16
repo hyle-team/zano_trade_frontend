@@ -135,7 +135,7 @@ function CandleChart(props: CandleChartProps) {
 
 			xAxis: {
 				type: 'category',
-				data: data0.categoryData,
+				// data: data0.categoryData,
 				boundaryGap: true,
 				axisLine: { onZero: false },
 				splitLine: {
@@ -191,7 +191,7 @@ function CandleChart(props: CandleChartProps) {
 				{
 					name: 'Candle Chart',
 					type: 'candlestick',
-					data: data0.values,
+					data: candles,
 					itemStyle: {
 						color: upColor,
 						color0: downColor,
@@ -210,6 +210,8 @@ function CandleChart(props: CandleChartProps) {
 			],
 		};
 	}, [candles, theme]);
+
+	console.log('option', option);
 
 	return (
 		<div className={styles.candle__chart__wrapper}>
