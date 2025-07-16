@@ -391,9 +391,9 @@ function Trading() {
 		setPriceValid(true);
 
 		if (!valueDecimal.isNaN() && !amountDecimal.isNaN() && amountState !== '') {
-			const total = valueDecimal.mul(amountDecimal).toFixed(secondCurrencyDP);
-			setTotalState(total);
-
+			const totalDecimal = valueDecimal.mul(amountDecimal);
+			setTotalState(totalDecimal.toString());
+			const total = totalDecimal.toFixed(secondCurrencyDP);
 			const totalValidationResult = validateTokensInput(total, secondCurrencyDP);
 
 			setTotalValid(totalValidationResult.valid);
@@ -453,13 +453,10 @@ function Trading() {
 		if (balance) setRangeInputValue(value.div(balance).mul(100).toFixed());
 
 		if (!price.isNaN() && !value.isNaN() && priceState !== '') {
-			const total = value.mul(price).toFixed(secondCurrencyDP);
-			setTotalState(total);
-
-			const totalValidationResult = validateTokensInput(
-				total,
-				pairData?.second_currency.asset_info?.decimal_point || 12,
-			);
+			const totalDecimal = value.mul(price);
+			setTotalState(totalDecimal.toString());
+			const total = totalDecimal.toFixed(secondCurrencyDP);
+			const totalValidationResult = validateTokensInput(total, secondCurrencyDP);
 
 			setTotalValid(totalValidationResult.valid);
 		} else {
