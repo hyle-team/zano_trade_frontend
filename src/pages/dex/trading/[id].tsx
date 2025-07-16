@@ -335,6 +335,8 @@ function Trading() {
 
 	const [rangeInputValue, setRangeInputValue] = useState('50');
 
+	const secondCurrencyDP = pairData?.second_currency.asset_info?.decimal_point || 12;
+
 	useEffect(() => {
 		let totalDecimal: Decimal | undefined;
 
@@ -377,8 +379,6 @@ function Trading() {
 		const valueDecimal = new Decimal(inputValue || NaN);
 		const amountDecimal = new Decimal(amountState || NaN);
 
-		const secondCurrencyDP = pairData?.second_currency.asset_info?.decimal_point || 12;
-
 		const validationResult = validateTokensInput(inputValue, secondCurrencyDP);
 
 		if (!validationResult.valid) {
@@ -391,7 +391,7 @@ function Trading() {
 		setPriceValid(true);
 
 		if (!valueDecimal.isNaN() && !amountDecimal.isNaN() && amountState !== '') {
-			const total = valueDecimal.mul(amountDecimal).toFixed();
+			const total = valueDecimal.mul(amountDecimal).toFixed(secondCurrencyDP);
 			setTotalState(total);
 
 			const totalValidationResult = validateTokensInput(total, secondCurrencyDP);
@@ -453,7 +453,7 @@ function Trading() {
 		if (balance) setRangeInputValue(value.div(balance).mul(100).toFixed());
 
 		if (!price.isNaN() && !value.isNaN() && priceState !== '') {
-			const total = value.mul(price).toFixed();
+			const total = value.mul(price).toFixed(secondCurrencyDP);
 			setTotalState(total);
 
 			const totalValidationResult = validateTokensInput(
@@ -484,7 +484,7 @@ function Trading() {
 			setRangeInputValue(percentageDecimal.toFixed() || '');
 		}
 
-		const total = priceDecimal.mul(amountDecimal).toFixed();
+		const total = priceDecimal.mul(amountDecimal).toFixed(secondCurrencyDP);
 
 		const totalValidationResult = validateTokensInput(
 			total,
