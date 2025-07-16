@@ -255,6 +255,7 @@ function Trading() {
 		: undefined;
 
 	const secondAssetUsdPrice = state.assetsRates.get(secondAssetId || '');
+	const secondCurrencyDP = pairData?.second_currency.asset_info?.decimal_point || 12;
 
 	useEffect(() => {
 		async function fetchPairStats() {
@@ -379,8 +380,6 @@ function Trading() {
 		const valueDecimal = new Decimal(inputValue || NaN);
 		const amountDecimal = new Decimal(amountState || NaN);
 
-		const secondCurrencyDP = pairData?.second_currency.asset_info?.decimal_point || 12;
-
 		const validationResult = validateTokensInput(inputValue, secondCurrencyDP);
 
 		if (!validationResult.valid) {
@@ -393,8 +392,9 @@ function Trading() {
 		setPriceValid(true);
 
 		if (!valueDecimal.isNaN() && !amountDecimal.isNaN() && amountState !== '') {
-			const total = valueDecimal.mul(amountDecimal).toFixed();
-			setTotalState(total);
+			const totalDecimal = valueDecimal.mul(amountDecimal);
+			setTotalState(totalDecimal.toString());
+			const total = totalDecimal.toFixed(secondCurrencyDP);
 
 			const totalValidationResult = validateTokensInput(total, secondCurrencyDP);
 
@@ -455,13 +455,10 @@ function Trading() {
 		if (balance) setRangeInputValue(value.div(balance).mul(100).toFixed());
 
 		if (!price.isNaN() && !value.isNaN() && priceState !== '') {
-			const total = value.mul(price).toFixed();
-			setTotalState(total);
-
-			const totalValidationResult = validateTokensInput(
-				total,
-				pairData?.second_currency.asset_info?.decimal_point || 12,
-			);
+			const totalDecimal = value.mul(price);
+			setTotalState(totalDecimal.toString());
+			const total = totalDecimal.toFixed(secondCurrencyDP);
+			const totalValidationResult = validateTokensInput(total, secondCurrencyDP);
 
 			setTotalValid(totalValidationResult.valid);
 		} else {
@@ -486,7 +483,7 @@ function Trading() {
 			setRangeInputValue(percentageDecimal.toFixed() || '');
 		}
 
-		const total = priceDecimal.mul(amountDecimal).toFixed();
+		const total = priceDecimal.mul(amountDecimal).toFixed(secondCurrencyDP);
 
 		const totalValidationResult = validateTokensInput(
 			total,
@@ -1038,8 +1035,8 @@ function Trading() {
 	const pairRateUsd =
 		pairStats?.rate !== undefined && secondAssetUsdPrice !== undefined
 			? new Decimal(pairStats.rate)
-				.mul(secondAssetUsdPrice)
-				.toFixed(pairStats.rate < 0.1 ? 6 : 2)
+					.mul(secondAssetUsdPrice)
+					.toFixed(pairStats.rate < 0.1 ? 6 : 2)
 			: undefined;
 
 	const scrollToOrderList = () => {
@@ -1071,13 +1068,13 @@ function Trading() {
 											pairData.first_currency?.name &&
 											pairData.second_currency?.name
 										) ? (
-												'...'
-											) : (
-												<>
-													{firstCurrencyName}
-													<span>/{secondCurrencyName}</span>
-												</>
-											)}
+											'...'
+										) : (
+											<>
+												{firstCurrencyName}
+												<span>/{secondCurrencyName}</span>
+											</>
+										)}
 									</p>
 									<div className={styles.trading__currency__rate}>
 										<p>
