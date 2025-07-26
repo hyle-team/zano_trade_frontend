@@ -31,8 +31,8 @@ function Home(props: HomeProps) {
 
 	const offersNotifications = state.user?.chats
 		? state.user.chats?.filter(
-			(e) => state.user?.id && !(e.view_list || [])?.includes(state.user?.id),
-		).length || 0
+				(e) => state.user?.id && !(e.view_list || [])?.includes(state.user?.id),
+			).length || 0
 		: 0;
 
 	function Card(props: { title: string; value: string }) {

@@ -97,10 +97,10 @@ function CurrencyDropdown(props: CurrencyDropdownProps) {
 							body={
 								!props.noStars
 									? separateArray(e.data, (curr) =>
-										(state?.user?.favourite_currencies || []).includes(
-											curr.id,
-										),
-									)
+											(state?.user?.favourite_currencies || []).includes(
+												curr.id,
+											),
+										)
 									: e.data
 							}
 						/>

@@ -62,8 +62,6 @@ App.getInitialProps = async (context: AppContext) => {
 	try {
 		const pageProps = await NextApp.getInitialProps(context);
 
-		if (!context.ctx.req) return pageProps;
-
 		const configRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/config`, {
 			method: 'GET',
 			headers: {
