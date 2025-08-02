@@ -8,7 +8,7 @@ interface InputPanelItemProps {
 	totalState: string;
 	buySellValues: SelectValue[];
 	buySellState: SelectValue;
-	setBuySellState: Dispatch<SetStateAction<SelectValue>>;
+	// setBuySellState: Dispatch<SetStateAction<SelectValue>>;
 	setPriceFunction: (_value: string) => void;
 	setAmountFunction: (_value: string) => void;
 	setAlertState: Dispatch<SetStateAction<AlertType>>;
@@ -23,7 +23,6 @@ interface InputPanelItemProps {
 	totalValid: boolean;
 	totalUsd: string | undefined;
 	scrollToOrderList: () => void;
-	updateUserOrders: () => void;
 }
 
 export default InputPanelItemProps;

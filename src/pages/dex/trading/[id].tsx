@@ -1,13 +1,11 @@
 import styles from '@/styles/Trading.module.scss';
 import Footer from '@/components/default/Footer/Footer';
 import Header from '@/components/default/Header/Header';
-import PageTitle from '@/components/default/PageTitle/PageTitle';
 import { ReactComponent as ClockIcon } from '@/assets/images/UI/clock_icon.svg';
 import { ReactComponent as UpIcon } from '@/assets/images/UI/up_icon.svg';
 import { ReactComponent as DownIcon } from '@/assets/images/UI/down_icon.svg';
 import { ReactComponent as VolumeIcon } from '@/assets/images/UI/volume_icon.svg';
 import { ReactComponent as NoOffersIcon } from '@/assets/images/UI/no_offers.svg';
-import { ReactComponent as ArrowRight } from '@/assets/images/UI/arrow-outlined-right.svg';
 import Dropdown from '@/components/UI/Dropdown/Dropdown';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -22,13 +20,16 @@ import {
 	getPairStats,
 	getUserOrdersPage,
 	getCandles,
+	getTrades,
 } from '@/utils/methods';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import Link from 'next/link';
 import { nanoid } from 'nanoid';
 import {
+	classes,
 	cutAddress,
 	formatDollarValue,
+	formatTime,
 	isPositiveFloatStr,
 	notationToString,
 	roundTo,
@@ -56,16 +57,17 @@ import LightningImg from '@/assets/images/UI/lightning.png';
 import RocketImg from '@/assets/images/UI/rocket.png';
 import { ReactComponent as ConnectionIcon } from '@/assets/images/UI/connection.svg';
 import Image from 'next/image';
+import BackButton from '@/components/default/BackButton/BackButton';
+import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
 import CandleChart from './CandleChart/CandleChart';
-import OrdersBuySellSwitch from './OrdersBuySellSwitch/OrdersBuySellSwitch';
 import InputPanelItem from './InputPanelItem/InputPanelItem';
 import { validateTokensInput } from '../../../../shared/utils';
 
-function BadgeStatus({ type = 'instant' }: { type?: 'instant' | 'high' }) {
+function BadgeStatus({ type = 'instant', icon }: { type?: 'instant' | 'high'; icon?: boolean }) {
 	return (
-		<div className={`${styles.badge} ${type === 'high' && styles.high}`}>
+		<div className={classes(styles.badge, type === 'high' && styles.high, icon && styles.icon)}>
 			<Image src={type === 'instant' ? LightningImg : RocketImg} alt="badge image" />
-			<span>{type === 'instant' ? 'instant' : 'high volume'}</span>
+			{!icon && <span>{type === 'instant' ? 'instant' : 'high volume'}</span>}
 		</div>
 	);
 }
@@ -102,6 +104,10 @@ function Trading() {
 
 	const buySellValues: SelectValue[] = [
 		{
+			name: 'All',
+			code: 'all',
+		},
+		{
 			name: 'Buy',
 			code: 'buy',
 		},
@@ -125,9 +131,16 @@ function Trading() {
 
 	const [ordersLoading, setOrdersLoading] = useState(true);
 
+	const [trades, setTrades] = useState<Trade[]>([]);
+	const [tradesLoading, setTradesLoading] = useState(true);
+
 	const [myOrdersLoading, setMyOrdersLoading] = useState(true);
 
 	const [ordersBuySell, setOrdersBuySell] = useState(buySellValues[0]);
+
+	const [tradesType, setTradesType] = useState<'all' | 'my'>('all');
+
+	const [ordersType, setOrdersType] = useState<'opened' | 'history'>('opened');
 
 	const [pairStats, setPairStats] = useState<PairStats | null>(null);
 
@@ -136,6 +149,54 @@ function Trading() {
 	const [alertState, setAlertState] = useState<AlertType>(null);
 
 	const [alertSubtitle, setAlertSubtitle] = useState<string>('');
+
+	const [ordersInfoTooltip, setOrdersInfoTooltip] = useState<PageOrderData | null>(null);
+	const ordersInfoRef = useRef<HTMLTableSectionElement | null>(null);
+	const [infoTooltipPos, setInfoTooltipPos] = useState({ x: 0, y: 0 });
+
+	async function fetchTrades() {
+		setTradesLoading(true);
+		const result = await getTrades(pairId);
+
+		if (result.success) {
+			setTrades(result.data);
+		}
+
+		setTradesLoading(false);
+	}
+
+	useEffect(() => {
+		(async () => {
+			await fetchTrades();
+		})();
+	}, [pairId]);
+
+	const filteredTrades =
+		tradesType === 'my'
+			? trades.filter(
+					(trade) =>
+						trade.buyer.address === state.wallet?.address ||
+						trade.seller.address === state.wallet?.address,
+				)
+			: trades;
+
+	useEffect(() => {
+		const targetEl = (event: MouseEvent) => {
+			if (ordersInfoRef.current && !ordersInfoRef.current.contains(event.target as Node)) {
+				setOrdersInfoTooltip(null);
+			}
+		};
+
+		window.addEventListener('mousemove', targetEl);
+
+		return () => {
+			window.removeEventListener('mousemove', targetEl);
+		};
+	}, []);
+
+	const moveInfoTooltip = (event: React.MouseEvent) => {
+		setInfoTooltipPos({ x: event.clientX, y: event.clientY });
+	};
 
 	const [matrixAddresses, setMatrixAddresses] = useState([]);
 
@@ -211,7 +272,7 @@ function Trading() {
 		);
 
 	const filteredOrdersHistory = ordersHistory
-		?.filter((e) => e.type === ordersBuySell.code)
+		?.filter((e) => (ordersBuySell.code === 'all' ? e : e.type === ordersBuySell.code))
 		?.filter((e) => e.user.address !== state.wallet?.address)
 		?.sort((a, b) => {
 			if (ordersBuySell.code === 'buy') {
@@ -328,15 +389,24 @@ function Trading() {
 	const [amountState, setAmountState] = useState('');
 	const [totalState, setTotalState] = useState('');
 
+	const [priceSellState, setPriceSellState] = useState('');
+	const [amountSellState, setAmountSellState] = useState('');
+	const [totalSellState, setTotalSellState] = useState('');
+
 	const [totalUsd, setTotalUsd] = useState<string | undefined>(undefined);
+	const [totalSellUsd, setTotalSellUsd] = useState<string | undefined>(undefined);
 
 	const [priceValid, setPriceValid] = useState(false);
 	const [amountValid, setAmountValid] = useState(false);
 	const [totalValid, setTotalValid] = useState(false);
+	const [priceSellValid, setPriceSellValid] = useState(false);
+	const [amountSellValid, setAmountSellValid] = useState(false);
+	const [totalSellValid, setTotalSellValid] = useState(false);
 
 	const [buySellState, setBuySellState] = useState(buySellValues[0]);
 
 	const [rangeInputValue, setRangeInputValue] = useState('50');
+	const [rangeInputSellValue, setRangeInputSellValue] = useState('50');
 
 	useEffect(() => {
 		let totalDecimal: Decimal | undefined;
@@ -351,6 +421,22 @@ function Trading() {
 
 		setTotalUsd(zanoPrice && totalDecimal ? totalDecimal.mul(zanoPrice).toFixed(2) : undefined);
 	}, [totalState, state.assetsRates, pairData?.second_currency?.asset_id]);
+
+	useEffect(() => {
+		let totalSellDecimal: Decimal | undefined;
+
+		try {
+			totalSellDecimal = new Decimal(totalSellState);
+		} catch (error) {
+			console.log(error);
+		}
+
+		const zanoPrice = state.assetsRates.get(pairData?.second_currency?.asset_id || '');
+
+		setTotalSellUsd(
+			zanoPrice && totalSellDecimal ? totalSellDecimal.mul(zanoPrice).toFixed(2) : undefined,
+		);
+	}, [totalSellState, state.assetsRates, pairData?.second_currency?.asset_id]);
 
 	function setPriceFunction(inputValue: string) {
 		if (inputValue !== '' && !isPositiveFloatStr(inputValue)) {
@@ -402,6 +488,60 @@ function Trading() {
 		} else {
 			setTotalState('');
 			setTotalValid(false);
+		}
+	}
+
+	function setPriceSellFunction(inputValue: string) {
+		if (inputValue !== '' && !isPositiveFloatStr(inputValue)) {
+			return;
+		}
+
+		try {
+			const value = new Decimal(inputValue || NaN);
+
+			if (value.toString().replace('.', '').length > 18) {
+				console.log('TOO MANY DECIMALS');
+				return;
+			}
+		} catch (error) {
+			console.log(error);
+		}
+
+		setPriceSellState(inputValue);
+
+		if (!inputValue) {
+			setTotalSellState('');
+			setTotalSellValid(false);
+			setPriceSellValid(false);
+			return;
+		}
+
+		const valueDecimal = new Decimal(inputValue || NaN);
+		const amountDecimal = new Decimal(amountSellState || NaN);
+
+		const secondCurrencyDP = pairData?.second_currency.asset_info?.decimal_point || 12;
+
+		const validationResult = validateTokensInput(inputValue, secondCurrencyDP);
+
+		if (!validationResult.valid) {
+			setTotalSellState('');
+			setTotalSellValid(false);
+			setPriceSellValid(false);
+			return;
+		}
+
+		setPriceSellValid(true);
+
+		if (!valueDecimal.isNaN() && !amountDecimal.isNaN() && amountSellState !== '') {
+			const total = valueDecimal.mul(amountDecimal).toFixed();
+			setTotalSellState(total);
+
+			const totalValidationResult = validateTokensInput(total, secondCurrencyDP);
+
+			setTotalSellValid(totalValidationResult.valid);
+		} else {
+			setTotalSellState('');
+			setTotalSellValid(false);
 		}
 	}
 
@@ -467,6 +607,67 @@ function Trading() {
 		}
 	}
 
+	function setAmountSellFunction(inputValue: string) {
+		if (inputValue !== '' && !isPositiveFloatStr(inputValue)) {
+			return;
+		}
+
+		try {
+			const value = new Decimal(inputValue || NaN);
+
+			if (value.toString().replace('.', '').length > 18) {
+				console.log('TOO MANY DECIMALS');
+				return;
+			}
+		} catch (error) {
+			console.log(error);
+		}
+
+		setAmountSellState(inputValue);
+
+		if (!inputValue) {
+			setTotalSellState('');
+			setTotalSellValid(false);
+			setAmountSellValid(false);
+			return;
+		}
+
+		const value = new Decimal(inputValue || NaN);
+		const price = new Decimal(priceSellState || NaN);
+
+		const validationResult = validateTokensInput(
+			inputValue,
+			pairData?.first_currency.asset_info?.decimal_point || 12,
+		);
+		console.log(validationResult);
+
+		if (!validationResult.valid) {
+			setTotalSellState('');
+			setTotalSellValid(false);
+			setAmountSellValid(false);
+			return;
+		}
+
+		setAmountSellValid(true);
+
+		if (balance) setRangeInputSellValue(value.div(balance).mul(100).toFixed());
+
+		if (!price.isNaN() && !value.isNaN() && priceSellState !== '') {
+			const total = value.mul(price).toFixed();
+			setTotalSellState(total);
+
+			const totalValidationResult = validateTokensInput(
+				total,
+				pairData?.second_currency.asset_info?.decimal_point || 12,
+			);
+
+			setTotalSellValid(totalValidationResult.valid);
+		} else {
+			setTotalSellState('');
+			setTotalSellValid(false);
+		}
+	}
+
 	function setCorrespondingOrder(price: number, amount: number) {
 		const priceDecimal = new Decimal(price || 0);
 		const amountDecimal = new Decimal(amount || 0);
@@ -493,24 +694,51 @@ function Trading() {
 		setTotalValid(totalValidationResult.valid);
 	}
 
+	function setCorrespondingSellOrder(price: number, amount: number) {
+		const priceDecimal = new Decimal(price || 0);
+		const amountDecimal = new Decimal(amount || 0);
+		const totalDecimal = priceDecimal.mul(amountDecimal);
+
+		setPriceSellFunction(notationToString(priceDecimal.toString()) || '');
+		setAmountSellFunction(notationToString(amountDecimal.toString()) || '');
+		setTotalSellState(notationToString(totalDecimal.toString()) || '');
+
+		if (balance) {
+			const balanceDecimal = new Decimal(balance);
+
+			const percentageDecimal = amountDecimal.div(balanceDecimal).mul(100);
+			setRangeInputSellValue(percentageDecimal.toFixed() || '');
+		}
+
+		const total = priceDecimal.mul(amountDecimal).toFixed();
+
+		const totalValidationResult = validateTokensInput(
+			total,
+			pairData?.second_currency.asset_info?.decimal_point || 12,
+		);
+
+		setTotalSellValid(totalValidationResult.valid);
+	}
+
 	function StatItem(props: StatItemProps) {
 		const { Img } = props;
 
 		return (
 			<div className={styles.trading__stat__item}>
-				<div>
+				<div className={styles.trading__stat__item_nav}>
 					<Img />
 					<p>{props.title}</p>
 				</div>
-				<div>
-					<p>{props.value}</p>
+				<div className={styles.trading__stat__item_content}>
+					<p className={styles.val}>{props.value}</p>
 					{props.coefficient !== undefined && (
 						<p
-							className={
+							className={classes(
+								styles.coefficient,
 								props.coefficient >= 0
 									? styles.coefficient__green
-									: styles.coefficient__red
-							}
+									: styles.coefficient__red,
+							)}
 						>
 							{props.coefficient >= 0 ? '+' : ''}
 							{props.coefficient?.toFixed(2)}%
@@ -522,14 +750,20 @@ function Trading() {
 	}
 
 	function takeOrderClick(
-		event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+		event:
+			| React.MouseEvent<HTMLAnchorElement, MouseEvent>
+			| React.MouseEvent<HTMLTableRowElement, MouseEvent>,
 		e: PageOrderData,
 	) {
 		event.preventDefault();
-		setCorrespondingOrder(e.price, e.amount);
-		setBuySellState(
-			buySellValues.find((e) => e.code !== ordersBuySell.code) || buySellValues[0],
-		);
+
+		if (e.type === 'buy') {
+			setCorrespondingOrder(e.price, e.amount);
+			setBuySellState(buySellValues[1]);
+		} else {
+			setCorrespondingSellOrder(e.price, e.amount);
+			setBuySellState(buySellValues[2]);
+		}
 
 		if (!orderFormRef.current) return;
 
@@ -542,11 +776,13 @@ function Trading() {
 		children,
 		sideText,
 		sideTextColor,
+		noTooltip,
 	}: {
 		style?: React.CSSProperties;
-		children: string;
+		children: string | React.ReactNode;
 		sideText?: string;
 		sideTextColor?: string;
+		noTooltip?: boolean;
 	}) {
 		const [showTooltip, setShowTooltip] = useState(false);
 
@@ -574,7 +810,7 @@ function Trading() {
 						</span>
 					)}
 				</p>
-				{isLongContent && (
+				{isLongContent && !noTooltip && (
 					<Tooltip
 						className={styles.table__tooltip}
 						arrowClass={styles.table__tooltip_arrow}
@@ -624,53 +860,15 @@ function Trading() {
 		const percentage = props?.percentage;
 
 		const totalDecimal = new Decimal(e.left).mul(new Decimal(e.price));
-		const totalValue = secondAssetUsdPrice
-			? totalDecimal.mul(secondAssetUsdPrice).toFixed(2)
-			: undefined;
-
-		const [showTooltip, setShowTooltip] = useState(false);
-
-		let sideText: string;
-
-		if (!secondAssetUsdPrice) {
-			sideText = 'undefined';
-		} else {
-			const value = secondAssetUsdPrice * e.price;
-			sideText = e.price < 0.9 ? `$${value.toFixed(5)}` : `$${value.toFixed(2)}`;
-		}
 
 		return (
 			<tr
-				className={ordersBuySell.code === 'sell' ? styles.sell_section : ''}
+				onMouseEnter={() => setOrdersInfoTooltip(e)}
+				onClick={(event) => takeOrderClick(event, e)}
+				className={e.type === 'sell' ? styles.sell_section : ''}
 				style={{ '--line-width': `${percentage}%` } as React.CSSProperties}
 				key={nanoid(16)}
 			>
-				<td>
-					<p
-						className={styles.alias}
-						onMouseEnter={() => setShowTooltip(true)}
-						onMouseLeave={() => setShowTooltip(false)}
-					>
-						@{cutAddress(e.user?.alias || 'no alias', 12)}
-						<MatrixConnectionBadge
-							userAdress={e?.user?.address}
-							userAlias={e.user?.alias}
-						/>
-					</p>
-					{e.isInstant && <BadgeStatus />}
-					{/* High volume */}
-					{/* <BadgeStatus type="high" /> */}
-
-					{e.user?.alias.length > 12 && (
-						<Tooltip
-							className={styles.table__tooltip_right}
-							arrowClass={styles.table__tooltip_arrow}
-							shown={showTooltip}
-						>
-							{e.user?.alias}
-						</Tooltip>
-					)}
-				</td>
 				<OrderRowTooltipCell
 					style={{
 						color: e.type === 'buy' ? '#16D1D6' : '#FF6767',
@@ -679,13 +877,11 @@ function Trading() {
 						gap: '8px',
 						maxWidth: 'max-content',
 					}}
-					sideText={sideText}
-					sideTextColor={e.type === 'buy' ? '#2C8688' : '#B49398'}
 				>
 					{notationToString(e.price)}
 				</OrderRowTooltipCell>
 				<OrderRowTooltipCell>{notationToString(e.amount)}</OrderRowTooltipCell>
-				<OrderRowTooltipCell>{notationToString(e.left)}</OrderRowTooltipCell>
+				{/* <OrderRowTooltipCell>{notationToString(e.left)}</OrderRowTooltipCell> */}
 				<OrderRowTooltipCell
 					style={{
 						display: 'flex',
@@ -693,33 +889,9 @@ function Trading() {
 						gap: '8px',
 						maxWidth: 'max-content',
 					}}
-					sideText={totalValue ? `$${formatDollarValue(totalValue)}` : undefined}
 				>
 					{notationToString(totalDecimal.toString())}
 				</OrderRowTooltipCell>
-				{/* <td><p>{localeTimeLeft(now, parseInt(e.expiration_timestamp, 10))}</p></td> */}
-				<td>
-					<Link
-						href="/"
-						className={
-							ordersBuySell.code === 'buy'
-								? styles.orders_table__buy
-								: styles.orders_table__sell
-						}
-						onClick={(event) => takeOrderClick(event, e)}
-						style={{
-							display: 'flex',
-							justifyContent: 'center',
-							alignItems: 'center',
-							width: '18px',
-							height: '18px',
-						}}
-					>
-						<ArrowRight style={{ fill: 'transparent' }} />
-					</Link>
-
-					<div className={styles.status_line}></div>
-				</td>
 			</tr>
 		);
 	}
@@ -760,7 +932,7 @@ function Trading() {
 
 		return (
 			<tr key={nanoid(16)}>
-				<td style={{ marginRight: '34px' }}>
+				<td>
 					<p
 						className={styles.alias}
 						onMouseEnter={() => setShowTooltip(true)}
@@ -777,8 +949,13 @@ function Trading() {
 							userAdress={state?.wallet?.address}
 							userAlias={state.wallet?.alias}
 						/>
+						{e.isInstant && (
+							<div style={{ marginLeft: 2 }}>
+								<BadgeStatus icon />
+							</div>
+						)}
 					</p>
-					{e.isInstant && <BadgeStatus />}
+
 					{(state.wallet?.connected && state.wallet?.alias ? state.wallet?.alias : '')
 						?.length > 12 && (
 						<Tooltip
@@ -796,16 +973,19 @@ function Trading() {
 					{notationToString(e.price)}
 				</OrderRowTooltipCell>
 				<OrderRowTooltipCell>{notationToString(e.amount)}</OrderRowTooltipCell>
-				<OrderRowTooltipCell>{notationToString(e.left)}</OrderRowTooltipCell>
+
 				<OrderRowTooltipCell
-					style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
-					sideText={totalValue ? `$${formatDollarValue(totalValue)}` : undefined}
+					noTooltip
+					style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
 				>
-					{notationToString(totalDecimal.toString())}
+					{notationToString(totalDecimal.toString())}{' '}
+					<span>~ ${totalValue && formatDollarValue(totalValue)}</span>
 				</OrderRowTooltipCell>
+
 				{/* <td>{localeTimeLeft(now, parseInt(e.expiration_timestamp, 10))}</td> */}
+
 				<td>
-					<p>
+					<p style={{ fontWeight: 700, color: '#1F8FEB' }}>
 						{applyTips?.filter((tip) => tip.connected_order_id === e.id)?.length || 0}
 					</p>
 				</td>
@@ -955,11 +1135,12 @@ function Trading() {
 			await updateOrders();
 			await updateUserOrders();
 			await fetchUser();
+			await fetchTrades();
 		}
 
 		return (
 			<tr key={nanoid(16)}>
-				<td style={{ marginRight: '34px' }}>
+				<td>
 					<p
 						className={styles.alias}
 						onMouseEnter={() => setShowTooltip(true)}
@@ -970,7 +1151,13 @@ function Trading() {
 							userAdress={e.user.address}
 							userAlias={e.user.alias}
 						/>
+						{e.isInstant && (
+							<div style={{ marginLeft: 2 }}>
+								<BadgeStatus icon />
+							</div>
+						)}
 					</p>
+
 					{(e.isInstant || e.transaction) && <BadgeStatus />}
 
 					{e.user?.alias.length > 12 && (
@@ -982,22 +1169,21 @@ function Trading() {
 							{e.user?.alias}
 						</Tooltip>
 					)}
-					{/* High volume */}
-					{/* <BadgeStatus type="high" /> */}
 				</td>
 
 				<OrderRowTooltipCell style={{ color: e.type === 'buy' ? '#16D1D6' : '#FF6767' }}>
 					{notationToString(e.price)}
 				</OrderRowTooltipCell>
 				<OrderRowTooltipCell>{notationToString(e.left)}</OrderRowTooltipCell>
-				<td></td>
+
 				<OrderRowTooltipCell
-					style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
-					sideText={totalValue ? `$${formatDollarValue(totalValue)}` : undefined}
+					noTooltip
+					style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
 				>
-					{notationToString(totalDecimal.toString())}
+					{notationToString(totalDecimal.toString())}{' '}
+					<span>~ ${totalValue && formatDollarValue(totalValue)}</span>
 				</OrderRowTooltipCell>
-				{/* <td>{localeTimeLeft(now, parseInt(e.expiration_timestamp, 10))}</td> */}
+
 				<td></td>
 				<td>
 					<Link href="/" onClick={applyClick}>
@@ -1013,24 +1199,16 @@ function Trading() {
 			? pairData.first_currency?.code
 			: 'tsds';
 
+	const imgCode2 =
+		pairData && tradingKnownCurrencies.includes(pairData.second_currency?.code)
+			? pairData.second_currency?.code
+			: 'tsds';
+
 	const coefficient = pairStats?.coefficient || 0;
 	const coefficientOutput =
 		parseFloat(coefficient?.toFixed(2) || '0') === -100
 			? -99.99
 			: parseFloat(coefficient?.toFixed(2) || '0');
-
-	const ordersIsBuy = ordersBuySell.code === 'buy';
-	const shownOrdersAmount = filteredOrdersHistory.filter(
-		(e) => (e.type === 'buy') === ordersIsBuy,
-	).length;
-
-	const ordersSummaryFunds = filteredOrdersHistory
-		.reduce(
-			(acc, e) => acc.add(new Decimal(e.left).mul(new Decimal(e.price)).toNumber()),
-			new Decimal(0),
-		)
-		.toDP(5)
-		.toFixed();
 
 	const pairRateUsd =
 		pairStats?.rate !== undefined && secondAssetUsdPrice !== undefined
@@ -1045,80 +1223,105 @@ function Trading() {
 		orderListRef.current.scrollIntoView({ behavior: 'smooth' });
 	};
 
+	const handleCancelAllOrders = async () => {
+		setMyOrdersLoading(true);
+
+		try {
+			await Promise.all(userOrders.map((order) => cancelOrder(order.id)));
+			await updateUserOrders();
+		} catch (err) {
+			console.error(err);
+		} finally {
+			setMyOrdersLoading(false);
+		}
+	};
+
 	return (
 		<>
-			<Header />
+			<Header isLg={true} />
 			<main className={styles.main}>
 				<div className={styles.trading__title__wrapper}>
-					<PageTitle>
-						<div className={styles.trading__currency__wrapper}>
-							<div className={styles.trading__currency__wrapper_top}>
-								<div>
-									<Image
-										width={50}
-										height={50}
-										src={`/currencies/trade_${imgCode}.svg`}
-										alt="currency"
-									/>
-								</div>
-								<div>
-									<p>
-										{!(
-											pairData &&
-											pairData.first_currency?.name &&
-											pairData.second_currency?.name
-										) ? (
-											'...'
-										) : (
-											<>
-												{firstCurrencyName}
-												<span>/{secondCurrencyName}</span>
-											</>
-										)}
+					<div className={styles.trading__currency__wrapper}>
+						<div className={styles.trading__currency__wrapper_top}>
+							<div className={styles.coin__icon}>
+								<Image
+									width={50}
+									height={50}
+									src={`/currencies/trade_${imgCode}.svg`}
+									alt="currency"
+								/>
+							</div>
+							<div className={styles.coin__currency}>
+								<p>
+									{!(
+										pairData &&
+										pairData.first_currency?.name &&
+										pairData.second_currency?.name
+									) ? (
+										'...'
+									) : (
+										<>
+											{firstCurrencyName}
+											<span>/{secondCurrencyName}</span>
+										</>
+									)}
+								</p>
+								<div className={styles.trading__currency__rate}>
+									<p className={styles.trading__currency__rate_secondCurrency}>
+										{notationToString(pairStats?.rate || 0)}{' '}
+										{secondCurrencyName}
 									</p>
-									<div className={styles.trading__currency__rate}>
-										<p>
-											{notationToString(pairStats?.rate || 0)}{' '}
-											{secondCurrencyName}
+									{pairRateUsd && (
+										<p className={styles.trading__currency__rate_usd}>
+											~ ${pairRateUsd}
 										</p>
-										{pairRateUsd && (
-											<>
-												<div />
-												<p className={styles.trading__currency__rate_usd}>
-													${pairRateUsd}
-												</p>
-											</>
-										)}
-									</div>
+									)}
 								</div>
 							</div>
-							{pairData && firstAssetLink && secondAssetLink && (
-								<div className={styles.trading__currency__wrapper_bottom}>
-									<p>
-										{firstCurrencyName}:{' '}
-										<Link
-											rel="noopener noreferrer"
-											target="_blank"
-											href={firstAssetLink}
-										>
-											{shortenAddress(firstAssetId || '')}
-										</Link>
-									</p>
-									<p>
-										{secondCurrencyName}:{' '}
-										<Link
-											rel="noopener noreferrer"
-											target="_blank"
-											href={secondAssetLink}
-										>
-											{shortenAddress(secondAssetId || '')}
-										</Link>
-									</p>
-								</div>
-							)}
 						</div>
-					</PageTitle>
+					</div>
 					<div className={styles.currency__stats__wrapper}>
+						{pairData && firstAssetLink && secondAssetLink && (
+							<div className={styles.currency__stats__wrapper_assets}>
+								<div className={styles.asset}>
+									<p>
+										<Image
+											width={16}
+											height={16}
+											src={`/currencies/trade_${imgCode}.svg`}
+											alt="currency"
+										/>{' '}
+										{firstCurrencyName}:
+									</p>
+									<Link
+										rel="noopener noreferrer"
+										target="_blank"
+										href={firstAssetLink}
+									>
+										{shortenAddress(firstAssetId || '')}
+									</Link>
+								</div>
+								<div className={styles.asset}>
+									<p>
+										<Image
+											width={16}
+											height={16}
+											src={`/currencies/trade_${imgCode2}.svg`}
+											alt="currency"
+										/>{' '}
+										{secondCurrencyName}:
+									</p>
+									<Link
+										rel="noopener noreferrer"
+										target="_blank"
+										href={secondAssetLink}
+									>
+										{shortenAddress(firstAssetId || '')}
+									</Link>
+								</div>
+							</div>
+						)}
+
 						<StatItem
 							Img={ClockIcon}
 							title="24h change"
@@ -1144,134 +1347,65 @@ function Trading() {
 							)} ${secondCurrencyName}`}
 						/>
 					</div>
+
+					<BackButton />
 				</div>
 
-				<div ref={orderFormRef} className={styles.trading__top__wrapper}>
-					<div>
-						{InputPanelItem({
-							priceState,
-							amountState,
-							totalState,
-							buySellValues,
-							buySellState,
-							setBuySellState,
-							setPriceFunction,
-							setAmountFunction,
-							setAlertState,
-							setAlertSubtitle,
-							setRangeInputValue,
-							rangeInputValue,
-							firstCurrencyName,
-							secondCurrencyName,
-							balance: Number(balance),
-							priceValid,
-							amountValid,
-							totalValid,
-							totalUsd,
-							scrollToOrderList,
-							updateUserOrders,
-						})}
-					</div>
-					<div className={styles.trading__chart__wrapper}>
-						<div className={styles.trading__chart__settings}>
-							<HorizontalSelect
-								body={periods}
-								value={periodsState}
-								setValue={setPeriodsState}
-							/>
-							<Dropdown
-								body={[
-									{ name: 'Zano Chart' },
-									{ name: 'Trading View', disabled: true },
-								]}
-								className={styles.trading__chart__dropdown}
-								selfContained
-								value={{ name: 'Zano Chart' }}
-								setValue={() => undefined}
-							/>
-						</div>
-
-						{candlesLoaded ? (
-							<CandleChart candles={candles} period={periodsState.code} />
-						) : (
-							<ContentPreloader className={styles.trading__chart__preloader} />
-						)}
-					</div>
-				</div>
-
-				<div className={styles.trading__info}>
+				<div className={styles.trading__top__wrapper}>
 					<div className={styles.trading__orders_panel}>
-						<div className={styles['orders-panel__header']}>
-							<div className={styles['orders-panel__header_left']}>
-								<div>
-									<h5>
-										{ordersBuySell.code === 'buy' ? 'Buy' : 'Sell'} Orders
-										{/* <span>{firstCurrencyName && secondCurrencyName ? " - " + firstCurrencyName + "/" + secondCurrencyName : ""}</span> */}
-									</h5>
-									<div className={styles.header__delimiter}></div>
-									<p>
-										{firstCurrencyName && secondCurrencyName
-											? `${firstCurrencyName}/${secondCurrencyName}`
-											: ''}
-									</p>
-								</div>
+						<div className={styles.trading__orders_panel__header}>
+							<h5 className={styles.trading__orders_panel__header_title}>
+								Orders pool
+							</h5>
 
-								<div className={styles.header__stats}>
-									<div
-										className={
-											ordersIsBuy
-												? styles.header__orders_buy
-												: styles.header__orders_sell
-										}
-									>
-										<p>
-											{shownOrdersAmount}{' '}
-											{shownOrdersAmount === 1 ? 'order' : 'orders'}
-										</p>
-									</div>
-									<div className={styles['header__summary-funds']}>
-										<p>
-											{ordersSummaryFunds} <span>{secondCurrencyName}</span>
-										</p>
-									</div>
-								</div>
+							<div className={styles.trading__orders_panel__header_type}>
+								<button
+									onClick={() => setOrdersBuySell(buySellValues[0])}
+									className={classes(
+										styles.all,
+										ordersBuySell.code === 'all' && styles.selected,
+									)}
+								></button>
+
+								<button
+									onClick={() => setOrdersBuySell(buySellValues[1])}
+									className={classes(
+										styles.buy,
+										ordersBuySell.code === 'buy' && styles.selected,
+									)}
+								>
+									B
+								</button>
+
+								<button
+									onClick={() => setOrdersBuySell(buySellValues[2])}
+									className={classes(
+										styles.sell,
+										ordersBuySell.code === 'sell' && styles.selected,
+									)}
+								>
+									S
+								</button>
 							</div>
-							{/* <HorizontalSelect
-                                body={buySellValues}
-                                value={ordersBuySell}
-                                setValue={setOrdersBuySell}
-                            /> */}
-							<OrdersBuySellSwitch
-								body={buySellValues}
-								value={ordersBuySell}
-								setValue={setOrdersBuySell}
-								className={styles['orders-panel__header__select']}
-							/>
 						</div>
 
-						<div>
+						<div className={styles.orders__panel_content}>
 							<table>
 								<thead>
 									<tr>
-										<th>Alias</th>
-										<th>
-											Price <br />({secondCurrencyName})
-										</th>
-										<th>
-											Amount <br />({firstCurrencyName})
-										</th>
-										<th>
-											Remaining <br />({firstCurrencyName})
-										</th>
-										<th>
-											{' '}
-											Total <br /> ({secondCurrencyName})
-										</th>
-										<th></th>
+										<th>Price ({secondCurrencyName})</th>
+										<th>Amount ({firstCurrencyName})</th>
+										<th>Total ({secondCurrencyName})</th>
 									</tr>
 								</thead>
+
 								{!ordersLoading && !!filteredOrdersHistory.length && (
-									<tbody className="orders-scroll">
+									<tbody
+										ref={ordersInfoRef}
+										onMouseMove={moveInfoTooltip}
+										onMouseLeave={() => setOrdersInfoTooltip(null)}
+										className="orders-scroll"
+									>
 										{filteredOrdersHistory?.map((e) => {
 											const maxValue = Math.max(
 												...filteredOrdersHistory.map((order) =>
@@ -1306,17 +1440,224 @@ function Trading() {
 							{ordersLoading && (
 								<ContentPreloader className={styles.orders__preloader} />
 							)}
+
+							{ordersInfoTooltip &&
+								(() => {
+									const totalDecimal = new Decimal(ordersInfoTooltip?.left).mul(
+										new Decimal(ordersInfoTooltip?.price),
+									);
+									const totalValue = secondAssetUsdPrice
+										? totalDecimal.mul(secondAssetUsdPrice).toFixed(2)
+										: undefined;
+
+									return (
+										<Tooltip
+											key={nanoid(16)}
+											className={styles.tooltip}
+											arrowClass={styles.tooltip__arrow}
+											style={{
+												left: infoTooltipPos.x,
+												top: infoTooltipPos.y + 20,
+											}}
+											shown
+										>
+											<div>
+												<h6>Alias</h6>
+												<p>
+													@
+													{cutAddress(
+														ordersInfoTooltip?.user?.alias ||
+															'no alias',
+														12,
+													)}{' '}
+													{ordersInfoTooltip?.isInstant && (
+														<BadgeStatus icon />
+													)}
+												</p>
+
+												<h6>Price ({secondCurrencyName})</h6>
+												<p
+													style={{
+														color:
+															ordersInfoTooltip?.type === 'buy'
+																? '#16D1D6'
+																: '#FF6767',
+													}}
+												>
+													{notationToString(ordersInfoTooltip?.price)}
+												</p>
+												<span>
+													~
+													{secondAssetUsdPrice &&
+													ordersInfoTooltip?.price !== undefined
+														? (() => {
+																const total =
+																	secondAssetUsdPrice *
+																	ordersInfoTooltip.price;
+																const formatted =
+																	ordersInfoTooltip.price < 0.9
+																		? `$${total.toFixed(5)}`
+																		: `$${total.toFixed(2)}`;
+																return formatted;
+															})()
+														: 'undefined'}
+												</span>
+
+												<h6>Amount ({firstCurrencyName})</h6>
+												<p>{notationToString(ordersInfoTooltip?.amount)}</p>
+
+												<h6>Total ({secondCurrencyName})</h6>
+												<p>{notationToString(totalDecimal.toString())}</p>
+												<span>
+													~{' '}
+													{totalValue
+														? `$${formatDollarValue(totalValue)}`
+														: 'undefined'}
+												</span>
+											</div>
+										</Tooltip>
+									);
+								})()}
 						</div>
 					</div>
-					<div id="my_orders" ref={orderListRef} className={styles.trading__user__orders}>
-						<div>
-							<h5>My Orders</h5>
 
-							<div>
-								<p>
-									{applyTips?.length || 0} Offer
-									{(applyTips?.length || 0) === 1 ? '' : 's'}
-								</p>
+					<div className={styles.trading__chart__wrapper}>
+						<div className={styles.trading__chart__settings}>
+							<HorizontalSelect
+								body={periods}
+								value={periodsState}
+								setValue={setPeriodsState}
+								isTab
+							/>
+							<Dropdown
+								body={[
+									{ name: 'Zano Chart' },
+									{ name: 'Trading View', disabled: true },
+								]}
+								className={styles.trading__chart__dropdown}
+								selfContained
+								value={{ name: 'Zano Chart' }}
+								setValue={() => undefined}
+							/>
+						</div>
+
+						{candlesLoaded ? (
+							<CandleChart candles={candles} period={periodsState.code} />
+						) : (
+							<ContentPreloader className={styles.trading__chart__preloader} />
+						)}
+					</div>
+
+					<div className={styles.allTrades}>
+						<div className={styles.allTrades__header}>
+							<button
+								onClick={() => setTradesType('all')}
+								className={classes(
+									styles.navItem,
+									tradesType === 'all' && styles.active,
+								)}
+							>
+								All Trades
+							</button>
+
+							<button
+								onClick={() => setTradesType('my')}
+								className={classes(
+									styles.navItem,
+									tradesType === 'my' && styles.active,
+								)}
+							>
+								My Trades
+							</button>
+						</div>
+
+						<div className={styles.orders__panel_content}>
+							<table>
+								<thead>
+									<tr>
+										<th>Price ({secondCurrencyName})</th>
+										<th>Amount ({firstCurrencyName})</th>
+										<th>Time</th>
+									</tr>
+								</thead>
+
+								{!tradesLoading && !!filteredTrades.length && (
+									<tbody className="orders-scroll">
+										{filteredTrades.map((trade) => (
+											<tr key={trade.id}>
+												<td>
+													<p
+														style={{
+															color:
+																trade.id % 2 === 0
+																	? '#16D1D6'
+																	: '#FF6767',
+														}}
+													>
+														{trade.price}
+													</p>
+												</td>
+												<td>
+													<p>{trade.amount}</p>
+												</td>
+												<td>
+													<p>{formatTime(trade.timestamp)}</p>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								)}
+							</table>
+
+							{!filteredTrades.length && !tradesLoading && (
+								<div
+									className={`${styles.orders__message} ${styles.all__orders__msg}`}
+								>
+									<NoOffersIcon />
+									<h6>No trades</h6>
+								</div>
+							)}
+
+							{tradesLoading && (
+								<ContentPreloader className={styles.orders__preloader} />
+							)}
+						</div>
+					</div>
+				</div>
+
+				<div className={styles.trading__info}>
+					<div id="my_orders" ref={orderListRef} className={styles.trading__user__orders}>
+						<div className={styles.trading__user__orders__header}>
+							<div className={styles.trading__user__orders__header_nav}>
+								<button
+									onClick={() => setOrdersType('opened')}
+									className={classes(
+										styles.navItem,
+										ordersType === 'opened' && styles.active,
+									)}
+								>
+									Opened orders{' '}
+									{applyTips?.length ? <span>{applyTips?.length}</span> : ''}
+								</button>
+
+								<button
+									onClick={() => setOrdersType('history')}
+									className={classes(
+										styles.navItem,
+										ordersType === 'history' && styles.active,
+									)}
+								>
+									Orders History
+								</button>
+							</div>
+
+							<div className={styles.trading__user_cancelOrder}>
+								<button
+									className={styles.trading__user__orders__header_btn}
+									onClick={handleCancelAllOrders}
+								>
+									Cancel all orders
+								</button>
 							</div>
 						</div>
 
@@ -1324,15 +1665,12 @@ function Trading() {
 							<table>
 								<thead>
 									<tr>
-										<th style={{ marginRight: '34px' }}>Alias</th>
+										<th>Alias</th>
 										<th>
 											Price <br />({secondCurrencyName})
 										</th>
 										<th>
 											Amount <br />({firstCurrencyName})
-										</th>
-										<th>
-											Remaining <br />({firstCurrencyName})
 										</th>
 										<th>
 											Total <br />({secondCurrencyName})
@@ -1342,6 +1680,7 @@ function Trading() {
 									</tr>
 								</thead>
 							</table>
+
 							{!myOrdersLoading && loggedIn && !!userOrders.length && (
 								<div className={`${styles.trading__right__tables} orders-scroll`}>
 									<table>
@@ -1389,6 +1728,56 @@ function Trading() {
 									<h6>No orders</h6>
 								</div>
 							)}
+						</div>
+					</div>
+
+					<div ref={orderFormRef} className={styles.trading__info_createOrders}>
+						<div className={styles.trading__info_createOrder}>
+							<InputPanelItem
+								priceState={priceState}
+								amountState={amountState}
+								totalState={totalState}
+								buySellValues={buySellValues}
+								buySellState={buySellValues[1]}
+								setPriceFunction={setPriceFunction}
+								setAmountFunction={setAmountFunction}
+								setAlertState={setAlertState}
+								setAlertSubtitle={setAlertSubtitle}
+								setRangeInputValue={setRangeInputValue}
+								rangeInputValue={rangeInputValue}
+								firstCurrencyName={firstCurrencyName}
+								secondCurrencyName={secondCurrencyName}
+								balance={Number(balance)}
+								priceValid={priceValid}
+								amountValid={amountValid}
+								totalValid={totalValid}
+								totalUsd={totalUsd}
+								scrollToOrderList={scrollToOrderList}
+							/>
+						</div>
+
+						<div className={styles.trading__info_createOrder}>
+							<InputPanelItem
+								priceState={priceSellState}
+								amountState={amountSellState}
+								totalState={totalSellState}
+								buySellValues={buySellValues}
+								buySellState={buySellValues[2]}
+								setPriceFunction={setPriceSellFunction}
+								setAmountFunction={setAmountSellFunction}
+								setAlertState={setAlertState}
+								setAlertSubtitle={setAlertSubtitle}
+								setRangeInputValue={setRangeInputSellValue}
+								rangeInputValue={rangeInputSellValue}
+								firstCurrencyName={firstCurrencyName}
+								secondCurrencyName={secondCurrencyName}
+								balance={Number(balance)}
+								priceValid={priceSellValid}
+								amountValid={amountSellValid}
+								totalValid={totalSellValid}
+								totalUsd={totalSellUsd}
+								scrollToOrderList={scrollToOrderList}
+							/>
 						</div>
 					</div>
 				</div>

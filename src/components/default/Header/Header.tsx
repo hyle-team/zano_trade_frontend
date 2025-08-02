@@ -18,7 +18,7 @@ import Button from '@/components/UI/Button/Button';
 
 import { useWindowWidth } from '@react-hook/window-size';
 import ConnectButton from '@/components/UI/ConnectButton/ConnectButton';
-import { notationToString, setWalletCredentials, shortenAddress } from '@/utils/utils';
+import { classes, notationToString, setWalletCredentials, shortenAddress } from '@/utils/utils';
 import useAdvancedTheme from '@/hook/useTheme';
 
 import { Store } from '@/store/store-reducer';
@@ -33,7 +33,7 @@ import useUpdateUser from '@/hook/useUpdateUser';
 import NavBar from './NavBar/NavBar';
 import styles from './Header.module.scss';
 
-function Header() {
+function Header({ isLg }: { isLg?: boolean }) {
 	const { theme, setTheme } = useAdvancedTheme();
 	const router = useRouter();
 
@@ -347,7 +347,7 @@ function Header() {
 	return (
 		<>
 			{menuOpened && <div className={styles.header__blur__block}></div>}
-			<header className={styles.header}>
+			<header className={classes(styles.header, isLg && styles.lg)}>
 				<div className={styles.header__logo}>
 					<Link href="/dex">
 						<img src={theme === 'dark' ? logoImg : logoImgWhite} alt="Zano P2P" />

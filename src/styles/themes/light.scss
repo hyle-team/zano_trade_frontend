@@ -46,6 +46,10 @@
 	--admin-table-border-color: rgba(31, 143, 235, 0.2);
 	--alert-btn-bg: rgba(31, 143, 235, 0.2);
 	--alert-btn-hover: rgba(31, 143, 235, 0.3);
+	--table-even-bg: #f2f5f9;
+	--table-tr-hover-color: #dcf0ff;
+	--dex-tooltip-bg: #eff8ff;
+	--dex-tooltip-border-color: #1f8feb33;
 }
 
 [data-theme='dark'] {
@@ -96,4 +100,8 @@
 	--admin-table-border-color: #596f98;
 	--alert-btn-bg: rgba(31, 143, 235, 0.2);
 	--alert-btn-hover: rgba(31, 143, 235, 0.3);
+	--table-even-bg: #0c1d4f;
+	--table-tr-hover-color: #172a66;
+	--dex-tooltip-bg: #11316b;
+	--dex-tooltip-border-color: #1f8feb26;
 }
