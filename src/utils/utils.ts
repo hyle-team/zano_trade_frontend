@@ -132,6 +132,17 @@ export function isPositiveFloatStr(input: string) {
 	return regExp.test(input);
 }
 
+export function formatTime(ts: string | number) {
+	let num = Number(ts);
+
+	if (num < 1e12) num *= 1000;
+	const date = new Date(num);
+
+	if (Number.isNaN(date.getTime())) return '-';
+
+	return date.toLocaleTimeString('ru-RU', { hour12: false });
+}
+
 export function classes(...items: (string | boolean | undefined)[]): string {
 	// boolean for constructions like [predicate] && [className]
 	return items.filter((className) => className).join(' ');

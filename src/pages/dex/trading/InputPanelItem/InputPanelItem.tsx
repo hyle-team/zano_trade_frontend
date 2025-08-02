@@ -11,36 +11,10 @@ import InputPanelItemProps from '@/interfaces/props/pages/dex/trading/InputPanel
 import LabeledInputProps from '@/interfaces/props/pages/dex/trading/InputPanelItem/LabeledInputProps';
 import CreateOrderData from '@/interfaces/fetch-data/create-order/CreateOrderData';
 import Decimal from 'decimal.js';
-import HorizontalSelectProps from '@/interfaces/props/components/UI/HorizontalSelect/HorizontalSelectProps';
-import SelectValue from '@/interfaces/states/pages/dex/trading/InputPanelItem/SelectValue';
-import { nanoid } from 'nanoid';
 import Alert from '@/components/UI/Alert/Alert';
 import infoIcon from '@/assets/images/UI/info_alert_icon.svg';
 import Image from 'next/image';
 import styles from './InputPanelItem.module.scss';
-
-function DexBuySellSwitch({ body, value, setValue }: HorizontalSelectProps<SelectValue>) {
-	return (
-		<div className={styles['buy-sell-switch']}>
-			{body.map((e) => {
-				let itemClass = styles['buy-sell-switch__item'];
-
-				if (value.code === e.code) {
-					itemClass +=
-						e.code === 'buy'
-							? ` ${styles['item_selected-buy']}`
-							: ` ${styles['item_selected-sell']}`;
-				}
-
-				return (
-					<button key={nanoid()} className={itemClass} onClick={() => setValue(e)}>
-						{e.name}
-					</button>
-				);
-			})}
-		</div>
-	);
-}
 
 function InputPanelItem(props: InputPanelItemProps) {
 	const { state } = useContext(Store);
@@ -53,7 +27,6 @@ function InputPanelItem(props: InputPanelItemProps) {
 		totalState = '',
 		buySellValues,
 		buySellState = buySellValues[0],
-		setBuySellState,
 		setPriceFunction,
 		setAmountFunction,
 		setAlertState,
@@ -68,7 +41,6 @@ function InputPanelItem(props: InputPanelItemProps) {
 		totalValid,
 		totalUsd,
 		scrollToOrderList,
-		updateUserOrders,
 	} = props;
 
 	const [creatingState, setCreatingState] = useState(false);
@@ -163,8 +135,6 @@ function InputPanelItem(props: InputPanelItemProps) {
 				setAlertSubtitle('');
 			}, 3000);
 		}
-
-		updateUserOrders();
 	}
 
 	function onRangeInput(e: ChangeEvent<HTMLInputElement>) {
@@ -181,10 +151,8 @@ function InputPanelItem(props: InputPanelItemProps) {
 
 	if (creatingState) {
 		buttonText = 'Creating...';
-	} else if (isBuy) {
-		buttonText = 'Buy';
 	} else {
-		buttonText = 'Sell';
+		buttonText = 'Create Order';
 	}
 
 	return (
@@ -214,16 +182,19 @@ function InputPanelItem(props: InputPanelItemProps) {
 				/>
 			)}
 
-			<div>
-				<h5>New order</h5>
-				<DexBuySellSwitch
-					body={buySellValues}
-					value={buySellState}
-					setValue={setBuySellState}
-				/>
+			<div className={styles.input_panel__item_header}>
+				<h5>
+					{isBuy ? 'Buy' : 'Sell'} {secondCurrencyName}
+				</h5>
+
+				<div className={styles.input_panel__fees}>
+					<p>
+						Fee: <span>0.01 Zano</span>
+					</p>
+				</div>
 			</div>
 
-			<div>
+			<div className={styles.input_panel__item_body}>
 				{LabeledInput({
 					value: priceState,
 					setValue: setPriceFunction,
@@ -262,11 +233,6 @@ function InputPanelItem(props: InputPanelItemProps) {
 				) : (
 					<ConnectButton className={isBuy ? styles.buy_btn : styles.sell_btn} />
 				)}
-				<div className={styles.input_panel__fees}>
-					<p>
-						Fee: <span style={{ color: isBuy ? '#16D1D6' : '#FF6767' }}>0.01 Zano</span>
-					</p>
-				</div>
 			</div>
 		</div>
 	);

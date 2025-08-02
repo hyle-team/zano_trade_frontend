@@ -18,6 +18,13 @@
 		top: 30px;
 		transition: none;
 		transform: translateX(-50%);
+		box-shadow: 0px 4px 14px 0px #07072b59;
+		padding: 9px 12px;
+
+		p {
+			font-size: 14px;
+			font-weight: 500;
+		}
 	}
 
 	.range__slider {

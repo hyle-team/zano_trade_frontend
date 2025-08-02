@@ -327,3 +327,11 @@ export async function getZanoPrice() {
 		)
 		.then((res) => res.data);
 }
+
+export async function getTrades(pairId: string) {
+	return axios
+		.post(`/api/orders/get-trades`, {
+			pairId,
+		})
+		.then((res) => res.data);
+}

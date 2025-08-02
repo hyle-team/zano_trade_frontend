@@ -128,8 +128,8 @@ function CandleChart(props: CandleChartProps) {
 		return {
 			grid: {
 				top: '5%',
-				left: '10%',
-				right: '5%',
+				left: '-1%',
+				right: '6%',
 				bottom: '10%',
 			},
 
@@ -218,7 +218,7 @@ function CandleChart(props: CandleChartProps) {
 			<ReactECharts
 				option={option}
 				style={{
-					height: '515px',
+					height: '100%',
 					width: '100%',
 				}}
 				opts={{
