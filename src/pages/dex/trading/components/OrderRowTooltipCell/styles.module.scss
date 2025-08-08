@@ -1,0 +1,28 @@
+.row {
+	position: relative;
+
+	&:last-child {
+		> p {
+			text-align: right;
+		}
+	}
+
+	> p {
+		min-width: 80px;
+		width: 100%;
+		font-size: 12px;
+		font-weight: 400;
+	}
+}
+
+.tooltip {
+	position: absolute;
+	top: 30px;
+	left: 20%;
+	transform: translateX(-50%);
+	background-color: var(--trade-table-tooltip);
+
+	&__arrow {
+		background-color: var(--trade-table-tooltip);
+	}
+}

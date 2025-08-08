@@ -1,12 +1,15 @@
 import Preloader from '@/components/UI/Preloader/Preloader';
+import { classes } from '@/utils/utils';
 import styles from './ContentPreloader.module.scss';
+import { ContentPreloaderProps } from './types';
 
-function ContentPreloader(props: { className?: string }) {
+function ContentPreloader({ className, style }: ContentPreloaderProps) {
 	return (
-		<div className={`${styles.content__preloader__wrapper} ${props.className}`}>
-			<div>
+		<div style={style} className={classes(styles.loader, className)}>
+			<div className={styles.loader__content}>
 				<Preloader />
-				<p>Loading...</p>
+
+				<p className={styles.loder__text}>Loading...</p>
 			</div>
 		</div>
 	);

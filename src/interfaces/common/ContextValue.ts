@@ -1,6 +1,7 @@
 import { Dispatch } from 'react';
 import { GetUserResData } from '../responses/user/GetUserRes';
 import { GetConfigResData } from '../responses/config/GetConfigRes';
+import AlertType from './AlertType';
 
 export interface Asset {
 	name: string;
@@ -50,6 +51,8 @@ interface ContextState {
 		offers: number;
 	};
 	closed_notifications: number[];
+	alertState: AlertType;
+	alertSubtitle: string;
 }
 
 type ContextAction =
@@ -75,6 +78,14 @@ type ContextAction =
 	| {
 			type: 'CLOSED_NOTIFICATIONS_UPDATED';
 			payload: number[];
+	  }
+	| {
+			type: 'ALERT_STATE_UPDATED';
+			payload: AlertType;
+	  }
+	| {
+			type: 'ALERT_SUBTITLE_UPDATED';
+			payload: string;
 	  };
 
 interface ContextValue {

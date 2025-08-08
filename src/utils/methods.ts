@@ -335,3 +335,15 @@ export async function getTrades(pairId: string) {
 		})
 		.then((res) => res.data);
 }
+
+export async function getMatrixAddresses(addresses: string[]) {
+	try {
+		const { data } = await axios.post('https://messenger.zano.org/api/get-addresses', {
+			addresses,
+		});
+
+		return data;
+	} catch (error) {
+		console.log(error);
+	}
+}

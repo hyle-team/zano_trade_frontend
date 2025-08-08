@@ -9,7 +9,7 @@
 		background: none;
 		outline: none;
 		border: none;
-		z-index: 5;
+		z-index: 2;
 		cursor: pointer;
 	}
 
@@ -81,18 +81,4 @@
 		border: 2px solid var(--window-bg-color);
 		transition: background 0.3s ease-in-out;
 	}
-
-	// .input__range::-webkit-slider-runnable-track::-webkit-slider-thumb {
-	//     background-color: #fff;
-	//     border: 2px solid #555;
-	// }
-
-	// .input__range::-webkit-slider-runnable-track  {
-	//     -webkit-appearance: none;
-	//     height: 20px;
-	//     background-color: #1F8FEB;
-	//     border: 1px solid #ffffff;
-	//     box-shadow: none;
-	//     background: transparent;
-	// }
 }

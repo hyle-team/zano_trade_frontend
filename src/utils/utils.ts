@@ -143,9 +143,9 @@ export function formatTime(ts: string | number) {
 	return date.toLocaleTimeString('ru-RU', { hour12: false });
 }
 
-export function classes(...items: (string | boolean | undefined)[]): string {
+export function classes(...classes: (string | boolean | undefined)[]): string {
 	// boolean for constructions like [predicate] && [className]
-	return items.filter((className) => className).join(' ');
+	return classes.filter((className) => className).join(' ');
 }
 
 export const ZANO_ASSET_ID = 'd6329b5b1f7c0805b5c345f4957554002a2f557845f64d7645dae0e051a6498a';

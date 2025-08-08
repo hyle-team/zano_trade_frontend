@@ -1,0 +1,44 @@
+.statItem {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+
+	&__nav {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+
+		&_title {
+			color: var(--footer-selected-link);
+			white-space: nowrap;
+			font-size: 14px;
+			font-weight: 700;
+		}
+	}
+
+	&__content {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+
+		&_val {
+			white-space: nowrap;
+			font-size: 14px;
+			font-weight: 400;
+		}
+
+		&_coefficient {
+			white-space: nowrap;
+			font-size: 14px;
+			font-weight: 400;
+
+			&.green {
+				color: #16d1d6;
+			}
+
+			&.red {
+				color: #ff6767;
+			}
+		}
+	}
+}
