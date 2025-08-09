@@ -1,3 +1,4 @@
+// PairsTable.tsx
 import { memo, useContext, useMemo } from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useRouter } from 'next/router';
@@ -7,29 +8,9 @@ import { Store } from '@/store/store-reducer';
 import PairData from '@/interfaces/common/PairData';
 import { ContextState } from '@/interfaces/common/ContextValue';
 import { tradingKnownCurrencies, roundTo, notationToString } from '@/utils/utils';
+import ImgWithFallback from '@/components/UI/ImgWithFallback';
 import styles from './PairsTable.module.scss';
-
-type Currency = {
-	code: string;
-	name: string;
-	whitelisted?: boolean;
-	featured?: boolean;
-};
-
-type Row = {
-	id: string;
-	pair: {
-		base: Currency;
-		quote: Currency;
-	};
-	price: number;
-	priceUSD: string;
-	change: number;
-	volume: number;
-	volumeUSD: string;
-	featured: boolean;
-	code: string;
-};
+import { Row } from './types';
 
 function transformPairsToRows(pairs: PairData[], state: ContextState): Row[] {
 	return pairs.map((pair) => {
@@ -38,17 +19,18 @@ function transformPairsToRows(pairs: PairData[], state: ContextState): Row[] {
 		const price = Number(roundTo(notationToString(pair.rate ?? 0)));
 		const currentPriceUSD = secondAssetUsdPrice ? price : 0;
 		const priceUSD = currentPriceUSD
-			? String(`$${(secondAssetUsdPrice * price).toFixed(2)}`)
-			: String(`$${(secondAssetUsdPrice * price).toFixed(0)}`);
+			? `$${(secondAssetUsdPrice * price).toFixed(2)}`
+			: `$${(secondAssetUsdPrice * price).toFixed(0)}`;
 
 		const volume = Number(roundTo(notationToString(pair.volume ?? 0)));
 		const currentVolumeUSD = secondAssetUsdPrice ? volume : 0;
 		const volumeUSD = currentVolumeUSD
-			? String(`$${(secondAssetUsdPrice * volume).toFixed(2)}`)
-			: String(`$${(secondAssetUsdPrice * volume).toFixed(0)}`);
+			? `$${(secondAssetUsdPrice * volume).toFixed(2)}`
+			: `$${(secondAssetUsdPrice * volume).toFixed(0)}`;
 
 		return {
 			id: pair.id,
+			assetId: pair.first_currency.asset_id,
 			pair: {
 				base: pair.first_currency,
 				quote: pair.second_currency,
@@ -74,6 +56,10 @@ function PairsTable({ data }: IProps) {
 	const router = useRouter();
 	const { state } = useContext(Store);
 
+	const rows = useMemo(() => {
+		return transformPairsToRows(data, state);
+	}, [data, state.assetsRates]);
+
 	const columns = useMemo<ColumnDef<Row>[]>(
 		() => [
 			{
@@ -82,15 +68,15 @@ function PairsTable({ data }: IProps) {
 				cell: ({ row }) => {
 					const {
 						pair: { base, quote },
-						code,
 						featured,
+						assetId,
 					} = row.original;
 					return (
 						<div className={styles.pair_cell}>
-							<Image
+							<ImgWithFallback
 								width={18}
 								height={18}
-								src={`/currencies/trade_${code}.svg`}
+								src={`/tokens/${assetId}.png`}
 								alt="currency"
 							/>
 							<div className={styles.currency_name}>
@@ -114,9 +100,8 @@ function PairsTable({ data }: IProps) {
 			{
 				accessorKey: 'price',
 				header: ({ table }) => {
-					const row = table.options.data[0] as Row;
-					const name = row?.pair.quote.name;
-
+					const row0 = table.options.data[0] as Row | undefined;
+					const name = row0?.pair.quote.name;
 					return `Price ${name ? `(${name})` : ''}`;
 				},
 				cell: ({ row }) => (
@@ -186,13 +171,14 @@ function PairsTable({ data }: IProps) {
 				),
 			},
 		],
-		[],
+		[router],
 	);
 
 	const table = useReactTable({
-		data: transformPairsToRows(data, state),
+		data: rows,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
+		getRowId: (r) => r.id,
 	});
 
 	return (

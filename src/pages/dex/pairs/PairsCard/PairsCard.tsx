@@ -5,6 +5,7 @@ import { ReactComponent as ArrowRight } from '@/assets/images/UI/arrow_right.svg
 import { Store } from '@/store/store-reducer';
 import PairData from '@/interfaces/common/PairData';
 import { notationToString, roundTo, tradingKnownCurrencies } from '@/utils/utils';
+import ImgWithFallback from '@/components/UI/ImgWithFallback';
 import styles from './PairsCard.module.scss';
 
 interface IProps {
@@ -51,10 +52,10 @@ export default function PairsCard({ pair }: IProps) {
 	return (
 		<div className={styles.card}>
 			<div className={styles.card__header}>
-				<Image
+				<ImgWithFallback
 					width={18}
 					height={18}
-					src={`/currencies/trade_${code}.svg`}
+					src={`/tokens/${firstCurrency.asset_id}.png`}
 					alt="currency"
 				/>
 				<div className={styles.currency_name}>

@@ -56,6 +56,7 @@ import LightningImg from '@/assets/images/UI/lightning.png';
 import RocketImg from '@/assets/images/UI/rocket.png';
 import { ReactComponent as ConnectionIcon } from '@/assets/images/UI/connection.svg';
 import Image from 'next/image';
+import ImgWithFallback from '@/components/UI/ImgWithFallback';
 import CandleChart from './CandleChart/CandleChart';
 import OrdersBuySellSwitch from './OrdersBuySellSwitch/OrdersBuySellSwitch';
 import InputPanelItem from './InputPanelItem/InputPanelItem';
@@ -1054,10 +1055,10 @@ function Trading() {
 						<div className={styles.trading__currency__wrapper}>
 							<div className={styles.trading__currency__wrapper_top}>
 								<div>
-									<Image
+									<ImgWithFallback
 										width={50}
 										height={50}
-										src={`/currencies/trade_${imgCode}.svg`}
+										src={`/tokens/${pairData?.first_currency.asset_id}.png`}
 										alt="currency"
 									/>
 								</div>
