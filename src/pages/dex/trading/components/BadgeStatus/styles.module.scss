@@ -1,0 +1,39 @@
+.badge {
+	width: fit-content;
+	padding: 1px 4px;
+	padding-right: 8px;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	border-radius: 100px;
+	background: radial-gradient(100% 246.57% at 0% 0%, #a366ff 0%, #601fff 100%);
+
+	&.high {
+		padding: 2px 4px;
+		background: radial-gradient(100% 188.88% at 0% 0%, #16d1d6 0%, #274cff 100%);
+	}
+
+	&.icon {
+		min-width: 15px;
+		height: 15px;
+		border-radius: 50%;
+		justify-content: center;
+		padding: 0;
+
+		.badge__img {
+			width: 11px;
+			height: 11px;
+		}
+	}
+
+	&__img {
+		height: 13px;
+		width: auto;
+	}
+
+	&__text {
+		font-size: 10px;
+		font-weight: 600;
+		color: #fff;
+	}
+}

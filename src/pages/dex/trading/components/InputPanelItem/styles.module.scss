@@ -1,0 +1,94 @@
+.inputPanel {
+	width: 100%;
+	padding: 15px;
+	background: var(--window-bg-color);
+	border: 1px solid var(--delimiter-color);
+	border-radius: 10px;
+
+	&__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: 10px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		margin-bottom: 10px;
+
+		.title {
+			font-size: 16px;
+			font-weight: 600;
+		}
+	}
+
+	&__fees {
+		color: var(--table-th-color);
+		font-weight: 400;
+		font-size: 12px;
+
+		span {
+			font-weight: 400;
+			font-size: 12px;
+		}
+	}
+
+	&__body {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+
+		&_btn {
+			margin-top: 10px;
+
+			&.buy {
+				background-color: #16d1d6;
+
+				&:hover {
+					background-color: #45dade;
+				}
+			}
+
+			&.sell {
+				background-color: #ff6767;
+
+				&:hover {
+					background-color: #ff8585;
+				}
+			}
+		}
+	}
+}
+
+.applyAlert {
+	display: flex;
+	gap: 20px;
+	align-items: center;
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	&__button {
+		max-width: 125px;
+		background-color: var(--alert-btn-bg);
+		color: #1f8feb;
+		padding: 7px 32px;
+		font-size: 12px;
+		font-weight: 500;
+
+		&:hover {
+			background-color: var(--alert-btn-hover);
+		}
+	}
+
+	h2 {
+		font-size: 16px;
+		font-weight: 600;
+	}
+
+	p {
+		font-size: 14px;
+		opacity: 0.7;
+		margin-bottom: 5px;
+	}
+}

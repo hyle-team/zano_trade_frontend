@@ -1,0 +1,32 @@
+.chart {
+	position: relative;
+	width: auto;
+	height: auto;
+	height: 100%;
+
+	height: 515px;
+
+	> canvas {
+		width: 100%;
+		height: 100%;
+		cursor: crosshair;
+	}
+
+	&__lowVolume {
+		font-size: 72px;
+		color: var(--font-dimmed-color);
+		white-space: nowrap;
+		position: absolute;
+		transform: translate(-50%, -50%);
+		top: 50%;
+		left: 50%;
+
+		@media screen and (max-width: 600px) {
+			font-size: 48px;
+		}
+
+		@media screen and (max-width: 400px) {
+			font-size: 36px;
+		}
+	}
+}

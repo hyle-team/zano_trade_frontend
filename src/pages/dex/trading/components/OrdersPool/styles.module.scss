@@ -1,0 +1,151 @@
+.ordersPool {
+	max-width: 415px;
+	width: 100%;
+	padding: 5px;
+	background: var(--window-bg-color);
+	border: 1px solid var(--delimiter-color);
+	border-radius: 10px;
+
+	@media screen and (max-width: 1480px) {
+		max-width: 340px;
+	}
+
+	&__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 10px;
+		padding: 10px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid var(--delimiter-color);
+
+		&_title {
+			font-size: 18px;
+			font-weight: 600;
+		}
+
+		&_type {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+
+			.btn {
+				cursor: pointer;
+				width: 20px;
+				height: 20px;
+				border-radius: 4px;
+				font-size: 12px;
+				font-weight: 700;
+				transition: 0.3s opacity ease;
+				color: #ffffff;
+
+				&.selected,
+				&:hover {
+					opacity: 80%;
+				}
+
+				&.all {
+					background: linear-gradient(to left, #ff6767 50%, #16d1d6 50%);
+				}
+
+				&.buy {
+					background-color: #16d1d6;
+				}
+
+				&.sell {
+					background-color: #ff6767;
+				}
+			}
+		}
+	}
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+		padding-top: 10px;
+
+		table {
+			width: 100%;
+
+			thead {
+				display: flex;
+				width: 100%;
+				padding-inline: 10px;
+				margin-bottom: 9px;
+
+				tr {
+					width: 100%;
+					display: flex;
+					justify-content: space-between;
+
+					th {
+						font-size: 11px;
+						font-weight: 700;
+						text-align: start;
+						color: var(--table-th-color);
+						min-width: 80px;
+
+						&:last-child {
+							text-align: right;
+						}
+					}
+				}
+			}
+
+			tbody {
+				height: 29dvh;
+				min-height: 265px;
+				max-height: 380px;
+				display: flex;
+				flex-direction: column;
+				overflow: auto;
+				padding-bottom: 20px;
+				padding: 10px;
+			}
+		}
+	}
+}
+
+.tooltip {
+	pointer-events: none;
+	position: fixed;
+	border: 1px solid var(--dex-tooltip-border-color);
+	min-width: 140px;
+	max-width: 180px;
+	padding: 10px;
+	transform: translateX(-50%);
+	background-color: var(--dex-tooltip-bg);
+
+	&__arrow {
+		border-top: 1px solid var(--dex-tooltip-border-color);
+		background-color: var(--dex-tooltip-bg) !important;
+	}
+
+	h6 {
+		color: var(--table-th-color);
+		margin-top: 12px;
+		font-size: 11px;
+		font-weight: 700;
+
+		&:first-child {
+			margin-top: 0;
+		}
+	}
+
+	p {
+		font-size: 12px;
+		font-weight: 400;
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		margin-top: 6px;
+	}
+
+	span {
+		margin-top: 5px;
+		display: block;
+		color: #8d95ae;
+		font-size: 11px;
+		font-weight: 400;
+	}
+}

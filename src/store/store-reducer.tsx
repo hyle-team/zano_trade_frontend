@@ -10,6 +10,8 @@ const initialState: ContextState = {
 		offers: 0,
 	},
 	closed_notifications: [],
+	alertState: null,
+	alertSubtitle: '',
 };
 
 const reducer = (state: ContextState, action: ContextAction): ContextState => {
@@ -31,6 +33,12 @@ const reducer = (state: ContextState, action: ContextAction): ContextState => {
 		case 'CLOSED_NOTIFICATIONS_UPDATED': {
 			return { ...state, closed_notifications: action.payload };
 		}
+		case 'ALERT_STATE_UPDATED': {
+			return { ...state, alertState: action.payload };
+		}
+		case 'ALERT_SUBTITLE_UPDATED': {
+			return { ...state, alertSubtitle: action.payload };
+		}
 		default:
 			return { ...state };
 	}
@@ -40,6 +48,7 @@ export const Store = createContext<ContextValue>({
 	state: initialState,
 	dispatch: () => undefined,
 });
+
 export const StoreProvider = (props: { children: ReactNode }) => {
 	const [state, dispatch] = useReducer(reducer, initialState);
 	return <Store.Provider value={{ state, dispatch }}>{props.children}</Store.Provider>;

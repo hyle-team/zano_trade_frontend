@@ -1,0 +1,28 @@
+.badge {
+	position: relative;
+
+	&__link {
+		margin-top: 4px;
+		cursor: pointer;
+	}
+
+	&__tooltip {
+		position: absolute;
+		top: 30px;
+		left: 50%;
+		transform: translateX(-50%);
+		background-color: var(--trade-table-tooltip);
+		font-size: 12px;
+		z-index: 9999;
+
+		&_text {
+			font-size: 12px !important;
+		}
+
+		&_arrow {
+			border-radius: 2px;
+			left: 50%;
+			background-color: var(--trade-table-tooltip) !important;
+		}
+	}
+}

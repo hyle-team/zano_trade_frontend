@@ -1,5 +1,6 @@
 import '@/styles/globals.scss';
 import '@/styles/themes/light.scss';
+import '@/styles/themes/dark.scss';
 import Head from 'next/head';
 import { StoreProvider } from '@/store/store-reducer';
 import NextApp, { AppContext, AppProps } from 'next/app';

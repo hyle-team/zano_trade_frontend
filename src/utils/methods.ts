@@ -327,3 +327,23 @@ export async function getZanoPrice() {
 		)
 		.then((res) => res.data);
 }
+
+export async function getTrades(pairId: string) {
+	return axios
+		.post(`/api/orders/get-trades`, {
+			pairId,
+		})
+		.then((res) => res.data);
+}
+
+export async function getMatrixAddresses(addresses: string[]) {
+	try {
+		const { data } = await axios.post('https://messenger.zano.org/api/get-addresses', {
+			addresses,
+		});
+
+		return data;
+	} catch (error) {
+		console.log(error);
+	}
+}
