@@ -1,5 +1,6 @@
 import WalletCredentials from '@/interfaces/common/WalletCredentials';
 import Decimal from 'decimal.js';
+import whitelistedTokens from '@/constants/tokens.json';
 
 export const intToStrFixedLen = (int: number, fixed = 2) => {
 	let str = int.toString();
@@ -136,6 +137,15 @@ export function classes(...items: (string | boolean | undefined)[]): string {
 	// boolean for constructions like [predicate] && [className]
 	return items.filter((className) => className).join(' ');
 }
+
+export const getAssetIcon = (assetId: string): string => {
+	const findAsset = whitelistedTokens.find((s) => s === assetId);
+
+	if (findAsset) {
+		return `/tokens/${assetId}.png`;
+	}
+	return '/tokens/token.png';
+};
 
 export const ZANO_ASSET_ID = 'd6329b5b1f7c0805b5c345f4957554002a2f557845f64d7645dae0e051a6498a';
 

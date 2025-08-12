@@ -4,8 +4,7 @@ import { useRouter } from 'next/router';
 import { ReactComponent as ArrowRight } from '@/assets/images/UI/arrow_right.svg';
 import { Store } from '@/store/store-reducer';
 import PairData from '@/interfaces/common/PairData';
-import { notationToString, roundTo, tradingKnownCurrencies } from '@/utils/utils';
-import ImgWithFallback from '@/components/UI/ImgWithFallback';
+import { getAssetIcon, notationToString, roundTo } from '@/utils/utils';
 import styles from './PairsCard.module.scss';
 
 interface IProps {
@@ -21,13 +20,9 @@ export default function PairsCard({ pair }: IProps) {
 
 	const isFeatured = pair.featured;
 
-	const code = tradingKnownCurrencies.includes(firstCurrency?.code)
-		? secondCurrency?.code
-		: 'tsds';
-
 	const secondAssetUsdPrice = state.assetsRates.get(secondCurrency.asset_id || '') ?? 0;
 
-	const price = Number(roundTo(notationToString(pair.rate ?? 0)));
+	const price = Number(roundTo(notationToString(pair.rate ?? 0), 2));
 	const currentPriceUSD = secondAssetUsdPrice ? price : 0;
 	const priceUSD = currentPriceUSD
 		? String(`$${(secondAssetUsdPrice * price).toFixed(2)}`)
@@ -39,7 +34,7 @@ export default function PairsCard({ pair }: IProps) {
 			? -99.99
 			: parseFloat(coefficient?.toFixed(2) || '0');
 
-	const volume = Number(roundTo(notationToString(pair.volume ?? 0)));
+	const volume = Number(roundTo(notationToString(pair.volume ?? 0), 2));
 	const currentVolumeUSD = secondAssetUsdPrice ? volume : 0;
 	const volumeUSD = currentVolumeUSD
 		? String(`$${(secondAssetUsdPrice * volume).toFixed(2)}`)
@@ -52,10 +47,10 @@ export default function PairsCard({ pair }: IProps) {
 	return (
 		<div className={styles.card}>
 			<div className={styles.card__header}>
-				<ImgWithFallback
+				<Image
 					width={18}
 					height={18}
-					src={`/tokens/${firstCurrency.asset_id}.png`}
+					src={getAssetIcon(String(firstCurrency.asset_id))}
 					alt="currency"
 				/>
 				<div className={styles.currency_name}>

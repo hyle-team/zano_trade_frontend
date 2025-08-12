@@ -29,6 +29,7 @@ import { nanoid } from 'nanoid';
 import {
 	cutAddress,
 	formatDollarValue,
+	getAssetIcon,
 	isPositiveFloatStr,
 	notationToString,
 	roundTo,
@@ -56,7 +57,6 @@ import LightningImg from '@/assets/images/UI/lightning.png';
 import RocketImg from '@/assets/images/UI/rocket.png';
 import { ReactComponent as ConnectionIcon } from '@/assets/images/UI/connection.svg';
 import Image from 'next/image';
-import ImgWithFallback from '@/components/UI/ImgWithFallback';
 import CandleChart from './CandleChart/CandleChart';
 import OrdersBuySellSwitch from './OrdersBuySellSwitch/OrdersBuySellSwitch';
 import InputPanelItem from './InputPanelItem/InputPanelItem';
@@ -1055,10 +1055,12 @@ function Trading() {
 						<div className={styles.trading__currency__wrapper}>
 							<div className={styles.trading__currency__wrapper_top}>
 								<div>
-									<ImgWithFallback
+									<Image
 										width={50}
 										height={50}
-										src={`/tokens/${pairData?.first_currency.asset_id}.png`}
+										src={getAssetIcon(
+											String(pairData?.first_currency.asset_id),
+										)}
 										alt="currency"
 									/>
 								</div>
@@ -1123,25 +1125,25 @@ function Trading() {
 						<StatItem
 							Img={ClockIcon}
 							title="24h change"
-							value={`${roundTo(notationToString(pairStats?.rate || 0), 8)} ${secondCurrencyName}`}
+							value={`${roundTo(notationToString(pairStats?.rate || 0), 2)} ${secondCurrencyName}`}
 							coefficient={coefficientOutput}
 						/>
 						<StatItem
 							Img={UpIcon}
 							title="24h high"
-							value={`${roundTo(notationToString(pairStats?.high || 0), 8)} ${secondCurrencyName}`}
+							value={`${roundTo(notationToString(pairStats?.high || 0), 2)} ${secondCurrencyName}`}
 						/>
 						<StatItem
 							Img={DownIcon}
 							title="24h low"
-							value={`${roundTo(notationToString(pairStats?.low || 0), 8)} ${secondCurrencyName}`}
+							value={`${roundTo(notationToString(pairStats?.low || 0), 2)} ${secondCurrencyName}`}
 						/>
 						<StatItem
 							Img={VolumeIcon}
 							title="24h volume"
 							value={`${roundTo(
 								notationToString(pairStats?.volume || 0),
-								8,
+								2,
 							)} ${secondCurrencyName}`}
 						/>
 					</div>
