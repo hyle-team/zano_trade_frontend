@@ -13,7 +13,7 @@ import PairData from '@/interfaces/common/PairData';
 import { useInView } from 'react-intersection-observer';
 import Preloader from '@/components/UI/Preloader/Preloader';
 import { PairSortOption } from '@/interfaces/enum/pair';
-import PairsTable from './pairs/PairsTable/PairsTable';
+import PairsTable from '@/components/default/PairsTable/PairsTable';
 import DexHeader from './DexHeader/DexHeader';
 import PairsList from './pairs/PairsList/PairsList';
 
