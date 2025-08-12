@@ -7,8 +7,7 @@ import { ReactComponent as ClockIcon } from '@/assets/images/UI/clock_icon.svg';
 import { Store } from '@/store/store-reducer';
 import PairData from '@/interfaces/common/PairData';
 import { ContextState } from '@/interfaces/common/ContextValue';
-import { tradingKnownCurrencies, roundTo, notationToString } from '@/utils/utils';
-import ImgWithFallback from '@/components/UI/ImgWithFallback';
+import { tradingKnownCurrencies, roundTo, notationToString, getAssetIcon } from '@/utils/utils';
 import styles from './PairsTable.module.scss';
 import { Row } from './types';
 
@@ -73,10 +72,10 @@ function PairsTable({ data }: IProps) {
 					} = row.original;
 					return (
 						<div className={styles.pair_cell}>
-							<ImgWithFallback
+							<Image
 								width={18}
 								height={18}
-								src={`/tokens/${assetId}.png`}
+								src={getAssetIcon(String(assetId))}
 								alt="currency"
 							/>
 							<div className={styles.currency_name}>
@@ -107,7 +106,7 @@ function PairsTable({ data }: IProps) {
 				cell: ({ row }) => (
 					<div className={styles.price_cell}>
 						<div className={styles.text}>
-							{roundTo(notationToString(row.original.price))}
+							{roundTo(notationToString(row.original.price), 2)}
 						</div>
 						<div className={styles.sub_text}>{row.original.priceUSD}</div>
 					</div>
@@ -150,7 +149,7 @@ function PairsTable({ data }: IProps) {
 				cell: ({ row }) => (
 					<div className={styles.price_cell}>
 						<div className={styles.text}>
-							{roundTo(notationToString(row.original?.volume ?? 0), 8)}
+							{roundTo(notationToString(row.original?.volume ?? 0), 2)}
 						</div>
 						<div className={styles.sub_text}>{row.original.volumeUSD}</div>
 					</div>
