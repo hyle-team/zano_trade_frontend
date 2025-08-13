@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Decimal from 'decimal.js';
 import PairData from '@/interfaces/common/PairData';
 import OrderFormOutput from '@/interfaces/common/orderFormOutput';
-import { handleInputChange } from '../helpers/handleInputChange';
+import { handleInputChange } from '@/utils/handleInputChange';
 
 interface UseOrderFormParams {
 	type: 'buy' | 'sell';
