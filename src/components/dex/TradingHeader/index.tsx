@@ -3,15 +3,12 @@ import { ReactComponent as UpIcon } from '@/assets/images/UI/up_icon.svg';
 import { ReactComponent as DownIcon } from '@/assets/images/UI/down_icon.svg';
 import { ReactComponent as VolumeIcon } from '@/assets/images/UI/volume_icon.svg';
 import BackButton from '@/components/default/BackButton/BackButton';
-import { tradingKnownCurrencies, roundTo, notationToString } from '@/utils/utils';
+import { roundTo, notationToString } from '@/utils/utils';
 import styles from './styles.module.scss';
 import StatItem from '../StatItem';
 import { TradingHeaderProps } from './types';
 import CurrencyIcon from './components/CurrencyIcon';
 import AssetRow from './components/AssetRow';
-
-const getCurrencyCode = (code?: string) =>
-	tradingKnownCurrencies.includes(code || '') ? code : 'tsds';
 
 const TradingHeader = ({
 	pairStats,
@@ -28,8 +25,6 @@ const TradingHeader = ({
 	};
 
 	const { firstCurrencyName, secondCurrencyName } = currencyNames;
-	const imgCode = getCurrencyCode(pairData?.first_currency?.code || '');
-	const imgCode2 = getCurrencyCode(pairData?.second_currency?.code || '');
 
 	const coefficient = pairStats?.coefficient || 0;
 	const coefficientOutput =
@@ -65,7 +60,7 @@ const TradingHeader = ({
 		<div className={styles.header}>
 			<div className={styles.header__currency}>
 				<div className={styles.header__currency_icon}>
-					<CurrencyIcon code={imgCode} />
+					<CurrencyIcon code={firstAssetId} />
 				</div>
 
 				<div className={styles.header__currency_item}>
@@ -96,13 +91,13 @@ const TradingHeader = ({
 							name={firstCurrencyName}
 							link={firstAssetLink}
 							id={firstAssetId || ''}
-							code={imgCode}
+							code={firstAssetId}
 						/>
 						<AssetRow
 							name={secondCurrencyName}
 							link={secondAssetLink}
 							id={secondAssetId || ''}
-							code={imgCode2}
+							code={secondAssetId}
 						/>
 					</div>
 				)}

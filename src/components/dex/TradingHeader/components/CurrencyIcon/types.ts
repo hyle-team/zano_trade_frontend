@@ -1,4 +1,4 @@
 export interface CurrencyIconProps {
-	code: string | undefined;
+	code: string | undefined | null;
 	size?: number;
 }
