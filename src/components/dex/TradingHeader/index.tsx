@@ -36,23 +36,23 @@ const TradingHeader = ({
 		{
 			Img: ClockIcon,
 			title: '24h change',
-			value: `${roundTo(notationToString(pairStats?.rate || 0), 8)} ${secondCurrencyName}`,
+			value: `${roundTo(notationToString(pairStats?.rate || 0), 4)} ${secondCurrencyName}`,
 			coefficient: coefficientOutput,
 		},
 		{
 			Img: UpIcon,
 			title: '24h high',
-			value: `${roundTo(notationToString(pairStats?.high || 0), 8)} ${secondCurrencyName}`,
+			value: `${roundTo(notationToString(pairStats?.high || 0), 4)} ${secondCurrencyName}`,
 		},
 		{
 			Img: DownIcon,
 			title: '24h low',
-			value: `${roundTo(notationToString(pairStats?.low || 0), 8)} ${secondCurrencyName}`,
+			value: `${roundTo(notationToString(pairStats?.low || 0), 4)} ${secondCurrencyName}`,
 		},
 		{
 			Img: VolumeIcon,
 			title: '24h volume',
-			value: `${roundTo(notationToString(pairStats?.volume || 0), 8)} ${secondCurrencyName}`,
+			value: `${roundTo(notationToString(pairStats?.volume || 0), 4)} ${secondCurrencyName}`,
 		},
 	];
 
@@ -77,7 +77,8 @@ const TradingHeader = ({
 
 					<div className={styles.price}>
 						<p className={styles.price__secondCurrency}>
-							{notationToString(pairStats?.rate || 0)} {secondCurrencyName}
+							{roundTo(notationToString(pairStats?.rate || 0), 4)}{' '}
+							{secondCurrencyName}
 						</p>
 						{pairRateUsd && <p className={styles.price__usd}>~ ${pairRateUsd}</p>}
 					</div>
