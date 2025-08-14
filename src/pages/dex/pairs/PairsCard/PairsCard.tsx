@@ -22,7 +22,7 @@ export default function PairsCard({ pair }: IProps) {
 
 	const secondAssetUsdPrice = state.assetsRates.get(secondCurrency.asset_id || '') ?? 0;
 
-	const price = Number(roundTo(notationToString(pair.rate ?? 0), 2));
+	const price = Number(roundTo(notationToString(pair.rate ?? 0), 4));
 	const currentPriceUSD = secondAssetUsdPrice ? price : 0;
 	const priceUSD = currentPriceUSD
 		? String(`$${(secondAssetUsdPrice * price).toFixed(2)}`)
@@ -34,7 +34,7 @@ export default function PairsCard({ pair }: IProps) {
 			? -99.99
 			: parseFloat(coefficient?.toFixed(2) || '0');
 
-	const volume = Number(roundTo(notationToString(pair.volume ?? 0), 2));
+	const volume = Number(roundTo(notationToString(pair.volume ?? 0), 4));
 	const currentVolumeUSD = secondAssetUsdPrice ? volume : 0;
 	const volumeUSD = currentVolumeUSD
 		? String(`$${(secondAssetUsdPrice * volume).toFixed(2)}`)

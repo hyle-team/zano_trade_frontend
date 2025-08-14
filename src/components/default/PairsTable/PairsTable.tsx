@@ -106,7 +106,7 @@ function PairsTable({ data }: IProps) {
 				cell: ({ row }) => (
 					<div className={styles.price_cell}>
 						<div className={styles.text}>
-							{roundTo(notationToString(row.original.price), 2)}
+							{roundTo(notationToString(row.original.price), 4)}
 						</div>
 						<div className={styles.sub_text}>{row.original.priceUSD}</div>
 					</div>
@@ -149,7 +149,7 @@ function PairsTable({ data }: IProps) {
 				cell: ({ row }) => (
 					<div className={styles.price_cell}>
 						<div className={styles.text}>
-							{roundTo(notationToString(row.original?.volume ?? 0), 2)}
+							{roundTo(notationToString(row.original?.volume ?? 0), 4)}
 						</div>
 						<div className={styles.sub_text}>{row.original.volumeUSD}</div>
 					</div>

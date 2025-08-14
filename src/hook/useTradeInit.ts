@@ -35,9 +35,7 @@ const useTradeInit = ({ pairData, pairStats }: useTradeInitParams) => {
 
 	const pairRateUsd =
 		pairStats?.rate !== undefined && secondAssetUsdPrice !== undefined
-			? new Decimal(pairStats.rate)
-					.mul(secondAssetUsdPrice)
-					.toFixed(pairStats.rate < 0.1 ? 6 : 2)
+			? new Decimal(pairStats.rate).mul(secondAssetUsdPrice).toFixed(2)
 			: undefined;
 
 	const buyForm = useOrderForm({
