@@ -31,6 +31,7 @@ import useTradeInit from '@/hook/useTradeInit';
 import useMatrixAddresses from '@/hook/useMatrixAddresses';
 import takeOrderClick from '@/utils/takeOrderClick';
 import { OrderType } from '@/components/dex/UserOrders/types';
+import useUpdateUser from '@/hook/useUpdateUser';
 
 const CHART_OPTIONS = [{ name: 'Zano Chart' }, { name: 'Trading View', disabled: true }];
 const DEFAULT_CHART = CHART_OPTIONS[0];
@@ -42,6 +43,7 @@ function Trading() {
 	const { elementRef: orderFormRef, scrollToElement: scrollToOrderForm } =
 		useScroll<HTMLDivElement>();
 
+	const fetchUser = useUpdateUser();
 	const [ordersHistory, setOrdersHistory] = useState<PageOrderData[]>([]);
 	const [userOrders, setUserOrders] = useState<OrderRow[]>([]);
 	const [periodsState, setPeriodsState] = useState<PeriodState>(periods[0]);
@@ -139,6 +141,13 @@ function Trading() {
 		tradesType,
 	});
 
+	const onAfter = async () => {
+		await updateOrders();
+		await updateUserOrders();
+		await fetchUser();
+		await fetchTrades();
+	};
+
 	return (
 		<>
 			<Header isLg={true} />
@@ -209,10 +218,8 @@ function Trading() {
 						handleCancelAllOrders={handleCancelAllOrders}
 						matrixAddresses={matrixAddresses}
 						secondAssetUsdPrice={secondAssetUsdPrice}
-						updateOrders={updateOrders}
-						updateUserOrders={updateUserOrders}
-						fetchTrades={fetchTrades}
 						pairData={pairData}
+						onAfter={onAfter}
 					/>
 				</div>
 				<div ref={orderFormRef} className={styles.trading__info_createOrders}>
@@ -239,6 +246,7 @@ function Trading() {
 								totalValid={form.totalValid}
 								totalUsd={form.totalUsd}
 								scrollToOrderList={scrollToOrdersList}
+								onAfter={onAfter}
 							/>
 						);
 					})}

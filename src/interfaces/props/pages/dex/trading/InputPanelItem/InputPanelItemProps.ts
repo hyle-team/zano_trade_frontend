@@ -21,6 +21,7 @@ interface InputPanelItemProps {
 	totalValid: boolean;
 	totalUsd: string | undefined;
 	scrollToOrderList: () => void;
+	onAfter: () => Promise<void>;
 }
 
 export default InputPanelItemProps;

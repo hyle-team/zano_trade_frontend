@@ -24,6 +24,7 @@ export interface BuildApplyTipsColumnsArgs {
 export interface BuildMyRequestsColumnsArgs {
 	firstCurrencyName: string;
 	secondCurrencyName: string;
+	matrixAddresses: MatrixAddress[];
 	onAfter: () => Promise<void>;
 }
 

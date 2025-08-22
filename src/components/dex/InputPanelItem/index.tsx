@@ -34,6 +34,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 		totalUsd,
 		scrollToOrderList,
 		currencyNames,
+		onAfter,
 	} = props;
 
 	const { state } = useContext(Store);
@@ -79,7 +80,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 			if (result.data?.immediateMatch) {
 				setHasImmediateMatch(true);
 			}
-
+			onAfter();
 			resetForm();
 		} else {
 			setAlertState('error');

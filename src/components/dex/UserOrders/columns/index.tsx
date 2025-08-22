@@ -230,6 +230,7 @@ export function buildApplyTipsColumns({
 export function buildMyRequestsColumns({
 	firstCurrencyName,
 	secondCurrencyName,
+	matrixAddresses,
 	onAfter,
 }: BuildMyRequestsColumnsArgs): ColumnDef<UserPendingType>[] {
 	return [
@@ -263,6 +264,24 @@ export function buildMyRequestsColumns({
 					{row.creator}
 				</p>
 			),
+		},
+		{
+			key: 'alias',
+			header: 'Alias',
+			width: '180px',
+			cell: (row) => (
+				<AliasCell
+					alias={row.finalizer?.alias}
+					address={row.finalizer?.address}
+					matrixAddresses={matrixAddresses}
+				/>
+			),
+		},
+		{
+			key: 'price',
+			header: <>Price ({secondCurrencyName})</>,
+			width: '150px',
+			cell: (row) => <p>{notationToString(row.price)}</p>,
 		},
 		{
 			key: 'quantity',
@@ -379,7 +398,7 @@ export function buildOrderHistoryColumns({
 		{
 			key: 'time',
 			header: 'Time',
-			width: '180px',
+			width: '100px',
 			cell: (row) => <p>{formatTimestamp(row.timestamp)}</p>,
 		},
 	];

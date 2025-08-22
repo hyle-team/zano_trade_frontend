@@ -30,9 +30,7 @@ const UserOrders = ({
 	orderListRef,
 	matrixAddresses,
 	secondAssetUsdPrice,
-	updateOrders,
-	updateUserOrders,
-	fetchTrades,
+	onAfter,
 	pairData,
 }: UserOrdersProps) => {
 	const { state } = useContext(Store);
@@ -79,13 +77,6 @@ const UserOrders = ({
 	const firstCurrencyName = pairData?.first_currency?.name ?? '';
 	const secondCurrencyName = pairData?.second_currency?.name ?? '';
 
-	const onAfter = useCallback(async () => {
-		await updateOrders();
-		await updateUserOrders();
-		await fetchUser();
-		await fetchTrades();
-	}, [updateOrders, updateUserOrders, fetchUser, fetchTrades]);
-
 	const offersCountByOrderId = useMemo(() => {
 		const map = new Map<string, number>();
 		for (const tip of applyTips) {
@@ -104,7 +95,7 @@ const UserOrders = ({
 				offersCountByOrderId,
 				onAfter,
 			}),
-		[firstCurrencyName, secondCurrencyName, secondAssetUsdPrice, offersCountByOrderId, onAfter],
+		[userOrders, applyTips, onAfter],
 	);
 
 	const columnsSuitables = useMemo(
@@ -135,9 +126,10 @@ const UserOrders = ({
 			buildMyRequestsColumns({
 				firstCurrencyName,
 				secondCurrencyName,
+				matrixAddresses,
 				onAfter,
 			}),
-		[firstCurrencyName, secondCurrencyName, onAfter],
+		[firstCurrencyName, secondCurrencyName, onAfter, matrixAddresses],
 	);
 
 	const columnsOffers = useMemo(
