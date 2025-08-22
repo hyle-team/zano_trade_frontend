@@ -30,6 +30,7 @@ import useFilteredData from '@/hook/useFilteredData';
 import useTradeInit from '@/hook/useTradeInit';
 import useMatrixAddresses from '@/hook/useMatrixAddresses';
 import takeOrderClick from '@/utils/takeOrderClick';
+import { OrderType } from '@/components/dex/UserOrders/types';
 
 const CHART_OPTIONS = [{ name: 'Zano Chart' }, { name: 'Trading View', disabled: true }];
 const DEFAULT_CHART = CHART_OPTIONS[0];
@@ -50,7 +51,7 @@ function Trading() {
 	const [myOrdersLoading, setMyOrdersLoading] = useState(true);
 	const [ordersBuySell, setOrdersBuySell] = useState(buySellValues[0]);
 	const [tradesType, setTradesType] = useState<'all' | 'my'>('all');
-	const [ordersType, setOrdersType] = useState<'opened' | 'history'>('opened');
+	const [ordersType, setOrdersType] = useState<OrderType>('opened');
 	const [pairStats, setPairStats] = useState<PairStats | null>(null);
 	const [applyTips, setApplyTips] = useState<ApplyTip[]>([]);
 	const matrixAddresses = useMatrixAddresses(ordersHistory);
@@ -63,7 +64,6 @@ function Trading() {
 		secondAssetLink,
 		secondAssetUsdPrice,
 		balance,
-		loggedIn,
 		pairRateUsd,
 	} = useTradeInit({ pairData, pairStats });
 
@@ -204,7 +204,6 @@ function Trading() {
 						userOrders={userOrders}
 						applyTips={applyTips}
 						myOrdersLoading={myOrdersLoading}
-						loggedIn={loggedIn}
 						ordersType={ordersType}
 						setOrdersType={setOrdersType}
 						handleCancelAllOrders={handleCancelAllOrders}
@@ -215,35 +214,34 @@ function Trading() {
 						fetchTrades={fetchTrades}
 						pairData={pairData}
 					/>
+				</div>
+				<div ref={orderFormRef} className={styles.trading__info_createOrders}>
+					{['buy', 'sell'].map((type) => {
+						const isBuy = type === 'buy';
+						const form = isBuy ? buyForm : sellForm;
 
-					<div ref={orderFormRef} className={styles.trading__info_createOrders}>
-						{['buy', 'sell'].map((type) => {
-							const isBuy = type === 'buy';
-							const form = isBuy ? buyForm : sellForm;
-
-							return (
-								<InputPanelItem
-									key={type}
-									currencyNames={currencyNames}
-									priceState={form.price}
-									amountState={form.amount}
-									totalState={form.total}
-									buySellValues={buySellValues}
-									buySellState={isBuy ? buySellValues[1] : buySellValues[2]}
-									setPriceFunction={form.onPriceChange}
-									setAmountFunction={form.onAmountChange}
-									setRangeInputValue={form.setRangeInputValue}
-									rangeInputValue={form.rangeInputValue}
-									balance={Number(balance)}
-									priceValid={form.priceValid}
-									amountValid={form.amountValid}
-									totalValid={form.totalValid}
-									totalUsd={form.totalUsd}
-									scrollToOrderList={scrollToOrdersList}
-								/>
-							);
-						})}
-					</div>
+						return (
+							<InputPanelItem
+								key={type}
+								currencyNames={currencyNames}
+								priceState={form.price}
+								amountState={form.amount}
+								totalState={form.total}
+								buySellValues={buySellValues}
+								buySellState={isBuy ? buySellValues[1] : buySellValues[2]}
+								setPriceFunction={form.onPriceChange}
+								setAmountFunction={form.onAmountChange}
+								setRangeInputValue={form.setRangeInputValue}
+								rangeInputValue={form.rangeInputValue}
+								balance={Number(balance)}
+								priceValid={form.priceValid}
+								amountValid={form.amountValid}
+								totalValid={form.totalValid}
+								totalUsd={form.totalUsd}
+								scrollToOrderList={scrollToOrdersList}
+							/>
+						);
+					})}
 				</div>
 
 				{alertState && (

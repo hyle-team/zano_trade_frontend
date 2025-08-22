@@ -17,7 +17,6 @@ const useTradeInit = ({ pairData, pairStats }: useTradeInitParams) => {
 		firstCurrencyName: pairData?.first_currency?.name || '',
 		secondCurrencyName: pairData?.second_currency?.name || '',
 	};
-	const loggedIn = !!state.wallet?.connected;
 
 	const assets = state.wallet?.connected ? state.wallet?.assets || [] : [];
 	const balance = assets.find((e) => e.ticker === currencyNames.firstCurrencyName)?.balance;
@@ -57,7 +56,6 @@ const useTradeInit = ({ pairData, pairStats }: useTradeInitParams) => {
 		firstAssetLink,
 		secondAssetLink,
 		secondAssetUsdPrice,
-		loggedIn,
 		balance,
 		buyForm,
 		sellForm,

@@ -1,22 +1,29 @@
 .userOrders {
+	position: relative;
 	width: 100%;
 	padding: 5px;
 	background: var(--window-bg-color);
 	border: 1px solid var(--delimiter-color);
 	border-radius: 10px;
+	min-height: 310px;
 
-	@media screen and (max-width: 1440px) {
-		width: 520px;
+	&__body {
+		position: relative;
+		padding: 10px;
+		padding-top: 5px;
+		padding-bottom: 20px;
+		height: 260px;
+		overflow: auto;
 	}
 
 	&__header {
-		border-bottom: 1px solid var(--delimiter-color);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		position: relative;
-		padding: 10px;
+		padding-top: 10px;
 		padding-bottom: 0;
+		border-bottom: 1px solid var(--delimiter-color);
 
 		&_nav {
 			display: flex;
@@ -24,37 +31,24 @@
 			gap: 22px;
 
 			.navItem {
+				cursor: pointer;
 				padding-bottom: 7px;
 				position: relative;
 				border-top-left-radius: 10px;
 				border-top-right-radius: 10px;
-				font-size: 16px;
+				font-size: 14px;
+				font-weight: 500;
 				border-bottom: 2px solid transparent;
-				font-weight: 600;
 				background-color: transparent;
-				cursor: pointer;
-
-				span {
-					top: -10px;
-					right: -15px;
-					position: absolute;
-					display: grid;
-					place-content: center;
-					color: #fff;
-					background-color: #ff6767;
-					width: 15px;
-					height: 15px;
-					font-size: 10px;
-					font-weight: 700;
-					border-radius: 50%;
-				}
+				color: #1f8feb;
 
 				&.active {
+					color: var(--text-color);
 					border-color: #1f8feb;
 				}
 
 				&:hover {
-					color: #1f8feb;
+					border-color: #1f8feb;
 				}
 			}
 		}
@@ -63,128 +57,62 @@
 			position: absolute;
 			right: 5px;
 			top: 5px;
-			z-index: 10;
-			cursor: pointer;
-			background-color: #1f8feb33;
-			color: #1f8feb;
-			font-size: 14px;
-			font-weight: 500;
-			padding: 6px 10px;
-			border-radius: 8px;
-
-			&:hover {
-				background-color: #1f8feb43;
-			}
+			z-index: 2;
 		}
 	}
 
 	table {
 		width: 100%;
+		border-spacing: 0;
+		border-collapse: collapse;
+		table-layout: fixed;
 
 		thead {
-			display: flex;
-			width: 100%;
-			padding-inline: 10px;
-			padding-bottom: 5px;
-			margin-top: 10px;
+			th {
+				min-width: 100px;
+				font-size: 11px;
+				font-weight: 700;
+				text-align: left;
+				color: var(--table-th-color);
+				padding: 6px 10px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 
-			tr {
-				width: 100%;
-				display: flex;
-				justify-content: space-between;
-
-				th {
-					min-width: 100px;
-					font-size: 11px;
-					font-weight: 700;
-					text-align: left;
-					color: var(--table-th-color);
-
-					&:last-child {
-						text-align: right;
-						min-width: 50px;
-					}
+				&:last-child {
+					text-align: right;
+					min-width: 50px;
 				}
 			}
 		}
 
 		tbody {
-			a {
-				display: block;
-				text-align: right;
-				font-size: 12px;
-				font-weight: 400;
-			}
-		}
-	}
+			td {
+				position: relative;
 
-	&__body {
-		padding: 10px;
-		padding-bottom: 20px;
-		height: 300px;
-		overflow: auto;
-
-		table {
-			width: 100%;
-
-			&.apply {
-				border-top: 1px solid #1f8feb40;
-				border-bottom: 1px solid #1f8feb40;
-				background-color: var(--blur-color) !important;
-
-				tr {
-					&:not(:last-child) {
-						border-bottom: 1px solid var(--delimiter-color);
-					}
-				}
-			}
-
-			tbody {
-				display: flex;
-				flex-direction: column;
-
-				&.incoming {
-					tr {
-						&:nth-child(even) {
-							background-color: var(--table-even-bg);
-						}
-					}
-				}
-
-				tr {
-					display: flex;
-					align-items: center;
-					justify-content: space-between;
+				> p {
 					width: 100%;
-					padding: 4px 0;
+					font-size: 12px;
+					font-weight: 400;
 
-					td {
-						position: relative;
-						min-width: 100px;
-
-						&:last-child {
-							min-width: 50px;
+					&:first-child {
+						&::before {
+							content: '';
+							pointer-events: none;
+							position: absolute;
+							left: 0;
+							top: 50%;
+							transform: translateY(-50%);
+							height: 50%;
+							width: 2px;
+							background-color: var(--direction-color);
 						}
+					}
 
-						@media screen and (max-width: 1440px) {
-							min-width: 0;
-
-							&:last-child {
-								min-width: 0;
-							}
-						}
-
-						> p {
-							width: 100%;
-							font-size: 12px;
-							font-weight: 400;
-
-							> span {
-								line-height: 1;
-								color: var(--font-dimmed-color);
-								font-size: 11px;
-							}
-						}
+					> span {
+						line-height: 1;
+						color: var(--font-dimmed-color);
+						font-size: 11px;
 					}
 				}
 			}
@@ -212,7 +140,6 @@
 	top: 30px;
 	left: 5%;
 	background-color: var(--trade-table-tooltip);
-
 	z-index: 9999;
 
 	&__text {

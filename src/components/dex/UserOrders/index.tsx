@@ -2,16 +2,28 @@ import { classes } from '@/utils/utils';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import useUpdateUser from '@/hook/useUpdateUser';
 import EmptyMessage from '@/components/UI/EmptyMessage';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import GenericTable from '@/components/default/GenericTable';
+import ActionBtn from '@/components/UI/ActionBtn';
+import { getUserOrders, getUserPendings } from '@/utils/methods';
+import UserPendingType from '@/interfaces/common/UserPendingType';
+import { Store } from '@/store/store-reducer';
+import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
+import { useAlert } from '@/hook/useAlert';
+import Alert from '@/components/UI/Alert/Alert';
+import { tabsType, UserOrdersProps } from './types';
 import styles from './styles.module.scss';
-import { UserOrdersProps } from './types';
-import MyOrdersRow from './components/MyOrdersRow';
-import MyOrdersApplyRow from './components/MyOrdersApplyRow';
+import {
+	buildApplyTipsColumns,
+	buildMyRequestsColumns,
+	buildOrderHistoryColumns,
+	buildUserColumns,
+} from './columns';
 
 const UserOrders = ({
 	userOrders,
 	applyTips,
 	myOrdersLoading,
-	loggedIn,
 	ordersType,
 	setOrdersType,
 	handleCancelAllOrders,
@@ -23,110 +35,271 @@ const UserOrders = ({
 	fetchTrades,
 	pairData,
 }: UserOrdersProps) => {
+	const { state } = useContext(Store);
+	const loggedIn = !!state.wallet?.connected;
+	const { setAlertState, setAlertSubtitle, alertState, alertSubtitle } = useAlert();
+
 	const fetchUser = useUpdateUser();
-	const firstCurrencyName = pairData?.first_currency?.name || '';
-	const secondCurrencyName = pairData?.second_currency?.name || '';
+	const suitables = applyTips.filter((s) => !s.transaction);
+	const offers = applyTips.filter((s) => s.transaction);
+	const [userRequests, setUserRequests] = useState<UserPendingType[]>([]);
+	const [ordersHistory, setOrdersHistory] = useState<UserOrderData[]>([]);
 
+	useEffect(() => {
+		(async () => {
+			const requestsData = await getUserPendings();
+
+			if (requestsData.success) {
+				setUserRequests(requestsData.data);
+			}
+		})();
+
+		(async () => {
+			const result = await getUserOrders();
+
+			if (!result.success) {
+				setAlertState('error');
+				setAlertSubtitle('Error loading orders data');
+				await new Promise((resolve) => setTimeout(resolve, 2000));
+				setAlertState(null);
+				setAlertSubtitle('');
+				return;
+			}
+
+			const filteredOrdersHistory = result.data
+				.filter((s) => s.pair_id === pairData?.id)
+				.filter((s) => s.status === 'finished');
+
+			fetchUser();
+
+			setOrdersHistory(filteredOrdersHistory);
+		})();
+	}, [userOrders, applyTips]);
+
+	const firstCurrencyName = pairData?.first_currency?.name ?? '';
+	const secondCurrencyName = pairData?.second_currency?.name ?? '';
+
+	const onAfter = useCallback(async () => {
+		await updateOrders();
+		await updateUserOrders();
+		await fetchUser();
+		await fetchTrades();
+	}, [updateOrders, updateUserOrders, fetchUser, fetchTrades]);
+
+	const offersCountByOrderId = useMemo(() => {
+		const map = new Map<string, number>();
+		for (const tip of applyTips) {
+			const key = String(tip.connected_order_id);
+			map.set(key, (map.get(key) ?? 0) + 1);
+		}
+		return map;
+	}, [applyTips]);
+
+	const columnsOpened = useMemo(
+		() =>
+			buildUserColumns({
+				firstCurrencyName,
+				secondCurrencyName,
+				secondAssetUsdPrice,
+				offersCountByOrderId,
+				onAfter,
+			}),
+		[firstCurrencyName, secondCurrencyName, secondAssetUsdPrice, offersCountByOrderId, onAfter],
+	);
+
+	const columnsSuitables = useMemo(
+		() =>
+			buildApplyTipsColumns({
+				type: 'suitables',
+				firstCurrencyName,
+				secondCurrencyName,
+				matrixAddresses,
+				secondAssetUsdPrice,
+				userOrders,
+				pairData,
+				onAfter,
+			}),
+		[
+			firstCurrencyName,
+			secondCurrencyName,
+			matrixAddresses,
+			secondAssetUsdPrice,
+			userOrders,
+			pairData,
+			onAfter,
+		],
+	);
+
+	const columnsMyRequests = useMemo(
+		() =>
+			buildMyRequestsColumns({
+				firstCurrencyName,
+				secondCurrencyName,
+				onAfter,
+			}),
+		[firstCurrencyName, secondCurrencyName, onAfter],
+	);
+
+	const columnsOffers = useMemo(
+		() =>
+			buildApplyTipsColumns({
+				type: 'offers',
+				firstCurrencyName,
+				secondCurrencyName,
+				matrixAddresses,
+				secondAssetUsdPrice,
+				userOrders,
+				pairData,
+				onAfter,
+			}),
+		[
+			firstCurrencyName,
+			secondCurrencyName,
+			matrixAddresses,
+			secondAssetUsdPrice,
+			userOrders,
+			pairData,
+			onAfter,
+		],
+	);
+
+	const columnsOrderHistory = useMemo(
+		() =>
+			buildOrderHistoryColumns({
+				firstCurrencyName,
+				secondCurrencyName,
+				secondAssetUsdPrice,
+			}),
+		[firstCurrencyName, secondCurrencyName, secondAssetUsdPrice],
+	);
+
+	const renderTable = () => {
+		switch (ordersType) {
+			case 'opened':
+				return (
+					<GenericTable
+						className={styles.userOrders__body}
+						columns={columnsOpened}
+						data={userOrders}
+						getRowKey={(r) => r.id}
+						emptyMessage="No orders"
+					/>
+				);
+			case 'suitable':
+				return (
+					<GenericTable
+						className={styles.userOrders__body}
+						columns={columnsSuitables}
+						data={suitables}
+						getRowKey={(r) => r.id}
+						emptyMessage="No suitables"
+					/>
+				);
+			case 'requests':
+				return (
+					<GenericTable
+						className={styles.userOrders__body}
+						columns={columnsMyRequests}
+						data={userRequests}
+						getRowKey={(r) => r.id}
+						emptyMessage="No requests"
+					/>
+				);
+			case 'offers':
+				return (
+					<GenericTable
+						className={styles.userOrders__body}
+						columns={columnsOffers}
+						data={offers}
+						getRowKey={(r) => r.id}
+						emptyMessage="No offers"
+					/>
+				);
+			case 'history':
+				return (
+					<GenericTable
+						className={styles.userOrders__body}
+						columns={columnsOrderHistory}
+						data={ordersHistory}
+						getRowKey={(r) => r.id}
+						emptyMessage="No data"
+					/>
+				);
+			default:
+				return null;
+		}
+	};
+
+	const tabsData: tabsType[] = [
+		{
+			title: 'Open Orders',
+			type: 'opened',
+			length: userOrders.length,
+		},
+		{
+			title: 'Suitable',
+			type: 'suitable',
+			length: suitables.length,
+		},
+		{
+			title: 'My requests',
+			type: 'requests',
+			length: userRequests.length,
+		},
+		{
+			title: 'Offers',
+			type: 'offers',
+			length: offers.length,
+		},
+		{
+			title: 'Order history',
+			type: 'history',
+			length: ordersHistory.length,
+		},
+	];
 	return (
-		<div ref={orderListRef} className={styles.userOrders}>
-			<div className={styles.userOrders__header}>
-				<div className={styles.userOrders__header_nav}>
-					<button
-						onClick={() => setOrdersType('opened')}
-						className={classes(
-							styles.navItem,
-							ordersType === 'opened' && styles.active,
-						)}
-					>
-						Opened orders {applyTips?.length ? <span>{applyTips?.length}</span> : ''}
-					</button>
-
-					<button
-						onClick={() => setOrdersType('history')}
-						className={classes(
-							styles.navItem,
-							ordersType === 'history' && styles.active,
-						)}
-					>
-						Orders History
-					</button>
-				</div>
-
-				<div className={styles.trading__user_cancelOrder}>
-					<button
-						className={styles.userOrders__header_btn}
-						onClick={handleCancelAllOrders}
-					>
-						Cancel all orders
-					</button>
-				</div>
-			</div>
-
-			<div>
-				<table>
-					<thead>
-						<tr>
-							<th>Alias</th>
-							<th>Price ({secondCurrencyName})</th>
-							<th>Amount ({firstCurrencyName})</th>
-							<th>Total ({secondCurrencyName})</th>
-							<th>Offers</th>
-							<th></th>
-						</tr>
-					</thead>
-				</table>
-
-				{!myOrdersLoading && loggedIn && !!userOrders.length && (
-					<div className={`${styles.userOrders__body} orders-scroll`}>
-						<table>
-							<tbody className={styles.incoming}>
-								{userOrders.map((e) => (
-									<MyOrdersRow
-										key={e.id}
-										orderData={e}
-										applyTips={applyTips}
-										fetchUser={fetchUser}
-										matrixAddresses={matrixAddresses}
-										secondAssetUsdPrice={secondAssetUsdPrice}
-										updateOrders={updateOrders}
-										updateUserOrders={updateUserOrders}
-									/>
-								))}
-							</tbody>
-						</table>
-
-						{!!applyTips.length && (
-							<table className={styles.apply}>
-								<tbody>
-									{applyTips.map((e) => (
-										<MyOrdersApplyRow
-											key={e.id}
-											pairData={pairData}
-											orderData={e}
-											userOrders={userOrders}
-											fetchTrades={fetchTrades}
-											fetchUser={fetchUser}
-											matrixAddresses={matrixAddresses}
-											secondAssetUsdPrice={secondAssetUsdPrice}
-											updateOrders={updateOrders}
-											updateUserOrders={updateUserOrders}
-										/>
-									))}
-								</tbody>
-							</table>
-						)}
+		<>
+			<div ref={orderListRef} className={styles.userOrders}>
+				<div className={styles.userOrders__header}>
+					<div className={styles.userOrders__header_nav}>
+						{tabsData.map((tab) => (
+							<button
+								key={tab.type}
+								onClick={() => setOrdersType(tab.type)}
+								className={classes(
+									styles.navItem,
+									ordersType === tab.type && styles.active,
+								)}
+							>
+								{tab.title} ({tab.length})
+							</button>
+						))}
 					</div>
-				)}
+
+					{ordersType === 'opened' && userOrders.length > 0 && (
+						<ActionBtn
+							className={styles.userOrders__header_btn}
+							onClick={handleCancelAllOrders}
+						>
+							Cancel all
+						</ActionBtn>
+					)}
+				</div>
+
+				{!myOrdersLoading && loggedIn && renderTable()}
 
 				{myOrdersLoading && loggedIn && <ContentPreloader style={{ marginTop: 40 }} />}
-
 				{!loggedIn && <EmptyMessage text="Connect wallet to see your orders" />}
-
-				{loggedIn && !userOrders.length && !myOrdersLoading && (
-					<EmptyMessage text="No orders" />
-				)}
 			</div>
-		</div>
+
+			{alertState && (
+				<Alert
+					type={alertState}
+					subtitle={alertSubtitle || ''}
+					close={() => setAlertState(null)}
+				/>
+			)}
+		</>
 	);
 };
 

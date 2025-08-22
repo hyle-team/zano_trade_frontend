@@ -144,6 +144,21 @@ export function formatTime(ts: string | number) {
 	return date.toLocaleTimeString('ru-RU', { hour12: false });
 }
 
+export function formatTimestamp(ms: number | string) {
+	if (Number.isNaN(Number(ms))) {
+		return 0;
+	}
+
+	const date = new Date(Number(ms));
+	const YYYY = date.getFullYear();
+	const MM = String(date.getMonth() + 1).padStart(2, '0');
+	const DD = String(date.getDate()).padStart(2, '0');
+	const HH = String(date.getHours()).padStart(2, '0');
+	const mm = String(date.getMinutes()).padStart(2, '0');
+	const ss = String(date.getSeconds()).padStart(2, '0');
+	return `${YYYY}-${MM}-${DD} ${HH}:${mm}:${ss}`;
+}
+
 export function classes(...classes: (string | boolean | undefined)[]): string {
 	// boolean for constructions like [predicate] && [className]
 	return classes.filter((className) => className).join(' ');
