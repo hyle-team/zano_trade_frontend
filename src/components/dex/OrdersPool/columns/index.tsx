@@ -47,7 +47,7 @@ export function buildOrderPoolColumns({
 			key: 'total',
 			header: <>Total ({secondCurrencyName})</>,
 			width: '80px',
-			cell: (row) => <TotalUsdCell amount={row.left} price={row.price} fixed={4} />,
+			cell: (row) => <TotalUsdCell amount={row.left} price={row.price} fixed={8} />,
 		},
 	];
 }
