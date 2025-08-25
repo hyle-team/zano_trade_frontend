@@ -104,11 +104,7 @@
 						td {
 							position: static !important;
 
-
-
 							&:last-child {
-
-
 								&::before {
 									content: '';
 									pointer-events: none;
