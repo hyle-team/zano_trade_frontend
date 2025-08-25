@@ -29,6 +29,7 @@ const tabsData: tabsType[] = [
 const OrdersPool = (props: OrdersPoolProps) => {
 	const {
 		ordersBuySell,
+		OrdersHistory,
 		setOrdersBuySell,
 		currencyNames,
 		ordersLoading,
@@ -44,7 +45,7 @@ const OrdersPool = (props: OrdersPoolProps) => {
 	const [infoTooltipPos, setInfoTooltipPos] = useState({ x: 0, y: 0 });
 	const [ordersInfoTooltip, setOrdersInfoTooltip] = useState<PageOrderData | null>(null);
 	const [currentOrder, setCurrentOrder] = useState<tabsType>(tabsData[0]);
-	const { maxBuyLeftValue, maxSellLeftValue } = filteredOrdersHistory.reduce(
+	const { maxBuyLeftValue, maxSellLeftValue } = OrdersHistory.reduce(
 		(acc, order) => {
 			const left = parseFloat(String(order.left)) || 0;
 			if (order.type === 'buy') acc.maxBuyLeftValue = Math.max(acc.maxBuyLeftValue, left);
@@ -200,7 +201,7 @@ const OrdersPool = (props: OrdersPoolProps) => {
 				<div className={styles.ordersPool__content}>
 					{renderTable()}
 
-					{currentOrder.type === 'orders' && (
+					{currentOrder.type === 'orders' && totalLeft > 0 && (
 						<div className={styles.ordersPool__content_stats}>
 							<div
 								style={
@@ -268,19 +269,24 @@ const OrdersPool = (props: OrdersPoolProps) => {
 												: '#FF6767',
 									}}
 								>
-									{notationToString(ordersInfoTooltip?.price)}
+									{ordersInfoTooltip?.price}
 								</p>
 								<span>
 									~
 									{secondAssetUsdPrice && ordersInfoTooltip?.price !== undefined
 										? (() => {
-												const total =
-													secondAssetUsdPrice * ordersInfoTooltip.price;
-												const formatted =
-													ordersInfoTooltip.price < 0.9
-														? `$${total.toFixed(5)}`
-														: `$${total.toFixed(2)}`;
-												return formatted;
+												const total = new Decimal(secondAssetUsdPrice).mul(
+													ordersInfoTooltip.price,
+												);
+
+												if (total.abs().lt(0.01)) {
+													return `$${total
+														.toFixed(8)
+														.replace(/(\.\d*?[1-9])0+$/, '$1')
+														.replace(/\.0+$/, '')}`;
+												}
+
+												return `$${total.toFixed(2).replace(/\.0+$/, '')}`;
 											})()
 										: 'undefined'}
 								</span>

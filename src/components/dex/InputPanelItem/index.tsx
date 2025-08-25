@@ -5,7 +5,7 @@ import RangeInput from '@/components/UI/RangeInput/RangeInput';
 import ConnectButton from '@/components/UI/ConnectButton/ConnectButton';
 import Button from '@/components/UI/Button/Button';
 import { useRouter } from 'next/router';
-import { classes, formatDollarValue } from '@/utils/utils';
+import { classes, formatDollarValue, notationToString } from '@/utils/utils';
 import InputPanelItemProps from '@/interfaces/props/pages/dex/trading/InputPanelItem/InputPanelItemProps';
 import CreateOrderData from '@/interfaces/fetch-data/create-order/CreateOrderData';
 import Decimal from 'decimal.js';
@@ -197,7 +197,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 
 				<div className={styles.inputPanel__body_total}>
 					<LabeledInput
-						value={totalState}
+						value={notationToString(totalState)}
 						setValue={() => undefined}
 						currency={secondCurrencyName}
 						label="Total"

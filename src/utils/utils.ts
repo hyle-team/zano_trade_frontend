@@ -90,10 +90,10 @@ export const notationToString = (notation: number | string, fixed?: number) => {
 	const decimalValue = new Decimal(notation || '0');
 
 	if (fixed !== undefined) {
-		return decimalValue.toDecimalPlaces(fixed).toString();
+		return decimalValue.toFixed(fixed).replace(/\.?0+$/, '');
 	}
 
-	return decimalValue.toString();
+	return decimalValue.toFixed();
 };
 
 export const localeTimeLeft = (now: number | null, timestamp: number) => {

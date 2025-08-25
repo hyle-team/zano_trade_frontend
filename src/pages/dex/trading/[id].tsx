@@ -163,11 +163,12 @@ function Trading() {
 						ordersBuySell={ordersBuySell}
 						ordersLoading={ordersLoading}
 						filteredOrdersHistory={filteredOrdersHistory}
-						trades={trades}
+						trades={trades.slice(0, 100)}
 						tradesLoading={tradesLoading}
 						setOrdersBuySell={setOrdersBuySell}
 						takeOrderClick={onHandleTakeOrder}
 						matrixAddresses={matrixAddresses}
+						OrdersHistory={ordersHistory}
 					/>
 
 					<div className={styles.trading__top_chart}>
