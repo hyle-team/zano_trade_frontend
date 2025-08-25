@@ -4,8 +4,9 @@
 	gap: 8px;
 
 	&__label {
-		font-size: 11px;
-		font-family: 700;
+		font-size: 12px;
+		font-family: 500;
+		line-height: 100%;
 		color: var(--table-th-color);
 	}
 
@@ -13,10 +14,18 @@
 		width: 100%;
 		position: relative;
 		background-color: var(--bordered-input-bg);
-		border: 1px solid var(--window-border-color);
+		border: 1px solid transparent;
 		border-radius: 8px;
 		display: flex;
 		overflow: hidden;
+
+		&:hover {
+			border-color: var(--window-border-color);
+		}
+
+		&:focus-within {
+			border-color: #1f8feb;
+		}
 
 		&.invalid {
 			border-color: #ff6767;
@@ -24,36 +33,24 @@
 
 		input {
 			width: 100%;
-			padding: 13px 15px;
+			padding: 15px;
 			background-color: transparent;
 			border: none;
-			font-size: 16px;
-			font-weight: 400;
-		}
-	}
-
-	&__value {
-		padding-right: 10px;
-		display: flex;
-		align-items: center;
-
-		> p {
-			color: var(--table-th-color);
-			font-size: 12px;
+			font-size: 14px;
 			font-weight: 400;
 		}
 	}
 
 	&__currency {
-		min-width: 82px;
 		max-width: 150px;
 		padding: 0 15px;
-		background-color: var(--dex-input-currency);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 
 		> p {
+			font-size: 14px;
+			font-weight: 400;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;

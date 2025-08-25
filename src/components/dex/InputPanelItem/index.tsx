@@ -5,7 +5,7 @@ import RangeInput from '@/components/UI/RangeInput/RangeInput';
 import ConnectButton from '@/components/UI/ConnectButton/ConnectButton';
 import Button from '@/components/UI/Button/Button';
 import { useRouter } from 'next/router';
-import { classes } from '@/utils/utils';
+import { classes, formatDollarValue } from '@/utils/utils';
 import InputPanelItemProps from '@/interfaces/props/pages/dex/trading/InputPanelItem/InputPanelItemProps';
 import CreateOrderData from '@/interfaces/fetch-data/create-order/CreateOrderData';
 import Decimal from 'decimal.js';
@@ -13,6 +13,7 @@ import Alert from '@/components/UI/Alert/Alert';
 import infoIcon from '@/assets/images/UI/info_alert_icon.svg';
 import Image from 'next/image';
 import { useAlert } from '@/hook/useAlert';
+import { buySellValues } from '@/constants';
 import styles from './styles.module.scss';
 import LabeledInput from './components/LabeledInput';
 
@@ -21,8 +22,8 @@ function InputPanelItem(props: InputPanelItemProps) {
 		priceState = '',
 		amountState = '',
 		totalState = '',
-		buySellValues,
 		buySellState = buySellValues[0],
+		setBuySellState,
 		setPriceFunction,
 		setAmountFunction,
 		setRangeInputValue,
@@ -138,46 +139,83 @@ function InputPanelItem(props: InputPanelItemProps) {
 			)}
 
 			<div className={styles.inputPanel__header}>
-				<h5 className={styles.title}>
-					{isBuy ? 'Buy' : 'Sell'} {secondCurrencyName}
-				</h5>
-
-				<p className={styles.inputPanel__fees}>
-					Fee: <span>0.01 Zano</span>
-				</p>
+				<h5 className={styles.title}>Trade</h5>
 			</div>
 
 			<div className={styles.inputPanel__body}>
-				{LabeledInput({
-					value: priceState,
-					setValue: setPriceFunction,
-					currency: secondCurrencyName,
-					placeholder: '0.00',
-					label: 'Price',
-					invalid: !!priceState && !priceValid,
-				})}
+				<div className={styles.inputPanel__selector}>
+					<button
+						onClick={() => setBuySellState(buySellValues[1])}
+						className={classes(
+							styles.inputPanel__selector_item,
+							buySellState.code === 'buy' && styles.buy,
+						)}
+					>
+						Buy
+					</button>
+					<button
+						onClick={() => setBuySellState(buySellValues[2])}
+						className={classes(
+							styles.inputPanel__selector_item,
+							buySellState.code === 'sell' && styles.sell,
+						)}
+					>
+						Sell
+					</button>
+				</div>
 
-				{LabeledInput({
-					value: amountState,
-					setValue: setAmountFunction,
-					currency: firstCurrencyName,
-					placeholder: '0.00',
-					label: 'Amount',
-					invalid: !!amountState && !amountValid,
-				})}
+				<LabeledInput
+					value={priceState}
+					setValue={setPriceFunction}
+					currency={secondCurrencyName}
+					label="Price"
+					invalid={!!priceState && !priceValid}
+				/>
 
-				<RangeInput value={rangeInputValue} onInput={onRangeInput} />
+				<LabeledInput
+					value={amountState}
+					setValue={setAmountFunction}
+					currency={firstCurrencyName}
+					label="Quantity"
+					invalid={!!amountState && !amountValid}
+				/>
 
-				{LabeledInput({
-					value: totalState,
-					setValue: () => undefined,
-					currency: secondCurrencyName,
-					placeholder: '0.00',
-					label: 'Total',
-					readonly: true,
-					invalid: !!totalState && !totalValid,
-					usd: totalUsd,
-				})}
+				<div>
+					<RangeInput value={rangeInputValue} onInput={onRangeInput} />
+					<div className={styles.inputPanel__body_labels}>
+						<p className={styles.inputPanel__body_labels__item}>0%</p>
+						<p className={styles.inputPanel__body_labels__item}>100%</p>
+					</div>
+				</div>
+
+				<div className={styles.inputPanel__body_labels}>
+					<p className={styles.inputPanel__body_labels__item}>Available Balance</p>
+					<p className={styles.inputPanel__body_labels__item}>
+						<span>{balance || 0}</span> {firstCurrencyName}
+					</p>
+				</div>
+
+				<div className={styles.inputPanel__body_total}>
+					<LabeledInput
+						value={totalState}
+						setValue={() => undefined}
+						currency={secondCurrencyName}
+						label="Total"
+						readonly={true}
+						invalid={!!totalState && !totalValid}
+					/>
+
+					<div className={styles.inputPanel__body_labels}>
+						<p className={styles.inputPanel__body_labels__item}>
+							Fee: <span>0.01</span> ZANO
+						</p>
+						{totalUsd && (
+							<p className={styles.inputPanel__body_labels__item}>
+								~ ${formatDollarValue(totalUsd)}
+							</p>
+						)}
+					</div>
+				</div>
 				{state.wallet?.connected ? (
 					<Button
 						disabled={isButtonDisabled}
@@ -190,12 +228,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 						{buttonText}
 					</Button>
 				) : (
-					<ConnectButton
-						className={classes(
-							styles.inputPanel__body_btn,
-							isBuy ? styles.buy : styles.sell,
-						)}
-					/>
+					<ConnectButton className={styles.inputPanel__body_btn} />
 				)}
 			</div>
 		</div>

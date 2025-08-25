@@ -13,6 +13,7 @@ export default function GenericTable<T>(props: GenericTableProps<T>) {
 		data,
 		getRowKey,
 		emptyMessage = 'No data',
+		getRowProps,
 	} = props;
 
 	return (
@@ -65,7 +66,10 @@ export default function GenericTable<T>(props: GenericTableProps<T>) {
 
 						<tbody className={tbodyClassName}>
 							{data.map((row, i) => (
-								<tr key={getRowKey(row, i)}>
+								<tr
+									{...(getRowProps ? getRowProps(row, i) : {})}
+									key={getRowKey(row, i)}
+								>
 									{columns.map((col) => (
 										<td
 											key={col.key}

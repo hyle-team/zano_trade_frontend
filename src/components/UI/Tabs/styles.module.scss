@@ -1,0 +1,30 @@
+.tabs {
+	width: 100%;
+	border-bottom: 1px solid var(--delimiter-color);
+	display: flex;
+	align-items: center;
+	gap: 22px;
+
+	&__item {
+		cursor: pointer;
+		padding-bottom: 7px;
+		position: relative;
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
+		font-size: 14px;
+		font-weight: 500;
+		border-bottom: 2px solid transparent;
+		background-color: transparent;
+		color: #1f8feb;
+
+		&.active {
+			color: var(--text-color);
+			border-color: #1f8feb;
+		}
+
+		&:hover {
+			border-color: #1f8feb;
+			background-color: transparent;
+		}
+	}
+}

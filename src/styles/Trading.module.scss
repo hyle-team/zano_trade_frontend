@@ -17,9 +17,7 @@
 		display: flex;
 		gap: 20px;
 		padding-bottom: 20px;
-		height: 40dvh;
-		min-height: 380px;
-		max-height: 500px;
+		height: 570px;
 
 		&_chart {
 			width: 100%;
@@ -42,17 +40,17 @@
 				}
 			}
 		}
+
+		&_form {
+			width: 100%;
+			height: 100%;
+			max-width: 415px;
+		}
 	}
 
 	&__info {
 		display: flex;
 		gap: 20px;
 		margin-bottom: 40px;
-
-		&_createOrders {
-			display: flex;
-			gap: 20px;
-			width: 100%;
-		}
 	}
 }

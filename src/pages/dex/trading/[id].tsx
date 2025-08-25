@@ -30,7 +30,6 @@ import useFilteredData from '@/hook/useFilteredData';
 import useTradeInit from '@/hook/useTradeInit';
 import useMatrixAddresses from '@/hook/useMatrixAddresses';
 import takeOrderClick from '@/utils/takeOrderClick';
-import { OrderType } from '@/components/dex/UserOrders/types';
 import useUpdateUser from '@/hook/useUpdateUser';
 
 const CHART_OPTIONS = [{ name: 'Zano Chart' }, { name: 'Trading View', disabled: true }];
@@ -52,15 +51,13 @@ function Trading() {
 	const [trades, setTrades] = useState<Trade[]>([]);
 	const [myOrdersLoading, setMyOrdersLoading] = useState(true);
 	const [ordersBuySell, setOrdersBuySell] = useState(buySellValues[0]);
-	const [tradesType, setTradesType] = useState<'all' | 'my'>('all');
-	const [ordersType, setOrdersType] = useState<OrderType>('opened');
 	const [pairStats, setPairStats] = useState<PairStats | null>(null);
 	const [applyTips, setApplyTips] = useState<ApplyTip[]>([]);
 	const matrixAddresses = useMatrixAddresses(ordersHistory);
+	const [orderFormType, setOrderFormType] = useState(buySellValues[1]);
 
 	const {
-		buyForm,
-		sellForm,
+		orderForm,
 		currencyNames,
 		firstAssetLink,
 		secondAssetLink,
@@ -99,23 +96,21 @@ function Trading() {
 
 	// Take order from trades
 	const onHandleTakeOrder = useCallback(
-		(
-			event:
-				| React.MouseEvent<HTMLAnchorElement, MouseEvent>
-				| React.MouseEvent<HTMLTableRowElement, MouseEvent>,
-			e: PageOrderData,
-		) => {
+		(event: React.MouseEvent<HTMLTableRowElement, MouseEvent>, e: PageOrderData) => {
+			setOrderFormType(() => {
+				return e.type === 'buy' ? buySellValues[2] : buySellValues[1];
+			});
+
 			takeOrderClick({
 				event,
 				PageOrderData: e,
 				balance,
-				buyForm,
+				orderForm,
 				pairData,
 				scrollToOrderForm,
-				sellForm,
 			});
 		},
-		[balance, buyForm, pairData, scrollToOrderForm, sellForm],
+		[balance, orderForm, pairData, scrollToOrderForm],
 	);
 
 	// Cancel all user orders
@@ -134,11 +129,9 @@ function Trading() {
 		}
 	}, [userOrders, updateUserOrders]);
 
-	const { filteredOrdersHistory, filteredTrades } = useFilteredData({
+	const { filteredOrdersHistory } = useFilteredData({
 		ordersBuySell,
 		ordersHistory,
-		trades,
-		tradesType,
 	});
 
 	const onAfter = async () => {
@@ -166,12 +159,15 @@ function Trading() {
 				<div className={styles.trading__top}>
 					<OrdersPool
 						currencyNames={currencyNames}
-						filteredOrdersHistory={filteredOrdersHistory}
+						secondAssetUsdPrice={secondAssetUsdPrice}
 						ordersBuySell={ordersBuySell}
 						ordersLoading={ordersLoading}
-						secondAssetUsdPrice={secondAssetUsdPrice}
+						filteredOrdersHistory={filteredOrdersHistory}
+						trades={trades}
+						tradesLoading={tradesLoading}
 						setOrdersBuySell={setOrdersBuySell}
 						takeOrderClick={onHandleTakeOrder}
+						matrixAddresses={matrixAddresses}
 					/>
 
 					<div className={styles.trading__top_chart}>
@@ -198,13 +194,34 @@ function Trading() {
 						)}
 					</div>
 
-					<AllTrades
+					<div ref={orderFormRef} className={styles.trading__top_form}>
+						<InputPanelItem
+							currencyNames={currencyNames}
+							priceState={orderForm.price}
+							amountState={orderForm.amount}
+							totalState={orderForm.total}
+							buySellState={orderFormType}
+							setBuySellState={setOrderFormType}
+							setPriceFunction={orderForm.onPriceChange}
+							setAmountFunction={orderForm.onAmountChange}
+							setRangeInputValue={orderForm.setRangeInputValue}
+							rangeInputValue={orderForm.rangeInputValue}
+							balance={Number(balance)}
+							priceValid={orderForm.priceValid}
+							amountValid={orderForm.amountValid}
+							totalValid={orderForm.totalValid}
+							totalUsd={orderForm.totalUsd}
+							scrollToOrderList={scrollToOrdersList}
+							onAfter={onAfter}
+						/>
+					</div>
+					{/* <AllTrades
 						currencyNames={currencyNames}
 						filteredTrades={filteredTrades}
 						setTradesType={setTradesType}
 						tradesLoading={tradesLoading}
 						tradesType={tradesType}
-					/>
+					/> */}
 				</div>
 
 				<div className={styles.trading__info}>
@@ -213,43 +230,12 @@ function Trading() {
 						userOrders={userOrders}
 						applyTips={applyTips}
 						myOrdersLoading={myOrdersLoading}
-						ordersType={ordersType}
-						setOrdersType={setOrdersType}
 						handleCancelAllOrders={handleCancelAllOrders}
 						matrixAddresses={matrixAddresses}
 						secondAssetUsdPrice={secondAssetUsdPrice}
 						pairData={pairData}
 						onAfter={onAfter}
 					/>
-				</div>
-				<div ref={orderFormRef} className={styles.trading__info_createOrders}>
-					{['buy', 'sell'].map((type) => {
-						const isBuy = type === 'buy';
-						const form = isBuy ? buyForm : sellForm;
-
-						return (
-							<InputPanelItem
-								key={type}
-								currencyNames={currencyNames}
-								priceState={form.price}
-								amountState={form.amount}
-								totalState={form.total}
-								buySellValues={buySellValues}
-								buySellState={isBuy ? buySellValues[1] : buySellValues[2]}
-								setPriceFunction={form.onPriceChange}
-								setAmountFunction={form.onAmountChange}
-								setRangeInputValue={form.setRangeInputValue}
-								rangeInputValue={form.rangeInputValue}
-								balance={Number(balance)}
-								priceValid={form.priceValid}
-								amountValid={form.amountValid}
-								totalValid={form.totalValid}
-								totalUsd={form.totalUsd}
-								scrollToOrderList={scrollToOrdersList}
-								onAfter={onAfter}
-							/>
-						);
-					})}
 				</div>
 
 				{alertState && (

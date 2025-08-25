@@ -5,14 +5,12 @@ import OrderFormOutput from '@/interfaces/common/orderFormOutput';
 import { handleInputChange } from '@/utils/handleInputChange';
 
 interface UseOrderFormParams {
-	type: 'buy' | 'sell';
 	pairData: PairData | null;
 	balance: string | undefined;
 	assetsRates: Map<string, number>;
 }
 
 export function useOrderForm({
-	type,
 	pairData,
 	balance,
 	assetsRates,

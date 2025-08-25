@@ -5,8 +5,8 @@ import ApplyTip from '@/interfaces/common/ApplyTip';
 import UserPendingType from '@/interfaces/common/UserPendingType';
 import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
 import CancelActionCell from '../components/CancelActionCell';
-import AliasCell from '../components/AliasCell';
-import TotalUsdCell from '../components/TotalUsdCell';
+import AliasCell from '../../AliasCell';
+import TotalUsdCell from '../../TotalUsdCell';
 import RequestActionCell from '../components/RequestActionCell';
 import {
 	BuildApplyTipsColumnsArgs,

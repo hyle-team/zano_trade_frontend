@@ -12,8 +12,7 @@ interface takeOrderClickParams {
 		| React.MouseEvent<HTMLTableRowElement, MouseEvent>;
 	PageOrderData: PageOrderData;
 	pairData: PairDataType | null;
-	buyForm: OrderFormOutput;
-	sellForm: OrderFormOutput;
+	orderForm: OrderFormOutput;
 	balance: string | undefined;
 	scrollToOrderForm: () => void;
 }
@@ -22,8 +21,7 @@ function takeOrderClick({
 	event,
 	PageOrderData,
 	pairData,
-	buyForm,
-	sellForm,
+	orderForm,
 	balance,
 	scrollToOrderForm,
 }: takeOrderClickParams) {
@@ -36,59 +34,31 @@ function takeOrderClick({
 	const secondCurrencyDP = pairData?.second_currency?.asset_info?.decimal_point || 12;
 	const firstCurrencyDP = pairData?.first_currency?.asset_info?.decimal_point || 12;
 
-	if (e.type === 'sell') {
-		handleInputChange({
-			inputValue: priceStr,
-			priceOrAmount: 'price',
-			otherValue: amountStr,
-			thisDP: secondCurrencyDP,
-			totalDP: secondCurrencyDP,
-			setThisState: buyForm.setPrice,
-			setTotalState: buyForm.setTotal,
-			setThisValid: buyForm.setPriceValid,
-			setTotalValid: buyForm.setTotalValid,
-		});
+	handleInputChange({
+		inputValue: priceStr,
+		priceOrAmount: 'price',
+		otherValue: amountStr,
+		thisDP: secondCurrencyDP,
+		totalDP: secondCurrencyDP,
+		setThisState: orderForm.setPrice,
+		setTotalState: orderForm.setTotal,
+		setThisValid: orderForm.setPriceValid,
+		setTotalValid: orderForm.setTotalValid,
+	});
 
-		handleInputChange({
-			inputValue: amountStr,
-			priceOrAmount: 'amount',
-			otherValue: priceStr,
-			thisDP: firstCurrencyDP,
-			totalDP: secondCurrencyDP,
-			setThisState: buyForm.setAmount,
-			setTotalState: buyForm.setTotal,
-			setThisValid: buyForm.setAmountValid,
-			setTotalValid: buyForm.setTotalValid,
-			balance,
-			setRangeInputValue: buyForm.setRangeInputValue,
-		});
-	} else {
-		handleInputChange({
-			inputValue: priceStr,
-			priceOrAmount: 'price',
-			otherValue: amountStr,
-			thisDP: secondCurrencyDP,
-			totalDP: secondCurrencyDP,
-			setThisState: sellForm.setPrice,
-			setTotalState: sellForm.setTotal,
-			setThisValid: sellForm.setPriceValid,
-			setTotalValid: sellForm.setTotalValid,
-		});
-
-		handleInputChange({
-			inputValue: amountStr,
-			priceOrAmount: 'amount',
-			otherValue: priceStr,
-			thisDP: firstCurrencyDP,
-			totalDP: secondCurrencyDP,
-			setThisState: sellForm.setAmount,
-			setTotalState: sellForm.setTotal,
-			setThisValid: sellForm.setAmountValid,
-			setTotalValid: sellForm.setTotalValid,
-			balance,
-			setRangeInputValue: sellForm.setRangeInputValue,
-		});
-	}
+	handleInputChange({
+		inputValue: amountStr,
+		priceOrAmount: 'amount',
+		otherValue: priceStr,
+		thisDP: firstCurrencyDP,
+		totalDP: secondCurrencyDP,
+		setThisState: orderForm.setAmount,
+		setTotalState: orderForm.setTotal,
+		setThisValid: orderForm.setAmountValid,
+		setTotalValid: orderForm.setTotalValid,
+		balance,
+		setRangeInputValue: orderForm.setRangeInputValue,
+	});
 
 	scrollToOrderForm();
 }

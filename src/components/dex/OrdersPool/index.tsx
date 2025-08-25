@@ -1,17 +1,30 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { classes, cutAddress, formatDollarValue, notationToString } from '@/utils/utils';
 import { nanoid } from 'nanoid';
 import Decimal from 'decimal.js';
 import Tooltip from '@/components/UI/Tooltip/Tooltip';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import { buySellValues } from '@/constants';
-import EmptyMessage from '@/components/UI/EmptyMessage';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import useMouseLeave from '@/hook/useMouseLeave';
-import OrdersRow from './components/OrdersRow';
+import { tabsType } from '@/components/UI/Tabs/types';
+import Tabs from '@/components/UI/Tabs';
+import GenericTable from '@/components/default/GenericTable';
 import styles from './styles.module.scss';
 import BadgeStatus from '../BadgeStatus';
 import { OrdersPoolProps } from './types';
+import { buildOrderPoolColumns, buildTradesColumns } from './columns';
+
+const tabsData: tabsType[] = [
+	{
+		title: 'Order Pool',
+		type: 'orders',
+	},
+	{
+		title: 'Recent Trades',
+		type: 'trades',
+	},
+];
 
 const OrdersPool = (props: OrdersPoolProps) => {
 	const {
@@ -22,14 +35,123 @@ const OrdersPool = (props: OrdersPoolProps) => {
 		filteredOrdersHistory,
 		secondAssetUsdPrice,
 		takeOrderClick,
+		matrixAddresses,
+		trades,
+		tradesLoading,
 	} = props;
 	const ordersInfoRef = useRef<HTMLTableSectionElement | null>(null);
 	const { firstCurrencyName, secondCurrencyName } = currencyNames;
 	const [infoTooltipPos, setInfoTooltipPos] = useState({ x: 0, y: 0 });
 	const [ordersInfoTooltip, setOrdersInfoTooltip] = useState<PageOrderData | null>(null);
+	const [currentOrder, setCurrentOrder] = useState<tabsType>(tabsData[0]);
+	const { maxBuyLeftValue, maxSellLeftValue } = filteredOrdersHistory.reduce(
+		(acc, order) => {
+			const left = parseFloat(String(order.left)) || 0;
+			if (order.type === 'buy') acc.maxBuyLeftValue = Math.max(acc.maxBuyLeftValue, left);
+			if (order.type === 'sell') acc.maxSellLeftValue = Math.max(acc.maxSellLeftValue, left);
+			return acc;
+		},
+		{ maxBuyLeftValue: 0, maxSellLeftValue: 0 },
+	);
+
+	const totalLeft = maxBuyLeftValue + maxSellLeftValue;
 
 	const moveInfoTooltip = (event: React.MouseEvent) => {
 		setInfoTooltipPos({ x: event.clientX, y: event.clientY });
+	};
+
+	const ordersPool = useMemo(
+		() =>
+			buildOrderPoolColumns({
+				firstCurrencyName,
+				secondCurrencyName,
+				matrixAddresses,
+			}),
+		[firstCurrencyName, secondCurrencyName, matrixAddresses],
+	);
+
+	const tradeOrders = useMemo(
+		() =>
+			buildTradesColumns({
+				firstCurrencyName,
+				secondCurrencyName,
+			}),
+		[firstCurrencyName, secondCurrencyName],
+	);
+
+	const renderTable = () => {
+		switch (currentOrder.type) {
+			case 'orders':
+				return (
+					<>
+						{!ordersLoading ? (
+							<div onMouseMove={moveInfoTooltip} ref={ordersInfoRef}>
+								<GenericTable
+									className={styles.ordersPool__content_orders}
+									tableClassName={styles.table}
+									tbodyClassName={styles.table__body}
+									theadClassName={styles.table__header}
+									columns={ordersPool}
+									data={filteredOrdersHistory.sort((a, b) => {
+										if (a.type === b.type) return 0;
+										return a.type === 'buy' ? -1 : 1;
+									})}
+									getRowKey={(r) => r.id}
+									getRowProps={(row) => ({
+										className: styles[row.type],
+										style: {
+											'--precentage': `${(
+												(parseFloat(String(row.left)) /
+													(row.type === 'buy'
+														? maxBuyLeftValue
+														: maxSellLeftValue)) *
+												100
+											).toFixed(2)}%`,
+										} as React.CSSProperties,
+										onClick: (event) => {
+											takeOrderClick(event, row);
+										},
+										onMouseMove: (event) => {
+											const tr = event.target as HTMLElement;
+											if (tr.classList.contains('alias')) {
+												setOrdersInfoTooltip(null);
+											}
+										},
+										onMouseEnter: () => {
+											setOrdersInfoTooltip(row);
+										},
+										onMouseLeave: () => {
+											setOrdersInfoTooltip(null);
+										},
+									})}
+								/>
+							</div>
+						) : (
+							<ContentPreloader style={{ marginTop: 40 }} />
+						)}
+					</>
+				);
+			case 'trades':
+				return (
+					<>
+						{!tradesLoading ? (
+							<GenericTable
+								className={styles.ordersPool__content_orders}
+								tableClassName={styles.table}
+								tbodyClassName={styles.table__body}
+								theadClassName={styles.table__header}
+								columns={tradeOrders}
+								data={trades}
+								getRowKey={(r) => r.id}
+							/>
+						) : (
+							<ContentPreloader style={{ marginTop: 40 }} />
+						)}
+					</>
+				);
+			default:
+				return null;
+		}
 	};
 
 	useMouseLeave(ordersInfoRef, () => setOrdersInfoTooltip(null));
@@ -37,88 +159,73 @@ const OrdersPool = (props: OrdersPoolProps) => {
 		<>
 			<div className={styles.ordersPool}>
 				<div className={styles.ordersPool__header}>
-					<h5 className={styles.ordersPool__header_title}>Orders pool</h5>
+					<Tabs value={currentOrder} setValue={setCurrentOrder} data={tabsData} />
 
-					<div className={styles.ordersPool__header_type}>
-						<button
-							onClick={() => setOrdersBuySell(buySellValues[0])}
-							className={classes(
-								styles.btn,
-								styles.all,
-								ordersBuySell.code === 'all' && styles.selected,
-							)}
-						></button>
+					{currentOrder.type === 'orders' && (
+						<div className={styles.ordersPool__header_type}>
+							<button
+								onClick={() => setOrdersBuySell(buySellValues[0])}
+								className={classes(
+									styles.btn,
+									styles.all,
+									ordersBuySell.code === 'all' && styles.selected,
+								)}
+							></button>
 
-						<button
-							onClick={() => setOrdersBuySell(buySellValues[1])}
-							className={classes(
-								styles.btn,
-								styles.buy,
-								ordersBuySell.code === 'buy' && styles.selected,
-							)}
-						>
-							B
-						</button>
+							<button
+								onClick={() => setOrdersBuySell(buySellValues[1])}
+								className={classes(
+									styles.btn,
+									styles.buy,
+									ordersBuySell.code === 'buy' && styles.selected,
+								)}
+							>
+								B
+							</button>
 
-						<button
-							onClick={() => setOrdersBuySell(buySellValues[2])}
-							className={classes(
-								styles.btn,
-								styles.sell,
-								ordersBuySell.code === 'sell' && styles.selected,
-							)}
-						>
-							S
-						</button>
-					</div>
+							<button
+								onClick={() => setOrdersBuySell(buySellValues[2])}
+								className={classes(
+									styles.btn,
+									styles.sell,
+									ordersBuySell.code === 'sell' && styles.selected,
+								)}
+							>
+								S
+							</button>
+						</div>
+					)}
 				</div>
 
 				<div className={styles.ordersPool__content}>
-					<table>
-						<thead>
-							<tr>
-								<th>Price ({secondCurrencyName})</th>
-								<th>Amount ({firstCurrencyName})</th>
-								<th>Total ({secondCurrencyName})</th>
-							</tr>
-						</thead>
+					{renderTable()}
 
-						{!ordersLoading && !!filteredOrdersHistory.length && (
-							<tbody
-								ref={ordersInfoRef}
-								onMouseMove={moveInfoTooltip}
-								onMouseLeave={() => setOrdersInfoTooltip(null)}
-								className="orders-scroll"
+					{currentOrder.type === 'orders' && (
+						<div className={styles.ordersPool__content_stats}>
+							<div
+								style={
+									{
+										'--width': `${(maxBuyLeftValue / totalLeft) * 100}%`,
+									} as React.CSSProperties
+								}
+								className={classes(styles.stat_item, styles.buy)}
 							>
-								{filteredOrdersHistory?.map((e) => {
-									const maxValue = Math.max(
-										...filteredOrdersHistory.map((order) =>
-											parseFloat(String(order.left)),
-										),
-									);
-									const percentage = (
-										(parseFloat(String(e.left)) / maxValue) *
-										100
-									).toFixed(2);
-
-									return (
-										<OrdersRow
-											orderData={e}
-											percentage={Number(percentage)}
-											key={nanoid(16)}
-											takeOrderClick={takeOrderClick}
-											setOrdersInfoTooltip={setOrdersInfoTooltip}
-										/>
-									);
-								})}
-							</tbody>
-						)}
-					</table>
-
-					{!filteredOrdersHistory.length && !ordersLoading && (
-						<EmptyMessage text="No orders" />
+								<div className={styles.stat_item__badge}>B</div>{' '}
+								{notationToString((maxBuyLeftValue / totalLeft) * 100, 0)}%
+							</div>
+							<div
+								style={
+									{
+										'--width': `${(maxSellLeftValue / totalLeft) * 100}%`,
+									} as React.CSSProperties
+								}
+								className={classes(styles.stat_item, styles.sell)}
+							>
+								{notationToString((maxSellLeftValue / totalLeft) * 100, 0)}%{' '}
+								<div className={styles.stat_item__badge}>S</div>
+							</div>
+						</div>
 					)}
-					{ordersLoading && <ContentPreloader style={{ marginTop: 40 }} />}
 				</div>
 			</div>
 

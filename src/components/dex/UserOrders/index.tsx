@@ -2,7 +2,7 @@ import { classes } from '@/utils/utils';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import useUpdateUser from '@/hook/useUpdateUser';
 import EmptyMessage from '@/components/UI/EmptyMessage';
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import GenericTable from '@/components/default/GenericTable';
 import ActionBtn from '@/components/UI/ActionBtn';
 import { getUserOrders, getUserPendings } from '@/utils/methods';
@@ -11,7 +11,9 @@ import { Store } from '@/store/store-reducer';
 import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
 import { useAlert } from '@/hook/useAlert';
 import Alert from '@/components/UI/Alert/Alert';
-import { tabsType, UserOrdersProps } from './types';
+import { tabsType } from '@/components/UI/Tabs/types';
+import Tabs from '@/components/UI/Tabs';
+import { UserOrdersProps } from './types';
 import styles from './styles.module.scss';
 import {
 	buildApplyTipsColumns,
@@ -24,8 +26,6 @@ const UserOrders = ({
 	userOrders,
 	applyTips,
 	myOrdersLoading,
-	ordersType,
-	setOrdersType,
 	handleCancelAllOrders,
 	orderListRef,
 	matrixAddresses,
@@ -42,6 +42,45 @@ const UserOrders = ({
 	const offers = applyTips.filter((s) => s.transaction);
 	const [userRequests, setUserRequests] = useState<UserPendingType[]>([]);
 	const [ordersHistory, setOrdersHistory] = useState<UserOrderData[]>([]);
+
+	const tabsData: tabsType[] = useMemo(
+		() => [
+			{
+				title: 'Open Orders',
+				type: 'opened',
+				length: userOrders.length,
+			},
+			{
+				title: 'Suitable',
+				type: 'suitable',
+				length: suitables.length,
+			},
+			{
+				title: 'My requests',
+				type: 'requests',
+				length: userRequests.length,
+			},
+			{
+				title: 'Offers',
+				type: 'offers',
+				length: offers.length,
+			},
+			{
+				title: 'Order history',
+				type: 'history',
+				length: ordersHistory.length,
+			},
+		],
+		[
+			offers.length,
+			userOrders.length,
+			suitables.length,
+			userRequests.length,
+			ordersHistory.length,
+		],
+	);
+
+	const [ordersType, setOrdersType] = useState<tabsType>(tabsData[0]);
 
 	useEffect(() => {
 		(async () => {
@@ -166,7 +205,7 @@ const UserOrders = ({
 	);
 
 	const renderTable = () => {
-		switch (ordersType) {
+		switch (ordersType.type) {
 			case 'opened':
 				return (
 					<GenericTable
@@ -222,53 +261,13 @@ const UserOrders = ({
 		}
 	};
 
-	const tabsData: tabsType[] = [
-		{
-			title: 'Open Orders',
-			type: 'opened',
-			length: userOrders.length,
-		},
-		{
-			title: 'Suitable',
-			type: 'suitable',
-			length: suitables.length,
-		},
-		{
-			title: 'My requests',
-			type: 'requests',
-			length: userRequests.length,
-		},
-		{
-			title: 'Offers',
-			type: 'offers',
-			length: offers.length,
-		},
-		{
-			title: 'Order history',
-			type: 'history',
-			length: ordersHistory.length,
-		},
-	];
 	return (
 		<>
 			<div ref={orderListRef} className={styles.userOrders}>
 				<div className={styles.userOrders__header}>
-					<div className={styles.userOrders__header_nav}>
-						{tabsData.map((tab) => (
-							<button
-								key={tab.type}
-								onClick={() => setOrdersType(tab.type)}
-								className={classes(
-									styles.navItem,
-									ordersType === tab.type && styles.active,
-								)}
-							>
-								{tab.title} ({tab.length})
-							</button>
-						))}
-					</div>
+					<Tabs data={tabsData} value={ordersType} setValue={setOrdersType} />
 
-					{ordersType === 'opened' && userOrders.length > 0 && (
+					{ordersType?.type === 'opened' && userOrders.length > 0 && (
 						<ActionBtn
 							className={styles.userOrders__header_btn}
 							onClick={handleCancelAllOrders}

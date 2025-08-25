@@ -37,15 +37,7 @@ const useTradeInit = ({ pairData, pairStats }: useTradeInitParams) => {
 			? new Decimal(pairStats.rate).mul(secondAssetUsdPrice).toFixed(2)
 			: undefined;
 
-	const buyForm = useOrderForm({
-		type: 'buy',
-		pairData,
-		balance,
-		assetsRates: state.assetsRates,
-	});
-
-	const sellForm = useOrderForm({
-		type: 'sell',
+	const orderForm = useOrderForm({
 		pairData,
 		balance,
 		assetsRates: state.assetsRates,
@@ -57,8 +49,7 @@ const useTradeInit = ({ pairData, pairStats }: useTradeInitParams) => {
 		secondAssetLink,
 		secondAssetUsdPrice,
 		balance,
-		buyForm,
-		sellForm,
+		orderForm,
 		pairRateUsd,
 	};
 };

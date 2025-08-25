@@ -1,5 +1,7 @@
 .inputPanel {
 	width: 100%;
+	max-width: 415px;
+	height: 100%;
 	padding: 15px;
 	background: var(--window-bg-color);
 	border: 1px solid var(--delimiter-color);
@@ -9,7 +11,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding-bottom: 10px;
+		padding-bottom: 12px;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		margin-bottom: 10px;
 
@@ -19,21 +21,65 @@
 		}
 	}
 
-	&__fees {
-		color: var(--table-th-color);
-		font-weight: 400;
-		font-size: 12px;
+	&__selector {
+		display: flex;
+		background-color: var(--main-bg-color);
+		padding: 4px;
+		border-radius: 20px;
 
-		span {
-			font-weight: 400;
-			font-size: 12px;
+		&_item {
+			cursor: pointer;
+			width: 50%;
+			background-color: transparent;
+			border-radius: 100px;
+			padding-block: 9px;
+			font-size: 14px;
+			font-weight: 500;
+			line-height: 100%;
+
+			&:hover {
+				background-color: transparent;
+				opacity: 0.8;
+			}
+
+			&.buy {
+				background-color: #16d1d6;
+			}
+
+			&.sell {
+				background-color: #ff6767;
+			}
 		}
 	}
 
 	&__body {
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: 15px;
+
+		&_labels {
+			margin-top: 5px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+
+			&__item {
+				font-size: 12px;
+				font-weight: 500;
+				line-height: 100%;
+				color: var(--table-th-color);
+
+				span {
+					font-size: 12px;
+				}
+			}
+		}
+
+		&_total {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+		}
 
 		&_btn {
 			margin-top: 10px;

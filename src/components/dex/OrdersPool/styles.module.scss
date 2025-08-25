@@ -1,28 +1,18 @@
 .ordersPool {
+	position: relative;
 	max-width: 415px;
 	width: 100%;
+	height: 100%;
 	padding: 5px;
 	background: var(--window-bg-color);
 	border: 1px solid var(--delimiter-color);
 	border-radius: 10px;
 
-	@media screen and (max-width: 1480px) {
-		max-width: 340px;
-	}
-
 	&__header {
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
+		flex-direction: column;
 		gap: 10px;
 		padding: 10px;
-		padding-bottom: 10px;
-		border-bottom: 1px solid var(--delimiter-color);
-
-		&_title {
-			font-size: 18px;
-			font-weight: 600;
-		}
 
 		&_type {
 			display: flex;
@@ -38,10 +28,11 @@
 				font-weight: 700;
 				transition: 0.3s opacity ease;
 				color: #ffffff;
+				opacity: 60%;
 
 				&.selected,
 				&:hover {
-					opacity: 80%;
+					opacity: 100%;
 				}
 
 				&.all {
@@ -63,44 +54,138 @@
 		display: flex;
 		flex-direction: column;
 		padding-top: 10px;
+		width: 100%;
 
-		table {
+		&_orders {
 			width: 100%;
+			height: 410px;
 
-			thead {
-				display: flex;
+			.table {
 				width: 100%;
-				padding-inline: 10px;
-				margin-bottom: 9px;
 
-				tr {
-					width: 100%;
-					display: flex;
-					justify-content: space-between;
+				&__header {
+					position: relative;
+					z-index: 3;
 
 					th {
-						font-size: 11px;
-						font-weight: 700;
-						text-align: start;
 						color: var(--table-th-color);
-						min-width: 80px;
+					}
+				}
 
-						&:last-child {
-							text-align: right;
+				&__body {
+					tr {
+						cursor: pointer;
+						position: relative;
+
+						&:hover {
+							background-color: var(--table-tr-hover-color);
+						}
+
+						&.buy {
+							td {
+								&:last-child {
+									&::before {
+										background-color: var(--dex-buy-percentage);
+									}
+								}
+							}
+						}
+
+						&.sell {
+							td {
+								&:last-child {
+									&::before {
+										background-color: var(--dex-sell-percentage);
+									}
+								}
+							}
+						}
+
+						td {
+							position: static !important;
+
+
+
+							&:last-child {
+
+
+								&::before {
+									content: '';
+									pointer-events: none;
+									position: absolute;
+									z-index: 1;
+									right: 0;
+									top: 0;
+									width: var(--precentage);
+									height: 100%;
+								}
+							}
+
+							p,
+							span {
+								position: relative;
+								z-index: 2;
+								font-size: 12px;
+								font-weight: 400;
+							}
 						}
 					}
 				}
 			}
+		}
 
-			tbody {
-				height: 29dvh;
-				min-height: 265px;
-				max-height: 380px;
+		&_stats {
+			position: absolute;
+			bottom: 15px;
+			left: 50%;
+			transform: translateX(-50%);
+			width: calc(100% - 30px);
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1px;
+
+			.stat_item {
 				display: flex;
-				flex-direction: column;
-				overflow: auto;
-				padding-bottom: 20px;
-				padding: 10px;
+				align-items: center;
+				gap: 6px;
+				font-size: 12px;
+				line-height: 100%;
+				font-weight: 400;
+				min-width: 60px;
+
+				&.buy {
+					width: var(--width);
+					background-color: var(--dex-buy-percentage);
+					color: #16d1d6;
+
+					.stat_item__badge {
+						background-color: #16d1d6;
+					}
+				}
+
+				&.sell {
+					width: var(--width);
+					background-color: var(--dex-sell-percentage);
+					justify-content: flex-end;
+					color: #ff6767;
+
+					.stat_item__badge {
+						background-color: #ff6767;
+					}
+				}
+
+				&__badge {
+					width: 20px;
+					height: 20px;
+					border-radius: 4px;
+					display: grid;
+					place-content: center;
+					font-size: 12px;
+					font-weight: 700;
+					line-height: 120%;
+					color: #ffffff;
+				}
 			}
 		}
 	}

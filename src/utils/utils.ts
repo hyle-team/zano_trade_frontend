@@ -86,13 +86,14 @@ export const roundTo = (x: number | string, digits = 7) => {
 	return fixedValue.replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.0+$/, '');
 };
 
-export const notationToString = (notation: number | string) => {
+export const notationToString = (notation: number | string, fixed?: number) => {
 	const decimalValue = new Decimal(notation || '0');
 
-	const fixedValue = decimalValue.toFixed();
+	if (fixed !== undefined) {
+		return decimalValue.toDecimalPlaces(fixed).toString();
+	}
 
-	// Remove trailing zeros
-	return fixedValue;
+	return decimalValue.toString();
 };
 
 export const localeTimeLeft = (now: number | null, timestamp: number) => {

@@ -1,62 +1,29 @@
 .userOrders {
 	position: relative;
 	width: 100%;
-	padding: 5px;
 	background: var(--window-bg-color);
 	border: 1px solid var(--delimiter-color);
 	border-radius: 10px;
+	padding: 1px;
 	min-height: 310px;
 
 	&__body {
 		position: relative;
-		padding: 10px;
 		padding-top: 5px;
-		padding-bottom: 20px;
 		height: 260px;
 		overflow: auto;
 	}
 
 	&__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
 		position: relative;
-		padding-top: 10px;
+		padding-top: 14px;
+		margin-inline: 14px;
 		padding-bottom: 0;
-		border-bottom: 1px solid var(--delimiter-color);
-
-		&_nav {
-			display: flex;
-			align-items: center;
-			gap: 22px;
-
-			.navItem {
-				cursor: pointer;
-				padding-bottom: 7px;
-				position: relative;
-				border-top-left-radius: 10px;
-				border-top-right-radius: 10px;
-				font-size: 14px;
-				font-weight: 500;
-				border-bottom: 2px solid transparent;
-				background-color: transparent;
-				color: #1f8feb;
-
-				&.active {
-					color: var(--text-color);
-					border-color: #1f8feb;
-				}
-
-				&:hover {
-					border-color: #1f8feb;
-				}
-			}
-		}
 
 		&_btn {
 			position: absolute;
-			right: 5px;
-			top: 5px;
+			right: 0px;
+			top: 7px;
 			z-index: 2;
 		}
 	}
@@ -90,7 +57,7 @@
 			td {
 				position: relative;
 
-				> p {
+				>p {
 					width: 100%;
 					font-size: 12px;
 					font-weight: 400;
@@ -109,7 +76,7 @@
 						}
 					}
 
-					> span {
+					>span {
 						line-height: 1;
 						color: var(--font-dimmed-color);
 						font-size: 11px;
@@ -117,38 +84,5 @@
 				}
 			}
 		}
-	}
-}
-
-.alias {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-	font-size: 14px;
-
-	&__text {
-		color: var(--font-main-color) !important;
-	}
-
-	path {
-		fill: none;
-	}
-}
-
-.tooltip {
-	position: absolute;
-	top: 30px;
-	left: 5%;
-	background-color: var(--trade-table-tooltip);
-	z-index: 9999;
-
-	&__text {
-		font-size: 12px !important;
-	}
-
-	&__arrow {
-		border-radius: 2px;
-		left: 30% !important;
-		background-color: var(--trade-table-tooltip) !important;
 	}
 }

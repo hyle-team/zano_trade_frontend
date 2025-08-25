@@ -9,8 +9,8 @@ interface InputPanelItemProps {
 	priceState: string;
 	amountState: string;
 	totalState: string;
-	buySellValues: SelectValue[];
 	buySellState: SelectValue;
+	setBuySellState: Dispatch<SetStateAction<SelectValue>>;
 	setPriceFunction: (_value: string) => void;
 	setAmountFunction: (_value: string) => void;
 	setRangeInputValue: Dispatch<SetStateAction<string>>;

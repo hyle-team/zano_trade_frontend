@@ -2,6 +2,7 @@ import Tooltip from '@/components/UI/Tooltip/Tooltip';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ReactComponent as ConnectionIcon } from '@/assets/images/UI/connection.svg';
+import { classes } from '@/utils/utils';
 import styles from './styles.module.scss';
 import { MatrixConnectionBadgeProps } from './types';
 
@@ -9,13 +10,14 @@ function MatrixConnectionBadge({
 	userAdress,
 	userAlias,
 	matrixAddresses,
+	className,
 }: MatrixConnectionBadgeProps) {
 	const hasConnection = (address: string) =>
 		matrixAddresses.some((item) => item.address === address && item.registered);
 
 	const [open, setOpen] = useState(false);
 	const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
-	const anchorRef = useRef<HTMLAnchorElement | null>(null);
+	const anchorRef = useRef<HTMLParagraphElement | null>(null);
 
 	const updatePosition = () => {
 		const el = anchorRef.current;
@@ -42,11 +44,13 @@ function MatrixConnectionBadge({
 	if (!userAdress || !hasConnection(userAdress)) return <></>;
 
 	return (
-		<div className={styles.badge}>
-			<a
+		<div className={classes(styles.badge, className)}>
+			<p
 				ref={anchorRef}
-				href={`https://matrix.to/#/@${userAlias}:zano.org`}
-				target="_blank"
+				onClick={(e) => {
+					e.preventDefault();
+					window.open(`https://matrix.to/#/@${userAlias}:zano.org`);
+				}}
 				onMouseEnter={() => {
 					setOpen(true);
 					requestAnimationFrame(updatePosition);
@@ -55,7 +59,7 @@ function MatrixConnectionBadge({
 				className={styles.badge__link}
 			>
 				<ConnectionIcon />
-			</a>
+			</p>
 
 			{open &&
 				pos &&
