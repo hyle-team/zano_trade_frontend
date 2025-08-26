@@ -1,5 +1,11 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { classes, cutAddress, formatDollarValue, notationToString } from '@/utils/utils';
+import {
+	classes,
+	createOrderSorter,
+	cutAddress,
+	formatDollarValue,
+	notationToString,
+} from '@/utils/utils';
 import { nanoid } from 'nanoid';
 import Decimal from 'decimal.js';
 import Tooltip from '@/components/UI/Tooltip/Tooltip';
@@ -80,6 +86,11 @@ const OrdersPool = (props: OrdersPoolProps) => {
 		[firstCurrencyName, secondCurrencyName],
 	);
 
+	const sortedTrades = createOrderSorter<PageOrderData>({
+		getPrice: (e) => e.price,
+		getSide: (e) => e.type,
+	});
+
 	const renderTable = () => {
 		switch (currentOrder.type) {
 			case 'orders':
@@ -93,10 +104,7 @@ const OrdersPool = (props: OrdersPoolProps) => {
 									tbodyClassName={styles.table__body}
 									theadClassName={styles.table__header}
 									columns={ordersPool}
-									data={filteredOrdersHistory.sort((a, b) => {
-										if (a.type === b.type) return 0;
-										return a.type === 'buy' ? -1 : 1;
-									})}
+									data={filteredOrdersHistory.sort(sortedTrades)}
 									getRowKey={(r) => r.id}
 									getRowProps={(row) => ({
 										className: styles[row.type],
@@ -201,32 +209,62 @@ const OrdersPool = (props: OrdersPoolProps) => {
 				<div className={styles.ordersPool__content}>
 					{renderTable()}
 
-					{currentOrder.type === 'orders' && totalLeft > 0 && (
-						<div className={styles.ordersPool__content_stats}>
-							<div
-								style={
-									{
-										'--width': `${(maxBuyLeftValue / totalLeft) * 100}%`,
-									} as React.CSSProperties
-								}
-								className={classes(styles.stat_item, styles.buy)}
-							>
-								<div className={styles.stat_item__badge}>B</div>{' '}
-								{notationToString((maxBuyLeftValue / totalLeft) * 100, 0)}%
-							</div>
-							<div
-								style={
-									{
-										'--width': `${(maxSellLeftValue / totalLeft) * 100}%`,
-									} as React.CSSProperties
-								}
-								className={classes(styles.stat_item, styles.sell)}
-							>
-								{notationToString((maxSellLeftValue / totalLeft) * 100, 0)}%{' '}
-								<div className={styles.stat_item__badge}>S</div>
-							</div>
-						</div>
-					)}
+					{currentOrder.type === 'orders' &&
+						totalLeft > 0 &&
+						(() => {
+							const buy = new Decimal(maxBuyLeftValue || 0);
+							const sell = new Decimal(maxSellLeftValue || 0);
+							const total = new Decimal(totalLeft);
+
+							let buyPct = total.gt(0) ? buy.mul(100).div(total) : new Decimal(0);
+							let sellPct = total.gt(0) ? sell.mul(100).div(total) : new Decimal(0);
+
+							if (buy.isZero() && sell.gt(0)) {
+								buyPct = new Decimal(0);
+								sellPct = new Decimal(100);
+							} else if (sell.isZero() && buy.gt(0)) {
+								sellPct = new Decimal(0);
+								buyPct = new Decimal(100);
+							}
+
+							const clamp = (d: Decimal) => Decimal.max(0, Decimal.min(100, d));
+
+							const buyPctClamped = clamp(buyPct);
+							const sellPctClamped = clamp(sellPct);
+
+							const buyLabel = buyPctClamped
+								.toDecimalPlaces(0, Decimal.ROUND_DOWN)
+								.toString();
+							const sellLabel = sellPctClamped
+								.toDecimalPlaces(0, Decimal.ROUND_DOWN)
+								.toString();
+
+							return (
+								<div className={styles.ordersPool__content_stats}>
+									<div
+										style={
+											{
+												'--width': `${buyPctClamped.toNumber()}%`,
+											} as React.CSSProperties
+										}
+										className={classes(styles.stat_item, styles.buy)}
+									>
+										<div className={styles.stat_item__badge}>B</div> {buyLabel}%
+									</div>
+									<div
+										style={
+											{
+												'--width': `${sellPctClamped.toNumber()}%`,
+											} as React.CSSProperties
+										}
+										className={classes(styles.stat_item, styles.sell)}
+									>
+										{sellLabel}%{' '}
+										<div className={styles.stat_item__badge}>S</div>
+									</div>
+								</div>
+							);
+						})()}
 				</div>
 			</div>
 

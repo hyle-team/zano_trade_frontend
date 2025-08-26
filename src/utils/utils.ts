@@ -174,6 +174,27 @@ export const getAssetIcon = (assetId: string): string => {
 	return '/tokens/token.png';
 };
 
+type Getters<T> = {
+	getSide: (_item: T) => 'buy' | 'sell';
+	getPrice: (_item: T) => string | number | Decimal;
+};
+
+export function createOrderSorter<T>({ getSide, getPrice }: Getters<T>) {
+	return (a: T, b: T) => {
+		const aSide = getSide(a);
+		const bSide = getSide(b);
+		if (aSide !== bSide) return aSide === 'buy' ? -1 : 1;
+
+		const ap = new Decimal(getPrice(a));
+		const bp = new Decimal(getPrice(b));
+
+		if (aSide === 'buy') {
+			return bp.comparedTo(ap);
+		}
+		return ap.comparedTo(bp);
+	};
+}
+
 export const ZANO_ASSET_ID = 'd6329b5b1f7c0805b5c345f4957554002a2f557845f64d7645dae0e051a6498a';
 
 const knownCurrencies = ['zano', 'xmr', 'btc', 'firo', 'usd', 'eur', 'cad', 'jpy'];

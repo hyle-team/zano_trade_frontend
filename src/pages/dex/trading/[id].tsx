@@ -163,7 +163,7 @@ function Trading() {
 						ordersBuySell={ordersBuySell}
 						ordersLoading={ordersLoading}
 						filteredOrdersHistory={filteredOrdersHistory}
-						trades={trades.slice(0, 100)}
+						trades={trades}
 						tradesLoading={tradesLoading}
 						setOrdersBuySell={setOrdersBuySell}
 						takeOrderClick={onHandleTakeOrder}
