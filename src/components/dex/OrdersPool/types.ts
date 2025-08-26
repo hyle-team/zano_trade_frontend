@@ -13,6 +13,7 @@ export interface OrdersPoolProps {
 		secondCurrencyName: string;
 	};
 	ordersLoading: boolean;
+	OrdersHistory: PageOrderData[];
 	filteredOrdersHistory: PageOrderData[];
 	trades: Trade[];
 	tradesLoading: boolean;
