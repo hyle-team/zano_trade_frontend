@@ -5,5 +5,6 @@ export interface AliasCellProps {
 	address?: string;
 	matrixAddresses: MatrixAddress[];
 	isInstant?: boolean;
+	isSm?: boolean;
 	max?: number;
 }

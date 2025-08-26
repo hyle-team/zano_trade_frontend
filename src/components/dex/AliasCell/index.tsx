@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Tooltip from '@/components/UI/Tooltip/Tooltip';
-import { cutAddress } from '@/utils/utils';
+import { classes, cutAddress } from '@/utils/utils';
 import MatrixConnectionBadge from '@/components/dex/MatrixConnectionBadge';
 import BadgeStatus from '@/components/dex/BadgeStatus';
 import { createPortal } from 'react-dom';
@@ -12,6 +12,7 @@ export default function AliasCell({
 	address,
 	matrixAddresses,
 	isInstant,
+	isSm,
 	max = 12,
 }: AliasCellProps) {
 	const display = alias ? cutAddress(alias, max) : 'no alias';
@@ -59,6 +60,7 @@ export default function AliasCell({
 				userAdress={address}
 				userAlias={alias}
 				matrixAddresses={matrixAddresses}
+				isSm={isSm}
 			/>
 
 			{isInstant && (

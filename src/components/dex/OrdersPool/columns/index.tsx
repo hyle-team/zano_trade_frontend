@@ -19,6 +19,7 @@ export function buildOrderPoolColumns({
 			className: 'alias',
 			cell: (row) => (
 				<AliasCell
+					isSm={true}
 					alias={row.user?.alias}
 					address={row.user?.address}
 					matrixAddresses={matrixAddresses}
@@ -47,6 +48,7 @@ export function buildOrderPoolColumns({
 			key: 'total',
 			header: <>Total ({secondCurrencyName})</>,
 			width: '80px',
+			align: 'right',
 			cell: (row) => <TotalUsdCell amount={row.left} price={row.price} fixed={8} />,
 		},
 	];
@@ -75,6 +77,7 @@ export function buildTradesColumns({
 		},
 		{
 			key: 'time',
+			align: 'right',
 			header: <>Time</>,
 			width: '80px',
 			cell: (row) => <p>{formatTimestamp(row.timestamp)}</p>,

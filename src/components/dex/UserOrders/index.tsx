@@ -1,4 +1,3 @@
-import { classes } from '@/utils/utils';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import useUpdateUser from '@/hook/useUpdateUser';
 import EmptyMessage from '@/components/UI/EmptyMessage';
@@ -13,6 +12,9 @@ import { useAlert } from '@/hook/useAlert';
 import Alert from '@/components/UI/Alert/Alert';
 import { tabsType } from '@/components/UI/Tabs/types';
 import Tabs from '@/components/UI/Tabs';
+import { createOrderSorter } from '@/utils/utils';
+import ApplyTip from '@/interfaces/common/ApplyTip';
+import { useQuerySyncedTab } from '@/hook/useQuerySyncedTab';
 import { UserOrdersProps } from './types';
 import styles from './styles.module.scss';
 import {
@@ -80,9 +82,15 @@ const UserOrders = ({
 		],
 	);
 
-	const [ordersType, setOrdersType] = useState<tabsType>(tabsData[0]);
+	const { active: ordersType, setActiveTab } = useQuerySyncedTab({
+		tabs: tabsData,
+		defaultType: 'opened',
+		queryKey: 'tab',
+	});
 
 	useEffect(() => {
+		if (!loggedIn) return;
+
 		(async () => {
 			const requestsData = await getUserPendings();
 
@@ -204,6 +212,11 @@ const UserOrders = ({
 		[firstCurrencyName, secondCurrencyName, secondAssetUsdPrice],
 	);
 
+	const sortedSuitables = createOrderSorter<ApplyTip>({
+		getPrice: (e) => e.price,
+		getSide: (e) => e.type,
+	});
+
 	const renderTable = () => {
 		switch (ordersType.type) {
 			case 'opened':
@@ -221,7 +234,7 @@ const UserOrders = ({
 					<GenericTable
 						className={styles.userOrders__body}
 						columns={columnsSuitables}
-						data={suitables}
+						data={suitables.sort(sortedSuitables)}
 						getRowKey={(r) => r.id}
 						emptyMessage="No suitables"
 					/>
@@ -265,7 +278,11 @@ const UserOrders = ({
 		<>
 			<div ref={orderListRef} className={styles.userOrders}>
 				<div className={styles.userOrders__header}>
-					<Tabs data={tabsData} value={ordersType} setValue={setOrdersType} />
+					<Tabs
+						data={tabsData}
+						value={ordersType}
+						setValue={(t) => setActiveTab(t.type)}
+					/>
 
 					{ordersType?.type === 'opened' && userOrders.length > 0 && (
 						<ActionBtn

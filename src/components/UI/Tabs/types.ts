@@ -1,5 +1,3 @@
-import { Dispatch, SetStateAction } from 'react';
-
 export type tabsType = {
 	title: string;
 	type: string;
@@ -8,6 +6,6 @@ export type tabsType = {
 
 export interface TabsProps {
 	value: tabsType;
-	setValue: Dispatch<SetStateAction<tabsType>>;
+	setValue: (_next: tabsType) => void;
 	data: tabsType[];
 }

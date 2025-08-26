@@ -14,6 +14,7 @@ import infoIcon from '@/assets/images/UI/info_alert_icon.svg';
 import Image from 'next/image';
 import { useAlert } from '@/hook/useAlert';
 import { buySellValues } from '@/constants';
+import { usePathname, useSearchParams } from 'next/navigation';
 import styles from './styles.module.scss';
 import LabeledInput from './components/LabeledInput';
 
@@ -40,12 +41,24 @@ function InputPanelItem(props: InputPanelItemProps) {
 
 	const { state } = useContext(Store);
 	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
 	const { setAlertState, setAlertSubtitle } = useAlert();
 	const [creatingState, setCreatingState] = useState(false);
 	const { firstCurrencyName, secondCurrencyName } = currencyNames;
 
 	const [hasImmediateMatch, setHasImmediateMatch] = useState(false);
 	const isBuy = buySellState?.code === 'buy';
+
+	function goToSuitableTab() {
+		const params = new URLSearchParams(searchParams.toString());
+		params.set('tab', 'suitable');
+
+		router.replace(`${pathname}?${params.toString()}`, undefined, {
+			shallow: true,
+			scroll: false,
+		});
+	}
 
 	function resetForm() {
 		setPriceFunction('');
@@ -126,6 +139,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 									className={styles.applyAlert__button}
 									onClick={() => {
 										scrollToOrderList();
+										goToSuitableTab();
 										setHasImmediateMatch(false);
 									}}
 								>

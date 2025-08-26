@@ -1,9 +1,21 @@
 .badge {
 	position: relative;
 
+	&.sm {
+		.badge__link svg {
+			width: 14px;
+			height: 14px;
+		}
+	}
+
 	&__link {
 		margin-top: 4px;
 		cursor: pointer;
+
+		svg {
+			width: 16px;
+			height: 16px;
+		}
 	}
 
 	&__tooltip {
