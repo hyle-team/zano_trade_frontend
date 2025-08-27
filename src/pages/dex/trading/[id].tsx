@@ -23,7 +23,6 @@ import TradingHeader from '@/components/dex/TradingHeader';
 import UserOrders from '@/components/dex/UserOrders';
 import OrdersPool from '@/components/dex/OrdersPool';
 import CandleChart from '@/components/dex/CandleChart';
-import AllTrades from '@/components/dex/AllTrades';
 import { useSocketListeners } from '@/hook/useSocketListeners';
 import { useTradingData } from '@/hook/useTradingData';
 import useFilteredData from '@/hook/useFilteredData';
@@ -216,13 +215,6 @@ function Trading() {
 							onAfter={onAfter}
 						/>
 					</div>
-					{/* <AllTrades
-						currencyNames={currencyNames}
-						filteredTrades={filteredTrades}
-						setTradesType={setTradesType}
-						tradesLoading={tradesLoading}
-						tradesType={tradesType}
-					/> */}
 				</div>
 
 				<div className={styles.trading__info}>

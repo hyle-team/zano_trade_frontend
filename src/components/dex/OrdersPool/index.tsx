@@ -145,12 +145,12 @@ const OrdersPool = (props: OrdersPoolProps) => {
 					<>
 						{!tradesLoading ? (
 							<GenericTable
-								className={styles.ordersPool__content_orders}
+								className={classes(styles.ordersPool__content_orders, styles.full)}
 								tableClassName={styles.table}
 								tbodyClassName={styles.table__body}
 								theadClassName={styles.table__header}
 								columns={tradeOrders}
-								data={trades}
+								data={trades.slice(0, 100)}
 								getRowKey={(r) => r.id}
 							/>
 						) : (

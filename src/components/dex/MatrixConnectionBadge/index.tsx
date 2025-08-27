@@ -10,7 +10,7 @@ function MatrixConnectionBadge({
 	userAdress,
 	userAlias,
 	matrixAddresses,
-	className,
+	isSm,
 }: MatrixConnectionBadgeProps) {
 	const hasConnection = (address: string) =>
 		matrixAddresses.some((item) => item.address === address && item.registered);
@@ -44,7 +44,7 @@ function MatrixConnectionBadge({
 	if (!userAdress || !hasConnection(userAdress)) return <></>;
 
 	return (
-		<div className={classes(styles.badge, className)}>
+		<div className={classes(styles.badge, isSm && styles.sm)}>
 			<p
 				ref={anchorRef}
 				onClick={(e) => {
