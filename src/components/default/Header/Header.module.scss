@@ -45,7 +45,6 @@
 			height: 50px;
 		}
 
-
 		@media screen and (max-width: 1600px) {
 			padding-inline: 40px;
 		}
@@ -60,7 +59,7 @@
 		width: 202px;
 		height: 40px;
 
-		>a {
+		> a {
 			display: flex;
 		}
 	}
@@ -140,7 +139,7 @@
 				.header__button__wrapper {
 					position: relative;
 
-					>.offers__tooltip {
+					> .offers__tooltip {
 						padding: 13px 20px;
 						position: absolute;
 						background: #11316b;
@@ -240,7 +239,7 @@
 						display: flex;
 						gap: 5px;
 
-						>span {
+						> span {
 							max-width: 100px;
 							overflow: hidden;
 							text-overflow: ellipsis;
@@ -265,7 +264,6 @@
 		}
 
 		&.header__menu__mobile {
-
 			.header__account,
 			.header__login {
 				padding: 20px;
@@ -290,11 +288,11 @@
 		cursor: pointer;
 		transition: none;
 
-		>svg {
+		> svg {
 			scale: 0.8;
 		}
 
-		>div {
+		> div {
 			width: 24px;
 			height: 2px;
 			margin-bottom: 6px;
@@ -321,7 +319,7 @@
 		max-height: 200px;
 		overflow: hidden;
 
-		>div {
+		> div {
 			width: 100%;
 		}
 

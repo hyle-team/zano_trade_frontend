@@ -78,8 +78,8 @@ export function zoomStartByPeriod(period: CandleChartProps['period']) {
 	const now = Date.now();
 	const hr = 3600_000;
 	switch (period) {
-		case '1sec':
-			return now - 1_000;
+		// case '1sec':
+		// 	return now - 1_000;
 		case '1min':
 			return now - hr / 60;
 		case '5min':

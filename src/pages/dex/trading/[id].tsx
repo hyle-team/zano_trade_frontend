@@ -40,7 +40,7 @@ function Trading() {
 	const fetchUser = useUpdateUser();
 	const [ordersHistory, setOrdersHistory] = useState<PageOrderData[]>([]);
 	const [userOrders, setUserOrders] = useState<OrderRow[]>([]);
-	const [periodsState, setPeriodsState] = useState<PeriodState>(periods[5]);
+	const [periodsState, setPeriodsState] = useState<PeriodState>(periods[6]);
 	const [pairData, setPairData] = useState<PairData | null>(null);
 	const [candles, setCandles] = useState<CandleRow[]>([]);
 	const [trades, setTrades] = useState<Trade[]>([]);
