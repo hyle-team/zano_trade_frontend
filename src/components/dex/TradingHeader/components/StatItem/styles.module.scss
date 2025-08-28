@@ -3,16 +3,20 @@
 	flex-direction: column;
 	gap: 6px;
 
-	&__nav {
+	&__top {
 		display: flex;
 		align-items: center;
 		gap: 5px;
 
+		svg {
+			transform: scale(0.9);
+		}
+
 		&_title {
 			color: var(--footer-selected-link);
 			white-space: nowrap;
-			font-size: 14px;
-			font-weight: 700;
+			font-size: 12px;
+			font-weight: 400;
 		}
 	}
 
@@ -24,13 +28,13 @@
 		&_val {
 			white-space: nowrap;
 			font-size: 14px;
-			font-weight: 400;
+			font-weight: 500;
 		}
 
 		&_coefficient {
 			white-space: nowrap;
 			font-size: 14px;
-			font-weight: 400;
+			font-weight: 500;
 
 			&.green {
 				color: #16d1d6;

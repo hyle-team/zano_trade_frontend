@@ -3,9 +3,9 @@ import { ReactComponent as UpIcon } from '@/assets/images/UI/up_icon.svg';
 import { ReactComponent as DownIcon } from '@/assets/images/UI/down_icon.svg';
 import { ReactComponent as VolumeIcon } from '@/assets/images/UI/volume_icon.svg';
 import BackButton from '@/components/default/BackButton/BackButton';
-import { roundTo, notationToString } from '@/utils/utils';
+import { roundTo, notationToString, classes } from '@/utils/utils';
 import styles from './styles.module.scss';
-import StatItem from '../StatItem';
+import StatItem from './components/StatItem';
 import { TradingHeaderProps } from './types';
 import CurrencyIcon from './components/CurrencyIcon';
 import AssetRow from './components/AssetRow';
@@ -36,56 +36,60 @@ const TradingHeader = ({
 		{
 			Img: ClockIcon,
 			title: '24h change',
-			value: `${roundTo(notationToString(pairStats?.rate || 0), 4)} ${secondCurrencyName}`,
+			value: `${roundTo(notationToString(pairStats?.rate || 0), 4)}`,
 			coefficient: coefficientOutput,
 		},
 		{
 			Img: UpIcon,
 			title: '24h high',
-			value: `${roundTo(notationToString(pairStats?.high || 0), 4)} ${secondCurrencyName}`,
+			value: `${roundTo(notationToString(pairStats?.high || 0), 4)}`,
 		},
 		{
 			Img: DownIcon,
 			title: '24h low',
-			value: `${roundTo(notationToString(pairStats?.low || 0), 4)} ${secondCurrencyName}`,
+			value: `${roundTo(notationToString(pairStats?.low || 0), 4)}`,
 		},
 		{
 			Img: VolumeIcon,
-			title: '24h volume',
-			value: `${roundTo(notationToString(pairStats?.volume || 0), 4)} ${secondCurrencyName}`,
+			title: `24h volume (${firstCurrencyName})`,
+			value: `${roundTo(notationToString(pairStats?.volume || 0), 4)}`,
 		},
 	];
 
 	return (
 		<div className={styles.header}>
-			<div className={styles.header__currency}>
-				<div className={styles.header__currency_icon}>
-					<CurrencyIcon code={firstAssetId} />
-				</div>
+			<div className={styles.header__stats}>
+				<div className={styles.header__currency}>
+					<div className={styles.header__currency_icon}>
+						<CurrencyIcon code={firstAssetId} />
+					</div>
 
-				<div className={styles.header__currency_item}>
-					<p className={styles.currencyName}>
-						{!pairData ? (
-							'...'
-						) : (
-							<>
-								{firstCurrencyName}
-								<span>/{secondCurrencyName}</span>
-							</>
-						)}
-					</p>
-
-					<div className={styles.price}>
-						<p className={styles.price__secondCurrency}>
-							{roundTo(notationToString(pairStats?.rate || 0), 4)}{' '}
-							{secondCurrencyName}
+					<div className={styles.header__currency_item}>
+						<p className={styles.currencyName}>
+							{!pairData ? (
+								'...'
+							) : (
+								<>
+									{firstCurrencyName}
+									<span>/{secondCurrencyName}</span>
+								</>
+							)}
 						</p>
-						{pairRateUsd && <p className={styles.price__usd}>~ ${pairRateUsd}</p>}
+
+						<div className={styles.price}>
+							<p
+								className={classes(
+									styles.price__secondCurrency,
+									coefficientOutput >= 0 ? styles.green : styles.red,
+								)}
+							>
+								{roundTo(notationToString(pairStats?.rate || 0, 8))}
+							</p>
+							{pairRateUsd && <p className={styles.price__usd}>~ ${pairRateUsd}</p>}
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<div className={styles.header__stats}>
 				{pairData && firstAssetLink && secondAssetLink && (
 					<div className={styles.header__stats_assets}>
 						<AssetRow
@@ -115,7 +119,7 @@ const TradingHeader = ({
 				))}
 			</div>
 
-			<BackButton />
+			<BackButton isSm />
 		</div>
 	);
 };
