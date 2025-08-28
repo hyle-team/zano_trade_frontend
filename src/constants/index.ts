@@ -2,7 +2,7 @@ import PeriodState from '@/interfaces/states/pages/dex/trading/InputPanelItem/Pe
 import SelectValue from '@/interfaces/states/pages/dex/trading/InputPanelItem/SelectValue';
 
 export const periods: PeriodState[] = [
-	{ name: '1s', code: '1sec' },
+	// { name: '1s', code: '1sec' },
 	{ name: '1m', code: '1min' },
 	{ name: '5m', code: '5min' },
 	{ name: '15m', code: '15min' },

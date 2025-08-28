@@ -7,7 +7,7 @@
 	&.sm {
 		gap: 5px !important;
 
-		>div {
+		> div {
 			a {
 				font-size: 14px !important;
 				padding: 8px !important;
@@ -20,7 +20,7 @@
 	&.tab {
 		gap: 3px;
 
-		>div {
+		> div {
 			a {
 				font-size: 16px;
 				font-weight: 500;
@@ -39,7 +39,7 @@
 		}
 	}
 
-	>div {
+	> div {
 		position: relative;
 
 		.profile__filters__notification {
