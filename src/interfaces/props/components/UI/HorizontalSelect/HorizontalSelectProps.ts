@@ -8,6 +8,7 @@ interface HorizontalSelectProps<T extends HorizontalSelectValue> {
 	setValue: Dispatch<SetStateAction<T>>;
 	className?: string;
 	isTab?: boolean;
+	isSm?: boolean;
 }
 
 export default HorizontalSelectProps;

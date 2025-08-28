@@ -1,7 +1,6 @@
 import styles from '@/styles/Trading.module.scss';
 import Footer from '@/components/default/Footer/Footer';
 import Header from '@/components/default/Header/Header';
-import Dropdown from '@/components/UI/Dropdown/Dropdown';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
 import { useCallback, useState } from 'react';
 import { cancelOrder } from '@/utils/methods';
@@ -31,9 +30,6 @@ import useMatrixAddresses from '@/hook/useMatrixAddresses';
 import takeOrderClick from '@/utils/takeOrderClick';
 import useUpdateUser from '@/hook/useUpdateUser';
 
-const CHART_OPTIONS = [{ name: 'Zano Chart' }, { name: 'Trading View', disabled: true }];
-const DEFAULT_CHART = CHART_OPTIONS[0];
-
 function Trading() {
 	const { alertState, alertSubtitle, setAlertState } = useAlert();
 	const { elementRef: orderListRef, scrollToElement: scrollToOrdersList } =
@@ -44,7 +40,7 @@ function Trading() {
 	const fetchUser = useUpdateUser();
 	const [ordersHistory, setOrdersHistory] = useState<PageOrderData[]>([]);
 	const [userOrders, setUserOrders] = useState<OrderRow[]>([]);
-	const [periodsState, setPeriodsState] = useState<PeriodState>(periods[0]);
+	const [periodsState, setPeriodsState] = useState<PeriodState>(periods[5]);
 	const [pairData, setPairData] = useState<PairData | null>(null);
 	const [candles, setCandles] = useState<CandleRow[]>([]);
 	const [trades, setTrades] = useState<Trade[]>([]);
@@ -177,18 +173,16 @@ function Trading() {
 								value={periodsState}
 								setValue={setPeriodsState}
 								isTab
-							/>
-							<Dropdown
-								body={CHART_OPTIONS}
-								className={styles.settings__dropdown}
-								selfContained
-								value={DEFAULT_CHART}
-								setValue={() => undefined}
+								isSm
 							/>
 						</div>
 
 						{candlesLoaded ? (
-							<CandleChart candles={candles} period={periodsState.code} />
+							<CandleChart
+								currencyNames={currencyNames}
+								candles={candles}
+								period={periodsState.code}
+							/>
 						) : (
 							<ContentPreloader style={{ height: '100%' }} />
 						)}

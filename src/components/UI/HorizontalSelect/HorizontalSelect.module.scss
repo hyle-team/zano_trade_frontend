@@ -4,10 +4,23 @@
 	overflow: auto;
 	padding-bottom: 3px;
 
+	&.sm {
+		gap: 5px !important;
+
+		>div {
+			a {
+				font-size: 14px !important;
+				padding: 8px !important;
+				border-radius: 8px !important;
+				line-height: 100%;
+			}
+		}
+	}
+
 	&.tab {
 		gap: 3px;
 
-		> div {
+		>div {
 			a {
 				font-size: 16px;
 				font-weight: 500;
@@ -26,7 +39,7 @@
 		}
 	}
 
-	> div {
+	>div {
 		position: relative;
 
 		.profile__filters__notification {

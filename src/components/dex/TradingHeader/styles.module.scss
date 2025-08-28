@@ -9,11 +9,13 @@
 	&__currency {
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 10px;
+		padding-right: 20px;
+		border-right: 1px solid var(--delimiter-color);
 
 		&_icon {
-			min-width: 48px;
-			min-height: 48px;
+			min-width: 40px;
+			min-height: 40px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -21,7 +23,7 @@
 			border-radius: 50%;
 
 			> img {
-				width: 26px;
+				width: 24px;
 				height: auto;
 			}
 		}
@@ -30,9 +32,10 @@
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
+			gap: 6px;
 
 			.currencyName {
-				font-size: 18px;
+				font-size: 16px;
 				font-weight: 600;
 
 				span {
@@ -48,6 +51,14 @@
 				&__secondCurrency {
 					font-weight: 400;
 					font-size: 14px;
+
+					&.green {
+						color: #16d1d6;
+					}
+
+					&.red {
+						color: #ff6767;
+					}
 				}
 
 				&__usd {

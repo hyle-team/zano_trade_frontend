@@ -355,9 +355,11 @@ function Header({ isLg }: { isLg?: boolean }) {
 				</div>
 
 				<div className={styles.header__desktop__navigation}>
-					<NavBar />
+					<NavBar isLg={isLg} />
 				</div>
+
 				{Menu()}
+
 				<BurgerButton className={styles.header__burger} />
 
 				<div className={styles.header__account__mobile} style={mobileHeaderStyle}>

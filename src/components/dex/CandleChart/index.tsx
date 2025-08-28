@@ -1,235 +1,194 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
 import useAdvancedTheme from '@/hook/useTheme';
-import CandleChartProps from '@/interfaces/props/pages/dex/trading/CandleChartProps/CandleChartProps';
 import ReactECharts from 'echarts-for-react';
-import Decimal from 'decimal.js';
-import * as echarts from 'echarts';
-import CandleRow from '@/interfaces/common/CandleRow';
-import testCandles from './testCandles.json';
+import type CandleChartProps from '@/interfaces/props/pages/dex/trading/CandleChartProps/CandleChartProps';
 import styles from './styles.module.scss';
-
-const TESTING_MODE = false;
+import { ResultCandle } from './types';
+import {
+	buildCandles,
+	d,
+	diffFmt,
+	fmt,
+	pickWindowIndices,
+	tsLabel,
+	zoomStartByPeriod,
+	chartColors,
+} from './utils';
 
 function CandleChart(props: CandleChartProps) {
-	type ResultCandle = [number, number, number, number, number];
-
 	const { theme } = useAdvancedTheme();
-	const chartRef = useRef(null);
-	const upColor = '#16D1D6cc';
-	const upBorderColor = '#16D1D6cc';
-	const downColor = '#ff6767cc';
-	const downBorderColor = '#ff6767cc';
+	const chartRef = useRef<ReactECharts>(null);
 
 	const [candles, setCandles] = useState<ResultCandle[]>([]);
 	const [isLoaded, setIsLoaded] = useState(false);
 
-	function timestampToString(timestamp: string) {
-		const targetPattern =
-			new Date(parseInt(timestamp, 10)).toDateString() === new Date().toDateString()
-				? 'hh:mm:ss'
-				: 'hh:mm:ss\ndd-MM-yyyy';
-
-		return echarts.format.formatTime(targetPattern, parseInt(timestamp, 10));
-	}
-
-	function prepareCandles() {
-		const candles = (TESTING_MODE ? (testCandles as CandleRow[]) : props.candles)
-			.map((candle) => {
-				const result = [
-					parseInt(candle.timestamp, 10),
-					candle.shadow_top || 0,
-					candle.shadow_bottom || 0,
-					candle.body_first || 0,
-					candle.body_second || 0,
-				];
-
-				return result as ResultCandle;
-			})
-			.filter((e) => e[0])
-			.map((e) => {
-				const decimals = e.map((el, i) => ({
-					value: i !== 0 ? new Decimal(el) : undefined,
-					index: i,
-				}));
-
-				for (const decimal of decimals) {
-					if (decimal.value !== undefined) {
-						if (decimal.value.lessThan(0.00001)) {
-							e[decimal.index] = 0;
-						}
-					}
-				}
-
-				return e;
-			});
-
-		return candles;
-	}
-
 	useEffect(() => {
-		const newCandles = prepareCandles();
-
-		setCandles(newCandles);
+		setCandles(buildCandles(props.candles));
 		setIsLoaded(true);
 	}, [props.candles]);
 
+	// shown candle
+	const shownIdx = candles.length ? candles.length - 1 : null;
+	const prevIdx = shownIdx && shownIdx > 0 ? shownIdx - 1 : null;
+
+	const shown = shownIdx !== null ? candles[shownIdx] : undefined;
+	const prev = prevIdx !== null ? candles[prevIdx] : undefined;
+
+	const O = shown?.[3];
+	const H = shown?.[1];
+	const L = shown?.[2];
+	const C = shown?.[4];
+	const P = prev?.[4];
+	const delta = diffFmt(C, P);
+
 	const option = useMemo(() => {
-		function splitData(rawData: ResultCandle[]) {
-			const categoryData = [];
-			const values = [];
-			for (let i = 0; i < rawData.length; i++) {
-				categoryData.push(rawData[i][0]);
-				values.push(rawData[i].slice(1));
-			}
-			return {
-				categoryData,
-				values,
-			};
-		}
-
-		const data0 = splitData(candles);
-
-		const now = new Date().getTime();
-		const zoomStartTime = (() => {
-			const date = +new Date();
-			const hr1 = 60 * 60 * 1000;
-
-			const hoursDecrement = 24 * hr1;
-			const daysDecrement = 7 * 24 * hr1;
-			const weeksDecrement = 4 * 7 * 24 * hr1;
-			const monthsDecrement = 52 * 7 * 24 * hr1;
-
-			switch (props.period) {
-				case '1h':
-					return date - hoursDecrement;
-				case '1d':
-					return date - daysDecrement;
-				case '1w':
-					return date - weeksDecrement;
-				case '1m':
-					return date - monthsDecrement;
-				default:
-					return date - hr1;
-			}
-		})();
-
-		const closestDateToStart = data0.categoryData.reduce((acc, curr) => {
-			const currDiff = Math.abs(curr - zoomStartTime);
-			const accDiff = Math.abs(acc - zoomStartTime);
-
-			return currDiff < accDiff ? curr : acc;
-		}, now);
-
-		const lastDate = data0.categoryData[data0.categoryData.length - 1];
-
-		const closestDateIndex = data0.categoryData.indexOf(closestDateToStart);
-		const lastDateIndex = data0.categoryData.indexOf(lastDate);
+		const timestamps = candles.map((c) => c[0]);
+		const { startIdx, endIdx } = pickWindowIndices(timestamps, zoomStartByPeriod(props.period));
 
 		return {
-			grid: {
-				top: '5%',
-				left: '-1%',
-				right: '6%',
-				bottom: '10%',
-			},
+			grid: { top: '5%', left: '0%', right: '10%', bottom: '10%' },
 
 			xAxis: {
 				type: 'category',
-				// data: data0.categoryData,
 				boundaryGap: true,
-				axisLine: { onZero: false },
+				min: 'dataMin',
+				max: 'dataMax',
 				splitLine: {
 					show: true,
 					lineStyle: {
-						color: theme === 'light' ? '#e3e3e8' : '#1f1f4a',
+						color: theme === 'light' ? chartColors.light : chartColors.dark,
 					},
 				},
-				min: 'dataMin',
-				max: 'dataMax',
+				axisLine: { onZero: false },
+				axisLabel: { formatter: (v: string) => tsLabel(parseInt(v, 10)) },
 				axisPointer: {
 					show: true,
 					type: 'line',
 					label: {
-						formatter: (params: { value: string }) => timestampToString(params.value),
-						backgroundColor: '#4A90E2',
-						color: '#ffffff',
+						formatter: (p: { value: string }) => tsLabel(parseInt(p.value, 10)),
+						backgroundColor: chartColors.default,
+						color: '#fff',
+					},
+				},
+			},
+
+			yAxis: {
+				scale: true,
+				position: 'right',
+				splitArea: { show: false },
+				min: (v: { min: number; max: number }) => {
+					const min = d(v.min);
+					const range = d(v.max).minus(min);
+					const pad = range.lte(0) ? d(v.max).mul(0.05) : range.mul(0.1);
+					return min.minus(pad).toNumber();
+				},
+				max: (v: { min: number; max: number }) => {
+					const min = d(v.min);
+					const max = d(v.max);
+					const range = max.minus(min);
+					const pad = range.lte(0) ? max.mul(0.05) : range.mul(0.1);
+					return max.plus(pad).toNumber();
+				},
+				splitLine: {
+					show: true,
+					lineStyle: {
+						color: theme === 'light' ? chartColors.light : chartColors.dark,
 					},
 				},
 				axisLabel: {
-					formatter: timestampToString,
+					formatter: (val: number | string) => d(val).toDecimalPlaces(6).toString(),
 				},
-			},
-			yAxis: {
-				scale: true,
-				splitArea: { show: false },
-				min: 0,
-				max: (value: { max: string }) => new Decimal(value.max).mul(1.1).toNumber(),
 				axisPointer: {
 					show: true,
 					type: 'line',
 					label: {
 						show: true,
-						backgroundColor: '#4A90E2',
-						color: '#ffffff',
-					},
-				},
-				splitLine: {
-					show: true,
-					lineStyle: {
-						color: theme === 'light' ? '#e3e3e8' : '#1f1f4a',
+						color: '#fff',
+						backgroundColor: (p: {
+							seriesData?: Array<{ value?: (number | string)[] }>;
+						}) => {
+							const ts = p.seriesData?.[0]?.value?.[0];
+							const idx = candles.findIndex((c) => c[0] === ts);
+							if (idx === -1) return chartColors.default;
+							const [, , , o, c] = candles[idx];
+							let color = chartColors.default;
+
+							if (c > o) {
+								color = chartColors.green;
+							} else if (c < o) {
+								color = chartColors.red;
+							}
+
+							return color;
+						},
 					},
 				},
 			},
-			dataZoom: [
-				{
-					type: 'inside',
-					startValue: closestDateIndex,
-					endValue: lastDateIndex,
-				},
-			],
+
+			dataZoom: [{ type: 'inside', startValue: startIdx, endValue: endIdx }],
+
 			series: [
 				{
 					name: 'Candle Chart',
 					type: 'candlestick',
 					data: candles,
-					itemStyle: {
-						color: upColor,
-						color0: downColor,
-						borderColor: upBorderColor,
-						borderColor0: downBorderColor,
-					},
 					barWidth: '75%',
-					dimensions: ['date', 'highest', 'lowest', 'open', 'close'],
-					encode: {
-						x: 'date',
-						y: ['open', 'close', 'highest', 'lowest'],
+					itemStyle: {
+						color: chartColors.green,
+						color0: chartColors.red,
+						borderColor: chartColors.green,
+						borderColor0: chartColors.red,
 					},
+					dimensions: ['date', 'highest', 'lowest', 'open', 'close'],
+					encode: { x: 'date', y: ['open', 'close', 'highest', 'lowest'] },
 					large: true,
-					largeThreshold: 2000000,
+					largeThreshold: 2_000_000,
 				},
 			],
 		};
-	}, [candles, theme]);
-
-	console.log('option', option);
+	}, [candles, props.period, theme]);
 
 	return (
 		<div className={styles.chart}>
+			{/* Header */}
+			<div className={styles.chart__top}>
+				<div className={styles.chart__top_item}>
+					<p>
+						{props.currencyNames.firstCurrencyName}/
+						{props.currencyNames.secondCurrencyName}
+					</p>
+				</div>
+				<div className={styles.chart__top_item}>
+					<p style={{ opacity: 0.7 }}>O</p>
+					<span style={{ color: delta.color }}>{fmt(O)}</span>
+				</div>
+				<div className={styles.chart__top_item}>
+					<span style={{ opacity: 0.7 }}>H</span>
+					<span style={{ color: delta.color }}>{fmt(H)}</span>
+				</div>
+				<div className={styles.chart__top_item}>
+					<span style={{ opacity: 0.7 }}>L</span>
+					<span style={{ color: delta.color }}>{fmt(L)}</span>
+				</div>
+				<div className={styles.chart__top_item}>
+					<span style={{ opacity: 0.7 }}>C</span>
+					<span style={{ color: delta.color }}>{fmt(C)}</span>
+				</div>
+				<div className={styles.chart__top_item}>
+					<p style={{ color: delta.color }}>{delta.txt}</p>
+				</div>
+			</div>
+
 			<ReactECharts
-				option={option}
-				style={{
-					height: '100%',
-					width: '100%',
-				}}
-				opts={{
-					devicePixelRatio: 2,
-				}}
-				lazyUpdate={true}
-				notMerge={true}
 				ref={chartRef}
+				option={option}
+				style={{ height: '100%', width: '100%' }}
+				opts={{ devicePixelRatio: 2 }}
+				lazyUpdate
+				notMerge
 			/>
 
-			{!candles?.length && isLoaded && (
+			{!candles.length && isLoaded && (
 				<h1 className={styles.chart__lowVolume}>[ Low volume ]</h1>
 			)}
 		</div>

@@ -9,6 +9,7 @@ import NavBarProps from '@/interfaces/props/components/default/Header/NavBar/Nav
 import NotificationIndicator from '@/components/UI/NotificationIndicator/NotificationIndicator';
 import { useContext } from 'react';
 import { Store } from '@/store/store-reducer';
+import { classes } from '@/utils/utils';
 import styles from './NavBar.module.scss';
 
 function NavBar(props: NavBarProps) {
@@ -40,14 +41,18 @@ function NavBar(props: NavBarProps) {
 			<Link href={href} className={linkClass}>
 				<Img />
 				<h6>{title}</h6>
-				<NotificationIndicator count={notifications} />
+				<NotificationIndicator className={styles.badge} count={notifications} />
 			</Link>
 		);
 	}
 
 	return (
 		<nav
-			className={`${styles.nav} ${!props.mobile ? styles.nav__desktop : styles.nav__mobile}`}
+			className={classes(
+				styles.nav,
+				!props.mobile ? styles.nav__desktop : styles.nav__mobile,
+				props.isLg && styles.lg,
+			)}
 		>
 			<NavItem
 				title={'Exchange'}

@@ -5,9 +5,9 @@ import styles from './styles.module.scss';
 function StatItem({ Img, title, value, className, coefficient }: StatItemProps) {
 	return (
 		<div className={classes(styles.statItem, className)}>
-			<div className={styles.statItem__nav}>
+			<div className={styles.statItem__top}>
 				<Img />
-				<p className={styles.statItem__nav_title}>{title}</p>
+				<p className={styles.statItem__top_title}>{title}</p>
 			</div>
 
 			<div className={styles.statItem__content}>
