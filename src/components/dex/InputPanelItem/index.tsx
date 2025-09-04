@@ -52,7 +52,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 
 	function goToSuitableTab() {
 		const params = new URLSearchParams(searchParams.toString());
-		params.set('tab', 'suitable');
+		params.set('tab', 'matches');
 
 		router.replace(`${pathname}?${params.toString()}`, undefined, {
 			shallow: true,
@@ -203,7 +203,9 @@ function InputPanelItem(props: InputPanelItemProps) {
 				</div>
 
 				<div className={styles.inputPanel__body_labels}>
-					<p className={styles.inputPanel__body_labels__item}>Available Balance</p>
+					<p className={styles.inputPanel__body_labels__item}>
+						Available <span className={styles.balance}>Balance</span>
+					</p>
 					<p className={styles.inputPanel__body_labels__item}>
 						<span>{balance || 0}</span> {firstCurrencyName}
 					</p>
@@ -219,15 +221,14 @@ function InputPanelItem(props: InputPanelItemProps) {
 						invalid={!!totalState && !totalValid}
 					/>
 
-					<div className={styles.inputPanel__body_labels}>
+					<div className={classes(styles.inputPanel__body_labels, styles.mobileWrap)}>
 						<p className={styles.inputPanel__body_labels__item}>
 							Fee: <span>0.01</span> ZANO
 						</p>
-						{totalUsd && (
-							<p className={styles.inputPanel__body_labels__item}>
-								~ ${formatDollarValue(totalUsd)}
-							</p>
-						)}
+
+						<p className={styles.inputPanel__body_labels__item}>
+							~ ${formatDollarValue(totalUsd || '0')}
+						</p>
 					</div>
 				</div>
 				{state.wallet?.connected ? (

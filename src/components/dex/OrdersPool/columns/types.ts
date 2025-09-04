@@ -1,12 +1,4 @@
-import MatrixAddress from '@/interfaces/common/MatrixAddress';
-
-export interface BuildOrderPoolColumnsArgs {
-	firstCurrencyName: string;
-	secondCurrencyName: string;
-	matrixAddresses: MatrixAddress[];
-}
-
-export interface BuildTradesColumnsArgs {
+export interface BuildColumnsArgs {
 	firstCurrencyName: string;
 	secondCurrencyName: string;
 }

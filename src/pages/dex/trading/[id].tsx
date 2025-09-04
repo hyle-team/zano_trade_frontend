@@ -152,19 +152,20 @@ function Trading() {
 				/>
 
 				<div className={styles.trading__top}>
-					<OrdersPool
-						currencyNames={currencyNames}
-						secondAssetUsdPrice={secondAssetUsdPrice}
-						ordersBuySell={ordersBuySell}
-						ordersLoading={ordersLoading}
-						filteredOrdersHistory={filteredOrdersHistory}
-						trades={trades}
-						tradesLoading={tradesLoading}
-						setOrdersBuySell={setOrdersBuySell}
-						takeOrderClick={onHandleTakeOrder}
-						matrixAddresses={matrixAddresses}
-						OrdersHistory={ordersHistory}
-					/>
+					<div className={styles.trading__top_trades}>
+						<OrdersPool
+							currencyNames={currencyNames}
+							secondAssetUsdPrice={secondAssetUsdPrice}
+							ordersBuySell={ordersBuySell}
+							ordersLoading={ordersLoading}
+							filteredOrdersHistory={filteredOrdersHistory}
+							trades={trades}
+							tradesLoading={tradesLoading}
+							setOrdersBuySell={setOrdersBuySell}
+							takeOrderClick={onHandleTakeOrder}
+							OrdersHistory={ordersHistory}
+						/>
+					</div>
 
 					<div className={styles.trading__top_chart}>
 						<div className={styles.settings}>
@@ -211,19 +212,17 @@ function Trading() {
 					</div>
 				</div>
 
-				<div className={styles.trading__info}>
-					<UserOrders
-						orderListRef={orderListRef}
-						userOrders={userOrders}
-						applyTips={applyTips}
-						myOrdersLoading={myOrdersLoading}
-						handleCancelAllOrders={handleCancelAllOrders}
-						matrixAddresses={matrixAddresses}
-						secondAssetUsdPrice={secondAssetUsdPrice}
-						pairData={pairData}
-						onAfter={onAfter}
-					/>
-				</div>
+				<UserOrders
+					orderListRef={orderListRef}
+					userOrders={userOrders}
+					applyTips={applyTips}
+					myOrdersLoading={myOrdersLoading}
+					handleCancelAllOrders={handleCancelAllOrders}
+					matrixAddresses={matrixAddresses}
+					secondAssetUsdPrice={secondAssetUsdPrice}
+					pairData={pairData}
+					onAfter={onAfter}
+				/>
 
 				{alertState && (
 					<Alert

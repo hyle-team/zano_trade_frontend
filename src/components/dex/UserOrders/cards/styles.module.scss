@@ -1,0 +1,206 @@
+.cards {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding: 6px 10px;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2px;
+            height: 100%;
+        }
+
+        &.sell {
+            &::before {
+                background-color: #ff6767;
+            }
+
+            .card__type {
+                color: #ff6767;
+                text-transform: capitalize;
+            }
+        }
+
+        &.buy {
+            &::before {
+                background-color: #16d1d6;
+            }
+
+            .card__type {
+                color: #16d1d6;
+                text-transform: capitalize;
+            }
+        }
+
+        &__row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+
+            &.sm {
+                gap: 18px;
+
+                .card__col {
+                    min-width: 50px;
+                }
+            }
+        }
+
+        &__label {
+            color: var(--table-th-color);
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 100%;
+        }
+
+        &__value {
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 100%;
+
+            &.primary {
+                color: #1f8feb;
+            }
+
+            &.secondary {
+                color: var(--table-th-color);
+            }
+
+            span {
+                color: var(--table-th-color);
+                font-size: 11px;
+                font-weight: 500;
+                line-height: 100%;
+            }
+        }
+
+        &__col {
+            min-width: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        &__pair {
+            .card__value {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .card__type {
+                display: none;
+            }
+        }
+
+        &__flex {
+            gap: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        &__actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+        }
+    }
+
+    .mobile {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .cards .card {
+        gap: 10px;
+
+        &__row {
+            gap: 15px;
+
+            &.sm {
+                gap: 5px;
+            }
+        }
+
+        &__col {
+            min-width: 80px;
+
+            &_direction {
+                display: none;
+            }
+        }
+
+        &__label {
+            font-size: 10px;
+        }
+
+        &__value {
+            font-size: 11px;
+        }
+
+        &__pair {
+            .card__label {
+                display: none;
+            }
+
+            .card__value {
+                font-size: 12px;
+            }
+
+            .card__type {
+                font-size: 12px;
+                display: inline-block;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .cards .card {
+        &__row {
+            justify-content: space-between;
+
+            &.sm {
+                justify-content: flex-start;
+            }
+        }
+
+        &__col {
+            min-width: auto;
+        }
+
+        &__flex {
+            flex-direction: column;
+        }
+
+        &__price {
+            display: none;
+
+            &.mobile {
+                display: flex;
+            }
+        }
+
+        &__offers {
+            display: none;
+
+            &.mobile {
+                display: flex;
+            }
+        }
+    }
+}

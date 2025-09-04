@@ -2,32 +2,15 @@ import { formatTimestamp, notationToString } from '@/utils/utils';
 import { ColumnDef } from '@/components/default/GenericTable/types';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
-import { BuildOrderPoolColumnsArgs, BuildTradesColumnsArgs } from './types';
+import { BuildColumnsArgs } from './types';
 import TotalUsdCell from '../../TotalUsdCell';
-import AliasCell from '../../AliasCell';
+import styles from '../styles.module.scss';
 
 export function buildOrderPoolColumns({
 	firstCurrencyName,
 	secondCurrencyName,
-	matrixAddresses,
-}: BuildOrderPoolColumnsArgs): ColumnDef<PageOrderData>[] {
+}: BuildColumnsArgs): ColumnDef<PageOrderData>[] {
 	return [
-		{
-			key: 'alias',
-			header: 'Alias',
-			width: '100px',
-			className: 'alias',
-			cell: (row) => (
-				<AliasCell
-					isSm={true}
-					alias={row.user?.alias}
-					address={row.user?.address}
-					matrixAddresses={matrixAddresses}
-					isInstant={row.isInstant}
-					max={7}
-				/>
-			),
-		},
 		{
 			key: 'price',
 			header: <>Price ({secondCurrencyName})</>,
@@ -49,6 +32,7 @@ export function buildOrderPoolColumns({
 			header: <>Total ({secondCurrencyName})</>,
 			width: '80px',
 			align: 'right',
+			className: styles.hideTotalSm,
 			cell: (row) => <TotalUsdCell amount={row.left} price={row.price} fixed={8} />,
 		},
 	];
@@ -57,7 +41,7 @@ export function buildOrderPoolColumns({
 export function buildTradesColumns({
 	firstCurrencyName,
 	secondCurrencyName,
-}: BuildTradesColumnsArgs): ColumnDef<Trade>[] {
+}: BuildColumnsArgs): ColumnDef<Trade>[] {
 	return [
 		{
 			key: 'price',

@@ -1,6 +1,5 @@
 .ordersPool {
 	position: relative;
-	max-width: 440px;
 	width: 100%;
 	height: 100%;
 	padding: 5px;
@@ -125,7 +124,7 @@
 							span {
 								position: relative;
 								z-index: 2;
-								font-size: 12px;
+								font-size: 11px;
 								font-weight: 400;
 							}
 						}
@@ -232,5 +231,35 @@
 		color: #8d95ae;
 		font-size: 11px;
 		font-weight: 400;
+	}
+}
+
+@media screen and (max-width: 640px) {
+	.ordersPool {
+		padding: 0;
+		border: none;
+		background: transparent;
+
+		&__header {
+			display: none;
+		}
+
+		&__content {
+			padding-top: 0;
+
+			&_orders {
+				height: 350px;
+			}
+
+			&_stats {
+				margin-top: 22px;
+				position: relative;
+				width: 100%;
+			}
+		}
+	}
+
+	.tooltip {
+		display: none;
 	}
 }

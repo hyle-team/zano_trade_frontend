@@ -4,6 +4,8 @@ import { ReactComponent as DownIcon } from '@/assets/images/UI/down_icon.svg';
 import { ReactComponent as VolumeIcon } from '@/assets/images/UI/volume_icon.svg';
 import BackButton from '@/components/default/BackButton/BackButton';
 import { roundTo, notationToString, classes } from '@/utils/utils';
+import questionIcon from '@/assets/images/UI/question.svg';
+import Image from 'next/image';
 import styles from './styles.module.scss';
 import StatItem from './components/StatItem';
 import { TradingHeaderProps } from './types';
@@ -119,7 +121,13 @@ const TradingHeader = ({
 				))}
 			</div>
 
-			<BackButton isSm />
+			<div className={styles.header__actions}>
+				<button className={styles.header__actions_guide}>
+					<Image src={questionIcon} width={24} height={24} alt="guide" />
+				</button>
+
+				<BackButton className={styles.header__actions_backBtn} isSm />
+			</div>
 		</div>
 	);
 };

@@ -15,7 +15,7 @@ function BackButton({ className, isSm }: BackButtonProps) {
 			onClick={router.back}
 		>
 			<ArrowWhiteIcon />
-			Back
+			<span>Back</span>
 		</Button>
 	);
 }

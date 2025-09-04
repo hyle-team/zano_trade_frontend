@@ -1,6 +1,5 @@
 .inputPanel {
 	width: 100%;
-	max-width: 415px;
 	height: 100%;
 	padding: 15px;
 	background: var(--window-bg-color);
@@ -12,7 +11,7 @@
 		justify-content: space-between;
 		align-items: center;
 		padding-bottom: 12px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid var(--delimiter-color);
 		margin-bottom: 10px;
 
 		.title {
@@ -23,7 +22,7 @@
 
 	&__selector {
 		display: flex;
-		background-color: var(--main-bg-color);
+		background-color: var(--selector-bg-color);
 		padding: 4px;
 		border-radius: 20px;
 
@@ -44,10 +43,12 @@
 
 			&.buy {
 				background-color: #16d1d6;
+				color: #fff;
 			}
 
 			&.sell {
 				background-color: #ff6767;
+				color: #fff;
 			}
 		}
 	}
@@ -68,6 +69,10 @@
 				font-weight: 500;
 				line-height: 100%;
 				color: var(--table-th-color);
+
+				.balance {
+					color: var(--table-th-color);
+				}
 
 				span {
 					font-size: 12px;
@@ -136,5 +141,58 @@
 		font-size: 14px;
 		opacity: 0.7;
 		margin-bottom: 5px;
+	}
+}
+
+
+@media screen and (max-width: 640px) {
+	.inputPanel {
+		padding: 0;
+		border: none;
+		background: transparent;
+
+		&__header {
+			display: none;
+		}
+
+		&__selector {
+			padding: 0;
+
+			&_item {
+				padding-block: 6px;
+				font-size: 12px;
+			}
+		}
+
+		&__body {
+			gap: 10px;
+
+			&_labels {
+				&.mobileWrap {
+					gap: 10px;
+					flex-direction: column-reverse;
+
+					.inputPanel__body_labels__item:last-child {
+						margin-left: auto;
+					}
+				}
+
+				&__item,
+				&__item span {
+					font-size: 10px;
+
+					.balance {
+						display: none;
+					}
+				}
+			}
+
+			&_btn {
+				margin-top: 0;
+				padding: 12px;
+				font-size: 12px;
+				line-height: 100%;
+			}
+		}
 	}
 }

@@ -57,7 +57,7 @@
 			td {
 				position: relative;
 
-				> p {
+				>p {
 					width: 100%;
 					font-size: 12px;
 					font-weight: 400;
@@ -76,13 +76,43 @@
 						}
 					}
 
-					> span {
+					>span {
 						line-height: 1;
 						color: var(--font-dimmed-color);
 						font-size: 11px;
 					}
 				}
 			}
+		}
+	}
+}
+
+@media screen and (max-width: 720px) {
+	.userOrders {
+		&__header {
+			&_btn {
+				display: none;
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 580px) {
+	.userOrders {
+		margin-top: 20px;
+		background: transparent;
+		border: none;
+		padding: 0;
+		min-height: auto;
+
+		&__header,
+		&__body {
+			padding: 0;
+			margin-inline: 0;
+		}
+
+		&__header {
+			margin-bottom: 10px;
 		}
 	}
 }

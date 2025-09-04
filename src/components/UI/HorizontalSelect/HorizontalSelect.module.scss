@@ -29,7 +29,8 @@
 				border-radius: 10px;
 
 				&.selected {
-					background-color: #1f8feb1a;
+					background-color: var(--tab-bg-color);
+					color: #fff;
 
 					&::after {
 						display: none;

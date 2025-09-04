@@ -42,7 +42,6 @@ const OrdersPool = (props: OrdersPoolProps) => {
 		filteredOrdersHistory,
 		secondAssetUsdPrice,
 		takeOrderClick,
-		matrixAddresses,
 		trades,
 		tradesLoading,
 	} = props;
@@ -72,9 +71,8 @@ const OrdersPool = (props: OrdersPoolProps) => {
 			buildOrderPoolColumns({
 				firstCurrencyName,
 				secondCurrencyName,
-				matrixAddresses,
 			}),
-		[firstCurrencyName, secondCurrencyName, matrixAddresses],
+		[firstCurrencyName, secondCurrencyName],
 	);
 
 	const tradeOrders = useMemo(
@@ -133,6 +131,12 @@ const OrdersPool = (props: OrdersPoolProps) => {
 											setOrdersInfoTooltip(null);
 										},
 									})}
+									responsive={{
+										query: '(max-width: 640px)',
+										hiddenKeys: ['total'],
+										alignOverride: { quantity: 'right' },
+										tableLayout: 'auto',
+									}}
 								/>
 							</div>
 						) : (
@@ -210,6 +214,7 @@ const OrdersPool = (props: OrdersPoolProps) => {
 					{renderTable()}
 
 					{currentOrder.type === 'orders' &&
+						!ordersLoading &&
 						totalLeft > 0 &&
 						(() => {
 							const buy = new Decimal(maxBuyLeftValue || 0);

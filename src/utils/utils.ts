@@ -195,6 +195,17 @@ export function createOrderSorter<T>({ getSide, getPrice }: Getters<T>) {
 	};
 }
 
+export function countByKeyRecord<T>(
+	array: T[],
+	keySelector: (_item: T) => string | number,
+): Record<string, number> {
+	return array.reduce<Record<string, number>>((acc, item) => {
+		const key = String(keySelector(item));
+		acc[key] = (acc[key] ?? 0) + 1;
+		return acc;
+	}, {});
+}
+
 export const ZANO_ASSET_ID = 'd6329b5b1f7c0805b5c345f4957554002a2f557845f64d7645dae0e051a6498a';
 
 const knownCurrencies = ['zano', 'xmr', 'btc', 'firo', 'usd', 'eur', 'cad', 'jpy'];

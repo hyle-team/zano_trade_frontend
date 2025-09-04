@@ -48,12 +48,37 @@
 		align-items: center;
 		justify-content: center;
 
-		> p {
+		>p {
 			font-size: 14px;
 			font-weight: 400;
 			white-space: nowrap;
 			overflow: hidden;
+			line-height: 100%;
 			text-overflow: ellipsis;
+		}
+	}
+}
+
+@media screen and (max-width: 640px) {
+	.labeledInput {
+		gap: 5px;
+
+		&__label {
+			font-size: 10px;
+		}
+
+		&__wrapper {
+			input {
+				padding: 11px 8px;
+			}
+		}
+
+		&__currency {
+			padding: 0 8px;
+
+			>p {
+				font-size: 12px;
+			}
 		}
 	}
 }

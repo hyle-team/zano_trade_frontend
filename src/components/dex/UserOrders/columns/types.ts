@@ -6,7 +6,9 @@ export interface BuildUserColumnsArgs {
 	firstCurrencyName: string;
 	secondCurrencyName: string;
 	secondAssetUsdPrice?: number;
-	offersCountByOrderId: Map<string, number>;
+	matchesCountByOrderId: Record<string, number>;
+	requestsCountByOrderId: Record<string, number>;
+	offersCountByOrderId: Record<string, number>;
 	onAfter: () => Promise<void>;
 }
 
@@ -24,6 +26,7 @@ export interface BuildApplyTipsColumnsArgs {
 export interface BuildMyRequestsColumnsArgs {
 	firstCurrencyName: string;
 	secondCurrencyName: string;
+	secondAssetUsdPrice?: number;
 	matrixAddresses: MatrixAddress[];
 	onAfter: () => Promise<void>;
 }

@@ -13,6 +13,7 @@
 		top: 18px;
 		display: flex;
 		align-items: center;
+		flex-wrap: wrap;
 		gap: 10px;
 		z-index: 2;
 
@@ -32,6 +33,10 @@
 				line-height: 100%;
 				white-space: nowrap;
 			}
+		}
+
+		@media screen and (max-width: 1280px) {
+			padding-bottom: 0;
 		}
 	}
 

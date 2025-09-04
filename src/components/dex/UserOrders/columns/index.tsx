@@ -19,7 +19,9 @@ export function buildUserColumns({
 	firstCurrencyName,
 	secondCurrencyName,
 	secondAssetUsdPrice,
+	matchesCountByOrderId,
 	offersCountByOrderId,
+	requestsCountByOrderId,
 	onAfter,
 }: BuildUserColumnsArgs): ColumnDef<OrderRow>[] {
 	return [
@@ -79,20 +81,61 @@ export function buildUserColumns({
 			),
 		},
 		{
-			key: 'offers',
-			header: 'Offers',
-			width: '90px',
-			cell: (row) => (
-				<p style={{ fontWeight: 500, color: '#1F8FEB' }}>
-					{offersCountByOrderId.get(String(row.id)) ?? 0}
-				</p>
-			),
+			key: 'matches',
+			header: 'Matches',
+			width: '70px',
+			cell: (row) => {
+				const count = matchesCountByOrderId[row.id] ?? 0;
+
+				return (
+					<p
+						style={{
+							fontWeight: 500,
+							color: count > 0 ? '#1F8FEB' : '#B6B6C4',
+						}}
+					>
+						{count}
+					</p>
+				);
+			},
 		},
 		{
-			key: 'orderid',
-			header: 'Order ID',
-			width: '140px',
-			cell: (row) => <p style={{ color: '#1F8FEB' }}>{row.pair_id}</p>,
+			key: 'requests',
+			header: 'Requests',
+			width: '70px',
+			cell: (row) => {
+				const count = requestsCountByOrderId[row.id] ?? 0;
+
+				return (
+					<p
+						style={{
+							fontWeight: 500,
+							color: count > 0 ? '#1F8FEB' : '#B6B6C4',
+						}}
+					>
+						{count}
+					</p>
+				);
+			},
+		},
+		{
+			key: 'offers',
+			header: 'Offers',
+			width: '70px',
+			cell: (row) => {
+				const count = offersCountByOrderId[row.id] ?? 0;
+
+				return (
+					<p
+						style={{
+							fontWeight: 500,
+							color: count > 0 ? '#1F8FEB' : '#B6B6C4',
+						}}
+					>
+						{count}
+					</p>
+				);
+			},
 		},
 		{
 			key: 'time',
@@ -121,37 +164,6 @@ export function buildApplyTipsColumns({
 	onAfter,
 }: BuildApplyTipsColumnsArgs): ColumnDef<ApplyTip>[] {
 	return [
-		{
-			key: 'pair',
-			header: 'Pair',
-			width: '120px',
-			cell: (row) => (
-				<p
-					style={
-						{
-							'--direction-color': row.type === 'buy' ? '#16D1D6' : '#FF6767',
-						} as React.CSSProperties
-					}
-				>
-					{firstCurrencyName}/{secondCurrencyName}
-				</p>
-			),
-		},
-		{
-			key: 'direction',
-			header: 'Direction',
-			width: '110px',
-			cell: (row) => (
-				<p
-					style={{
-						color: row.type === 'buy' ? '#16D1D6' : '#FF6767',
-						textTransform: 'capitalize',
-					}}
-				>
-					{row.type}
-				</p>
-			),
-		},
 		{
 			key: 'alias',
 			header: 'Alias',
@@ -190,12 +202,6 @@ export function buildApplyTipsColumns({
 			),
 		},
 		{
-			key: 'orderid',
-			header: 'Order ID',
-			width: '140px',
-			cell: (row) => <p style={{ color: '#1F8FEB' }}>{row.connected_order_id}</p>,
-		},
-		{
 			key: 'time',
 			header: 'Time',
 			width: '180px',
@@ -204,7 +210,7 @@ export function buildApplyTipsColumns({
 		{
 			key: 'action',
 			header: 'Action',
-			width: type === 'offers' ? '150px' : '90px',
+			width: type === 'offers' ? '140px' : '90px',
 			cell: (row) => (
 				<div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
 					<RequestActionCell
@@ -231,40 +237,10 @@ export function buildMyRequestsColumns({
 	firstCurrencyName,
 	secondCurrencyName,
 	matrixAddresses,
+	secondAssetUsdPrice,
 	onAfter,
 }: BuildMyRequestsColumnsArgs): ColumnDef<UserPendingType>[] {
 	return [
-		{
-			key: 'pair',
-			header: 'Pair',
-			width: '120px',
-			cell: (row) => (
-				<p
-					style={
-						{
-							'--direction-color': row.creator === 'buy' ? '#16D1D6' : '#FF6767',
-						} as React.CSSProperties
-					}
-				>
-					{firstCurrencyName}/{secondCurrencyName}
-				</p>
-			),
-		},
-		{
-			key: 'direction',
-			header: 'Direction',
-			width: '110px',
-			cell: (row) => (
-				<p
-					style={{
-						color: row.creator === 'buy' ? '#16D1D6' : '#FF6767',
-						textTransform: 'capitalize',
-					}}
-				>
-					{row.creator}
-				</p>
-			),
-		},
 		{
 			key: 'alias',
 			header: 'Alias',
@@ -290,22 +266,16 @@ export function buildMyRequestsColumns({
 			cell: (row) => <p>{notationToString(row.amount)}</p>,
 		},
 		{
-			key: 'sell_order_id',
-			header: 'Sell Order ID',
-			width: '140px',
-			cell: (row) => <p style={{ color: '#1F8FEB' }}>{row.sell_order_id}</p>,
-		},
-		{
-			key: 'buy_order_id',
-			header: 'Buy Order ID',
-			width: '140px',
-			cell: (row) => <p style={{ color: '#1F8FEB' }}>{row.buy_order_id}</p>,
-		},
-		{
-			key: 'status',
-			header: 'Status',
-			width: '140px',
-			cell: (row) => <p style={{ textTransform: 'capitalize' }}>{row.status}</p>,
+			key: 'total',
+			header: <>Total ({secondCurrencyName})</>,
+			width: '180px',
+			cell: (row) => (
+				<TotalUsdCell
+					amount={row.amount}
+					price={row.price}
+					secondAssetUsdPrice={secondAssetUsdPrice}
+				/>
+			),
 		},
 		{
 			key: 'time',
@@ -388,12 +358,6 @@ export function buildOrderHistoryColumns({
 					secondAssetUsdPrice={secondAssetUsdPrice}
 				/>
 			),
-		},
-		{
-			key: 'orderid',
-			header: 'Order ID',
-			width: '140px',
-			cell: (row) => <p style={{ color: '#1F8FEB' }}>{row.pair_id}</p>,
 		},
 		{
 			key: 'time',
