@@ -3,4 +3,5 @@ export interface TotalUsdCellProps {
 	price: string | number;
 	secondAssetUsdPrice?: number;
 	fixed?: number;
+	className?: string;
 }

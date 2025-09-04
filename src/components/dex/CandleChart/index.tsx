@@ -46,7 +46,7 @@ function CandleChart(props: CandleChartProps) {
 		const { startIdx, endIdx } = pickWindowIndices(timestamps, zoomStartByPeriod(props.period));
 
 		return {
-			grid: { top: '5%', left: '0%', right: '10%', bottom: '10%' },
+			grid: { top: '5%', left: '0%', right: '10%', bottom: '8%' },
 
 			xAxis: {
 				type: 'category',

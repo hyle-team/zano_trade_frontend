@@ -3,9 +3,9 @@ import { classes } from '@/utils/utils';
 import styles from './styles.module.scss';
 import { TabsProps } from './types';
 
-const Tabs = ({ data, value, setValue }: TabsProps) => {
+const Tabs = ({ type = 'tab', data, value, setValue }: TabsProps) => {
 	return (
-		<div className={styles.tabs}>
+		<div className={classes(styles.tabs, styles[type])}>
 			{data.map((tab) => (
 				<button
 					key={tab.type}
