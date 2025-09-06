@@ -50,9 +50,13 @@ function InputPanelItem(props: InputPanelItemProps) {
 	const [hasImmediateMatch, setHasImmediateMatch] = useState(false);
 	const isBuy = buySellState?.code === 'buy';
 
-	function goToSuitableTab() {
+	function goToTab(name?: string) {
 		const params = new URLSearchParams(searchParams.toString());
-		params.set('tab', 'matches');
+		if (name) {
+			params.set('tab', name);
+		} else {
+			params.delete('tab');
+		}
 
 		router.replace(`${pathname}?${params.toString()}`, undefined, {
 			shallow: true,
@@ -93,6 +97,8 @@ function InputPanelItem(props: InputPanelItemProps) {
 		if (result.success) {
 			if (result.data?.immediateMatch) {
 				setHasImmediateMatch(true);
+				goToTab();
+				scrollToOrderList();
 			}
 			onAfter();
 			resetForm();
@@ -125,7 +131,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 	const isButtonDisabled = !priceValid || !amountValid || !totalValid || creatingState;
 
 	return (
-		<div className={styles.inputPanel}>
+		<div data-tour="input-panel" className={styles.inputPanel}>
 			{hasImmediateMatch && (
 				<Alert
 					type="custom"
@@ -139,7 +145,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 									className={styles.applyAlert__button}
 									onClick={() => {
 										scrollToOrderList();
-										goToSuitableTab();
+										goToTab('matches');
 										setHasImmediateMatch(false);
 									}}
 								>

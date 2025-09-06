@@ -170,7 +170,7 @@ const OrdersPool = (props: OrdersPoolProps) => {
 	useMouseLeave(ordersInfoRef, () => setOrdersInfoTooltip(null));
 	return (
 		<>
-			<div className={styles.ordersPool}>
+			<div data-tour="orders-pool" className={styles.ordersPool}>
 				<div className={styles.ordersPool__header}>
 					<Tabs value={currentOrder} setValue={setCurrentOrder} data={tabsData} />
 
