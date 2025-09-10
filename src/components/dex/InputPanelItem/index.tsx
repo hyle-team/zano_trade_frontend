@@ -69,12 +69,14 @@ function InputPanelItem(props: InputPanelItemProps) {
 	async function postOrder() {
 		const price = new Decimal(priceState);
 		const amount = new Decimal(amountState);
+		const total = new Decimal(totalState);
 
 		const isFull =
 			price.greaterThan(0) &&
 			price.lessThan(1000000000) &&
 			amount.greaterThan(0) &&
-			amount.lessThan(1000000000);
+			amount.lessThan(1000000000) &&
+			total.greaterThan(0);
 
 		if (!isFull) return;
 
@@ -123,6 +125,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 
 	const buttonText = creatingState ? 'Creating...' : 'Create Order';
 	const isButtonDisabled = !priceValid || !amountValid || !totalValid || creatingState;
+	const showTotalError = priceState !== '' && amountState !== '' && !totalValid;
 
 	return (
 		<div className={styles.inputPanel}>
@@ -213,12 +216,12 @@ function InputPanelItem(props: InputPanelItemProps) {
 
 				<div className={styles.inputPanel__body_total}>
 					<LabeledInput
-						value={notationToString(totalState)}
+						value={amountState && priceState && notationToString(totalState)}
 						setValue={() => undefined}
 						currency={secondCurrencyName}
 						label="Total"
 						readonly={true}
-						invalid={!!totalState && !totalValid}
+						invalid={showTotalError}
 					/>
 
 					<div className={classes(styles.inputPanel__body_labels, styles.mobileWrap)}>

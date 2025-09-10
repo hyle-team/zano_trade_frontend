@@ -3,14 +3,15 @@ import Decimal from 'decimal.js';
 import { isPositiveFloatStr } from '@/utils/utils';
 import { validateTokensInput } from 'shared/utils';
 
+type SetStr = (_v: string) => void;
 interface HandleInputChangeParams {
 	inputValue: string;
 	priceOrAmount: 'price' | 'amount';
 	otherValue: string;
 	thisDP: number;
 	totalDP: number;
-	setThisState: Dispatch<SetStateAction<string>>;
-	setTotalState: Dispatch<SetStateAction<string>>;
+	setThisState: SetStr;
+	setTotalState: SetStr;
 	setThisValid: Dispatch<SetStateAction<boolean>>;
 	setTotalValid: Dispatch<SetStateAction<boolean>>;
 	balance?: string | undefined;
@@ -68,18 +69,22 @@ export function handleInputChange({
 	setThisValid(true);
 
 	if (!thisDecimal.isNaN() && !otherDecimal.isNaN() && otherValue !== '') {
-		const total =
+		const rawTotal =
 			priceOrAmount === 'price'
 				? thisDecimal.mul(otherDecimal)
 				: otherDecimal.mul(thisDecimal);
 
-		setTotalState(total.toString());
+		const totalClamped = rawTotal.toDecimalPlaces(totalDP, Decimal.ROUND_DOWN);
 
-		const totalValid = validateTokensInput(total.toFixed(totalDP), totalDP);
-		setTotalValid(totalValid.valid);
+		setTotalState(totalClamped.toString());
+
+		const fmtOk = validateTokensInput(totalClamped.toFixed(totalDP), totalDP).valid;
+		const gtZero = totalClamped.gt(0);
+		setTotalValid(fmtOk && gtZero);
 
 		if (priceOrAmount === 'amount' && balance && setRangeInputValue) {
-			const percent = thisDecimal.div(balance).mul(100);
+			const bal = new Decimal(balance || '0');
+			const percent = bal.gt(0) ? thisDecimal.div(bal).mul(100) : new Decimal(0);
 			setRangeInputValue(percent.toFixed());
 		}
 	} else {

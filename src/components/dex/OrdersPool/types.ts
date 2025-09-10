@@ -12,7 +12,7 @@ export interface OrdersPoolProps {
 		secondCurrencyName: string;
 	};
 	ordersLoading: boolean;
-	OrdersHistory: PageOrderData[];
+	ordersHistory: PageOrderData[];
 	filteredOrdersHistory: PageOrderData[];
 	trades: Trade[];
 	tradesLoading: boolean;

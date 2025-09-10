@@ -1,5 +1,5 @@
 import { classes } from '@/utils/utils';
-import React, { useMemo } from 'react';
+import React, { useLayoutEffect, useMemo, useRef } from 'react';
 import EmptyMessage from '@/components/UI/EmptyMessage';
 import { useMediaQuery } from '@/hook/useMediaQuery';
 import { GenericTableProps } from './types';
@@ -19,8 +19,10 @@ export default function GenericTable<T>(props: GenericTableProps<T>) {
 		renderGroupHeader,
 		sortGroups,
 		responsive,
+		centerBoundaryOnMount,
 	} = props;
 
+	const scrollRef = useRef<HTMLDivElement | null>(null);
 	const isMatch = useMediaQuery(responsive?.query ?? '');
 	const mediaActive = !!responsive?.query && isMatch;
 
@@ -57,10 +59,57 @@ export default function GenericTable<T>(props: GenericTableProps<T>) {
 		return entries.map(([key, items]) => ({ key, items }));
 	}, [data, groupBy, sortGroups]);
 
+	// Scroll center
+	useLayoutEffect(() => {
+		if (!scrollRef.current) return;
+		const sc = scrollRef.current;
+
+		if (!centerBoundaryOnMount) {
+			sc.scrollTop = 0;
+			return;
+		}
+
+		if (!data?.length) return;
+
+		const raf = requestAnimationFrame(() => {
+			const tbody = sc.querySelector('tbody');
+			if (!tbody) return;
+
+			const buys = tbody.querySelectorAll<HTMLElement>('tr[data-type="buy"]');
+			const sells = tbody.querySelectorAll<HTMLElement>('tr[data-type="sell"]');
+
+			const lastBuy = buys.length ? buys[buys.length - 1] : null;
+			const firstSell = sells.length ? sells[0] : null;
+
+			const theadRow = sc.querySelector<HTMLElement>('thead tr');
+			const stickyH = theadRow?.offsetHeight ?? 0;
+
+			const centerOn = (y: number) => {
+				const target = Math.max(0, y - (sc.clientHeight - stickyH) / 2);
+				sc.scrollTop = target;
+			};
+
+			if (lastBuy && firstSell) {
+				const mid = (lastBuy.offsetTop + firstSell.offsetTop) / 2;
+				centerOn(mid);
+			} else if (firstSell) {
+				centerOn(firstSell.offsetTop);
+			} else if (lastBuy) {
+				centerOn(lastBuy.offsetTop);
+			}
+		});
+
+		return () => cancelAnimationFrame(raf);
+	}, [centerBoundaryOnMount, data?.length]);
+
 	return (
 		<div className={className}>
 			{data.length > 0 ? (
-				<div className="orders-scroll" style={{ maxHeight: '100%', overflowY: 'auto' }}>
+				<div
+					ref={scrollRef}
+					className="orders-scroll"
+					style={{ maxHeight: '100%', overflowY: 'auto' }}
+				>
 					<table
 						className={tableClassName}
 						style={{
