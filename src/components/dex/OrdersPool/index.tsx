@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
 	classes,
 	createOrderSorter,
@@ -45,7 +45,9 @@ const OrdersPool = (props: OrdersPoolProps) => {
 		trades,
 		tradesLoading,
 	} = props;
-	const ordersInfoRef = useRef<HTMLTableSectionElement | null>(null);
+	const ordersInfoRef = useRef<HTMLTableSectionElement>(null);
+	const scrollRef = useRef<HTMLTableSectionElement>(null);
+	const ordersMiddleRef = useRef<HTMLDivElement>(null);
 	const { firstCurrencyName, secondCurrencyName } = currencyNames;
 	const [infoTooltipPos, setInfoTooltipPos] = useState({ x: 0, y: 0 });
 	const [ordersInfoTooltip, setOrdersInfoTooltip] = useState<PageOrderData | null>(null);
@@ -142,6 +144,36 @@ const OrdersPool = (props: OrdersPoolProps) => {
 		[firstCurrencyName, secondCurrencyName],
 	);
 
+	useLayoutEffect(() => {
+		if (!scrollRef.current) return;
+
+		const parent = scrollRef.current;
+
+		if (ordersBuySell.code === 'all' && ordersMiddleRef.current) {
+			const child = ordersMiddleRef.current;
+
+			const parentRect = parent.getBoundingClientRect();
+			const childRect = child.getBoundingClientRect();
+
+			const scrollTop =
+				childRect.top -
+				parentRect.top +
+				parent.scrollTop -
+				parent.clientHeight / 2 +
+				childRect.height / 2;
+
+			parent.scrollTo({
+				top: scrollTop,
+				behavior: 'smooth',
+			});
+		} else {
+			parent.scrollTo({
+				top: 0,
+				behavior: 'smooth',
+			});
+		}
+	}, [ordersLoading, filteredOrdersHistory.length, ordersBuySell.code]);
+
 	const sortedTrades = createOrderSorter<PageOrderData>({
 		getPrice: (e) => e.price,
 		getSide: (e) => e.type,
@@ -161,8 +193,16 @@ const OrdersPool = (props: OrdersPoolProps) => {
 									theadClassName={styles.table__header}
 									columns={ordersPool}
 									data={filteredOrdersHistory.sort(sortedTrades)}
-									centerBoundaryOnMount={ordersBuySell.code === 'all'}
 									getRowKey={(r) => r.id}
+									groupBy={(r) => r.type}
+									scrollRef={scrollRef}
+									renderGroupHeader={({ groupKey }) => {
+										if (groupKey === 'buy') {
+											return (
+												<div ref={ordersMiddleRef} style={{ height: 0 }} />
+											);
+										}
+									}}
 									getRowProps={(row) => {
 										const rowTotalZano = new Decimal(row.left || 0).mul(
 											new Decimal(row.price || 0),
@@ -176,7 +216,6 @@ const OrdersPool = (props: OrdersPoolProps) => {
 											: new Decimal(0);
 
 										return {
-											'data-type': row.type,
 											className: styles[row.type],
 											style: {
 												'--precentage': `${widthPct.toDecimalPlaces(2).toString()}%`,
