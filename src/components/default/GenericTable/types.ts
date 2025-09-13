@@ -38,4 +38,5 @@ export type GenericTableProps<T> = {
 		alignOverride?: Record<string, 'left' | 'center' | 'right'>;
 		tableLayout?: 'auto' | 'fixed';
 	};
+	scrollRef?: React.RefObject<HTMLDivElement>;
 };

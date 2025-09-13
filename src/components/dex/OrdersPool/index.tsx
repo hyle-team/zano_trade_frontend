@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
 	classes,
 	createOrderSorter,
@@ -35,32 +35,92 @@ const tabsData: tabsType[] = [
 const OrdersPool = (props: OrdersPoolProps) => {
 	const {
 		ordersBuySell,
-		OrdersHistory,
 		setOrdersBuySell,
 		currencyNames,
 		ordersLoading,
+		ordersHistory,
 		filteredOrdersHistory,
 		secondAssetUsdPrice,
 		takeOrderClick,
 		trades,
 		tradesLoading,
 	} = props;
-	const ordersInfoRef = useRef<HTMLTableSectionElement | null>(null);
+	const ordersInfoRef = useRef<HTMLTableSectionElement>(null);
+	const scrollRef = useRef<HTMLTableSectionElement>(null);
+	const ordersMiddleRef = useRef<HTMLDivElement>(null);
 	const { firstCurrencyName, secondCurrencyName } = currencyNames;
 	const [infoTooltipPos, setInfoTooltipPos] = useState({ x: 0, y: 0 });
 	const [ordersInfoTooltip, setOrdersInfoTooltip] = useState<PageOrderData | null>(null);
 	const [currentOrder, setCurrentOrder] = useState<tabsType>(tabsData[0]);
-	const { maxBuyLeftValue, maxSellLeftValue } = OrdersHistory.reduce(
-		(acc, order) => {
-			const left = parseFloat(String(order.left)) || 0;
-			if (order.type === 'buy') acc.maxBuyLeftValue = Math.max(acc.maxBuyLeftValue, left);
-			if (order.type === 'sell') acc.maxSellLeftValue = Math.max(acc.maxSellLeftValue, left);
-			return acc;
-		},
-		{ maxBuyLeftValue: 0, maxSellLeftValue: 0 },
-	);
 
-	const totalLeft = maxBuyLeftValue + maxSellLeftValue;
+	const totals = useMemo(() => {
+		let buyTotal = new Decimal(0);
+		let sellTotal = new Decimal(0);
+		let maxBuyRow = new Decimal(0);
+		let maxSellRow = new Decimal(0);
+
+		for (const o of ordersHistory) {
+			const qty = new Decimal(o.amount || 0);
+			const price = new Decimal(o.price || 0);
+			const rowTotal = qty.mul(price);
+
+			if (o.type === 'buy') {
+				buyTotal = buyTotal.plus(rowTotal);
+				if (rowTotal.gt(maxBuyRow)) maxBuyRow = rowTotal;
+			} else if (o.type === 'sell') {
+				sellTotal = sellTotal.plus(rowTotal);
+				if (rowTotal.gt(maxSellRow)) maxSellRow = rowTotal;
+			}
+		}
+
+		const totalZano = buyTotal.plus(sellTotal);
+		const pct = (part: Decimal, whole: Decimal) =>
+			whole.gt(0) ? part.mul(100).div(whole) : new Decimal(0);
+
+		const buyPct = pct(buyTotal, totalZano);
+		const sellPct = pct(sellTotal, totalZano);
+
+		return {
+			buyTotal,
+			sellTotal,
+			totalZano,
+			buyPct,
+			sellPct,
+			maxBuyRow,
+			maxSellRow,
+		};
+	}, [ordersHistory]);
+
+	const toDisplayPair = (buyPctDec: Decimal, sellPctDec: Decimal) => {
+		const MIN_DISPLAY_PCT = 1;
+		const buyRaw = buyPctDec.toNumber();
+		const sellRaw = sellPctDec.toNumber();
+
+		if (!Number.isFinite(buyRaw) || !Number.isFinite(sellRaw)) return { buy: 0, sell: 0 };
+
+		if (buyRaw === 0 && sellRaw === 0) return { buy: 0, sell: 0 };
+		if (buyRaw === 0) return { buy: 0, sell: 100 };
+		if (sellRaw === 0) return { buy: 100, sell: 0 };
+
+		let buyDisp = Math.floor(buyRaw);
+		let sellDisp = Math.floor(sellRaw);
+
+		if (buyDisp < MIN_DISPLAY_PCT) buyDisp = MIN_DISPLAY_PCT;
+		if (sellDisp < MIN_DISPLAY_PCT) sellDisp = MIN_DISPLAY_PCT;
+
+		const diff = 100 - (buyDisp + sellDisp);
+		if (diff !== 0) {
+			if (buyRaw >= sellRaw) buyDisp += diff;
+			else sellDisp += diff;
+		}
+
+		buyDisp = Math.max(0, Math.min(100, buyDisp));
+		sellDisp = Math.max(0, Math.min(100, sellDisp));
+
+		return { buy: buyDisp, sell: sellDisp };
+	};
+
+	const { buy: buyDisp, sell: sellDisp } = toDisplayPair(totals.buyPct, totals.sellPct);
 
 	const moveInfoTooltip = (event: React.MouseEvent) => {
 		setInfoTooltipPos({ x: event.clientX, y: event.clientY });
@@ -84,6 +144,36 @@ const OrdersPool = (props: OrdersPoolProps) => {
 		[firstCurrencyName, secondCurrencyName],
 	);
 
+	useLayoutEffect(() => {
+		if (!scrollRef.current) return;
+
+		const parent = scrollRef.current;
+
+		if (ordersBuySell.code === 'all' && ordersMiddleRef.current) {
+			const child = ordersMiddleRef.current;
+
+			const parentRect = parent.getBoundingClientRect();
+			const childRect = child.getBoundingClientRect();
+
+			const scrollTop =
+				childRect.top -
+				parentRect.top +
+				parent.scrollTop -
+				parent.clientHeight / 2 +
+				childRect.height / 2;
+
+			parent.scrollTo({
+				top: scrollTop,
+				behavior: 'smooth',
+			});
+		} else {
+			parent.scrollTo({
+				top: 0,
+				behavior: 'smooth',
+			});
+		}
+	}, [ordersLoading, filteredOrdersHistory.length, ordersBuySell.code]);
+
 	const sortedTrades = createOrderSorter<PageOrderData>({
 		getPrice: (e) => e.price,
 		getSide: (e) => e.type,
@@ -104,33 +194,42 @@ const OrdersPool = (props: OrdersPoolProps) => {
 									columns={ordersPool}
 									data={filteredOrdersHistory.sort(sortedTrades)}
 									getRowKey={(r) => r.id}
-									getRowProps={(row) => ({
-										className: styles[row.type],
-										style: {
-											'--precentage': `${(
-												(parseFloat(String(row.left)) /
-													(row.type === 'buy'
-														? maxBuyLeftValue
-														: maxSellLeftValue)) *
-												100
-											).toFixed(2)}%`,
-										} as React.CSSProperties,
-										onClick: (event) => {
-											takeOrderClick(event, row);
-										},
-										onMouseMove: (event) => {
-											const tr = event.target as HTMLElement;
-											if (tr.classList.contains('alias')) {
-												setOrdersInfoTooltip(null);
-											}
-										},
-										onMouseEnter: () => {
-											setOrdersInfoTooltip(row);
-										},
-										onMouseLeave: () => {
-											setOrdersInfoTooltip(null);
-										},
-									})}
+									groupBy={(r) => r.type}
+									scrollRef={scrollRef}
+									renderGroupHeader={({ groupKey }) => {
+										if (groupKey === 'buy') {
+											return (
+												<div ref={ordersMiddleRef} style={{ height: 0 }} />
+											);
+										}
+									}}
+									getRowProps={(row) => {
+										const rowTotalZano = new Decimal(row.left || 0).mul(
+											new Decimal(row.price || 0),
+										);
+										const denom =
+											row.type === 'buy'
+												? totals.maxBuyRow
+												: totals.maxSellRow;
+										const widthPct = denom.gt(0)
+											? rowTotalZano.mul(100).div(denom)
+											: new Decimal(0);
+
+										return {
+											className: styles[row.type],
+											style: {
+												'--precentage': `${widthPct.toDecimalPlaces(2).toString()}%`,
+											} as React.CSSProperties,
+											onClick: (event) => takeOrderClick(event, row),
+											onMouseMove: (event) => {
+												const tr = event.target as HTMLElement;
+												if (tr.classList.contains('alias'))
+													setOrdersInfoTooltip(null);
+											},
+											onMouseEnter: () => setOrdersInfoTooltip(row),
+											onMouseLeave: () => setOrdersInfoTooltip(null),
+										};
+									}}
 									responsive={{
 										query: '(max-width: 640px)',
 										hiddenKeys: ['total'],
@@ -213,63 +312,24 @@ const OrdersPool = (props: OrdersPoolProps) => {
 				<div className={styles.ordersPool__content}>
 					{renderTable()}
 
-					{currentOrder.type === 'orders' &&
-						!ordersLoading &&
-						totalLeft > 0 &&
-						(() => {
-							const buy = new Decimal(maxBuyLeftValue || 0);
-							const sell = new Decimal(maxSellLeftValue || 0);
-							const total = new Decimal(totalLeft);
+					{currentOrder.type === 'orders' && !ordersLoading && totals.totalZano.gt(0) && (
+						<div className={styles.ordersPool__content_stats}>
+							<div
+								style={{ '--width': `${buyDisp}%` } as React.CSSProperties}
+								className={classes(styles.stat_item, styles.buy)}
+							>
+								<div className={styles.stat_item__badge}>B</div>
+								{buyDisp}%
+							</div>
 
-							let buyPct = total.gt(0) ? buy.mul(100).div(total) : new Decimal(0);
-							let sellPct = total.gt(0) ? sell.mul(100).div(total) : new Decimal(0);
-
-							if (buy.isZero() && sell.gt(0)) {
-								buyPct = new Decimal(0);
-								sellPct = new Decimal(100);
-							} else if (sell.isZero() && buy.gt(0)) {
-								sellPct = new Decimal(0);
-								buyPct = new Decimal(100);
-							}
-
-							const clamp = (d: Decimal) => Decimal.max(0, Decimal.min(100, d));
-
-							const buyPctClamped = clamp(buyPct);
-							const sellPctClamped = clamp(sellPct);
-
-							const buyLabel = buyPctClamped
-								.toDecimalPlaces(0, Decimal.ROUND_DOWN)
-								.toString();
-							const sellLabel = sellPctClamped
-								.toDecimalPlaces(0, Decimal.ROUND_DOWN)
-								.toString();
-
-							return (
-								<div className={styles.ordersPool__content_stats}>
-									<div
-										style={
-											{
-												'--width': `${buyPctClamped.toNumber()}%`,
-											} as React.CSSProperties
-										}
-										className={classes(styles.stat_item, styles.buy)}
-									>
-										<div className={styles.stat_item__badge}>B</div> {buyLabel}%
-									</div>
-									<div
-										style={
-											{
-												'--width': `${sellPctClamped.toNumber()}%`,
-											} as React.CSSProperties
-										}
-										className={classes(styles.stat_item, styles.sell)}
-									>
-										{sellLabel}%{' '}
-										<div className={styles.stat_item__badge}>S</div>
-									</div>
-								</div>
-							);
-						})()}
+							<div
+								style={{ '--width': `${sellDisp}%` } as React.CSSProperties}
+								className={classes(styles.stat_item, styles.sell)}
+							>
+								{sellDisp}%<div className={styles.stat_item__badge}>S</div>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 

@@ -19,8 +19,8 @@ export default function GenericTable<T>(props: GenericTableProps<T>) {
 		renderGroupHeader,
 		sortGroups,
 		responsive,
+		scrollRef,
 	} = props;
-
 	const isMatch = useMediaQuery(responsive?.query ?? '');
 	const mediaActive = !!responsive?.query && isMatch;
 
@@ -34,7 +34,7 @@ export default function GenericTable<T>(props: GenericTableProps<T>) {
 
 		if (mediaActive && responsive?.alignOverride) {
 			cols = cols.map((c) => {
-				const ov = responsive.alignOverride![c.key];
+				const ov = responsive.alignOverride?.[c.key];
 				return ov ? { ...c, align: ov } : c;
 			});
 		}
@@ -60,7 +60,11 @@ export default function GenericTable<T>(props: GenericTableProps<T>) {
 	return (
 		<div className={className}>
 			{data.length > 0 ? (
-				<div className="orders-scroll" style={{ maxHeight: '100%', overflowY: 'auto' }}>
+				<div
+					ref={scrollRef}
+					className="orders-scroll"
+					style={{ maxHeight: '100%', overflowY: 'auto' }}
+				>
 					<table
 						className={tableClassName}
 						style={{

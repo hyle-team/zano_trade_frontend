@@ -159,11 +159,11 @@ function Trading() {
 							ordersBuySell={ordersBuySell}
 							ordersLoading={ordersLoading}
 							filteredOrdersHistory={filteredOrdersHistory}
+							ordersHistory={ordersHistory}
 							trades={trades}
 							tradesLoading={tradesLoading}
 							setOrdersBuySell={setOrdersBuySell}
 							takeOrderClick={onHandleTakeOrder}
-							OrdersHistory={ordersHistory}
 						/>
 					</div>
 
