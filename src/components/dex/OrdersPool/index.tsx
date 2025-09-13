@@ -162,15 +162,9 @@ const OrdersPool = (props: OrdersPoolProps) => {
 				parent.clientHeight / 2 +
 				childRect.height / 2;
 
-			parent.scrollTo({
-				top: scrollTop,
-				behavior: 'smooth',
-			});
+			parent.scrollTop = Math.round(scrollTop);
 		} else {
-			parent.scrollTo({
-				top: 0,
-				behavior: 'smooth',
-			});
+			parent.scrollTop = 0;
 		}
 	}, [ordersLoading, filteredOrdersHistory.length, ordersBuySell.code]);
 
