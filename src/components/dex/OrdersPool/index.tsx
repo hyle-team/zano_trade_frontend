@@ -389,7 +389,7 @@ const OrdersPool = (props: OrdersPoolProps) => {
 								</span>
 
 								<h6>Amount ({firstCurrencyName})</h6>
-								<p>{notationToString(ordersInfoTooltip?.amount)}</p>
+								<p>{notationToString(ordersInfoTooltip?.left)}</p>
 
 								<h6>Total ({secondCurrencyName})</h6>
 								<p>{notationToString(totalDecimal.toString())}</p>
