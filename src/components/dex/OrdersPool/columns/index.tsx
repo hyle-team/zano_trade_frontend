@@ -25,7 +25,7 @@ export function buildOrderPoolColumns({
 			key: 'quantity',
 			header: <>Qty ({firstCurrencyName})</>,
 			width: '80px',
-			cell: (row) => <p>{notationToString(row.amount, 8)}</p>,
+			cell: (row) => <p>{notationToString(row.left, 8)}</p>,
 		},
 		{
 			key: 'total',

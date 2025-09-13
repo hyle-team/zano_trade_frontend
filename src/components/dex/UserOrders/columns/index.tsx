@@ -66,7 +66,7 @@ export function buildUserColumns({
 			key: 'quantity',
 			header: <>Quantity ({firstCurrencyName})</>,
 			width: '160px',
-			cell: (row) => <p>{notationToString(row.amount)}</p>,
+			cell: (row) => <p>{notationToString(row.left)}</p>,
 		},
 		{
 			key: 'total',
@@ -345,7 +345,7 @@ export function buildOrderHistoryColumns({
 			key: 'quantity',
 			header: <>Quantity ({firstCurrencyName})</>,
 			width: '160px',
-			cell: (row) => <p>{notationToString(row.amount)}</p>,
+			cell: (row) => <p>{notationToString(row.left)}</p>,
 		},
 		{
 			key: 'total',
