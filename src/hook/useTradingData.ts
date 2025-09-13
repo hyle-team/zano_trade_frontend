@@ -64,7 +64,6 @@ export function useTradingData({
 	}
 
 	async function updateOrders() {
-		setOrdersLoading(true);
 		const result = await getOrdersPage(pairId);
 		if (!result.success) return;
 		setOrdersHistory(result?.data || []);
@@ -83,7 +82,7 @@ export function useTradingData({
 	}
 
 	async function fetchTrades() {
-		setTradesLoading(true);
+		// setTradesLoading(true);
 		const result = await getTrades(pairId);
 
 		if (result.success) {
