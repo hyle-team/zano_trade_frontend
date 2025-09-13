@@ -29,7 +29,7 @@ function takeOrderClick({
 	const e = PageOrderData;
 
 	const priceStr = notationToString(new Decimal(e.price).toString()) || '';
-	const amountStr = notationToString(new Decimal(e.amount).toString()) || '';
+	const amountStr = notationToString(new Decimal(e.left).toString()) || '';
 
 	const secondCurrencyDP = pairData?.second_currency?.asset_info?.decimal_point || 12;
 	const firstCurrencyDP = pairData?.first_currency?.asset_info?.decimal_point || 12;

@@ -197,8 +197,8 @@ function InputPanelItem(props: InputPanelItemProps) {
 					invalid={!!amountState && !amountValid}
 				/>
 
-				<div>
-					<RangeInput value={rangeInputValue} onInput={onRangeInput} />
+				<div className={classes(isBuy && styles.disabled)}>
+					<RangeInput value={!isBuy ? rangeInputValue : '50'} onInput={onRangeInput} />
 					<div className={styles.inputPanel__body_labels}>
 						<p className={styles.inputPanel__body_labels__item}>0%</p>
 						<p className={styles.inputPanel__body_labels__item}>100%</p>

@@ -14,6 +14,7 @@ const useFilteredData = ({ ordersHistory, ordersBuySell }: useFilteredDataParams
 	const filteredOrdersHistory = ordersHistory
 		?.filter((e) => (ordersBuySell.code === 'all' ? e : e.type === ordersBuySell.code))
 		?.filter((e) => e.user.address !== state.wallet?.address)
+		?.filter((e) => parseFloat(e.left.toString()) !== 0)
 		?.sort((a, b) => {
 			if (ordersBuySell.code === 'buy') {
 				return parseFloat(b.price.toString()) - parseFloat(a.price.toString());
