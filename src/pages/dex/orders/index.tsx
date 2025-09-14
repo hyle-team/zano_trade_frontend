@@ -165,13 +165,21 @@ function Orders() {
 		setAlertState('loading');
 		setAlertSubtitle('Canceling all orders...');
 
-		const results = await Promise.allSettled(
-			activeOrders.map(async (e) => {
-				await cancelOrder(e.id);
-			}),
-		);
+		// const results = await Promise.allSettled(
+		// 	activeOrders.map(async (e) => {
+		// 		await cancelOrder(e.id);
+		// 	}),
+		// );
 
-		if (results.some((e) => e.status === 'rejected')) {
+		const results = await (async () => {
+			const res = [];
+			for (const order of activeOrders) {
+				res.push(await cancelOrder(order.id).catch(() => null));
+			}
+			return res;
+		})();
+
+		if (results.some((e) => e === null)) {
 			setAlertState('error');
 			setAlertSubtitle('Some of the orders were not canceled');
 		} else {

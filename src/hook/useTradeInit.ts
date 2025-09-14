@@ -3,6 +3,7 @@ import { Store } from '@/store/store-reducer';
 import { useContext } from 'react';
 import Decimal from 'decimal.js';
 import { PairStats } from '@/interfaces/responses/orders/GetPairStatsRes';
+import { ZANO_ASSET_ID } from '@/utils/utils';
 import { useOrderForm } from './useOrdereForm';
 
 interface useTradeInitParams {
@@ -18,8 +19,11 @@ const useTradeInit = ({ pairData, pairStats }: useTradeInitParams) => {
 		secondCurrencyName: pairData?.second_currency?.name || '',
 	};
 
+	const firstCurrencyAssetID = pairData?.first_currency?.asset_id;
+
 	const assets = state.wallet?.connected ? state.wallet?.assets || [] : [];
-	const balance = assets.find((e) => e.ticker === currencyNames.firstCurrencyName)?.balance;
+	const balance = assets.find((e) => e.assetId === firstCurrencyAssetID)?.balance;
+	const zanoBalance = assets.find((e) => e.assetId === ZANO_ASSET_ID)?.balance || 0;
 
 	const firstAssetId = pairData ? pairData.first_currency?.asset_id : undefined;
 	const secondAssetId = pairData ? pairData.second_currency?.asset_id : undefined;
@@ -49,6 +53,7 @@ const useTradeInit = ({ pairData, pairStats }: useTradeInitParams) => {
 		secondAssetLink,
 		secondAssetUsdPrice,
 		balance,
+		zanoBalance,
 		orderForm,
 		pairRateUsd,
 	};

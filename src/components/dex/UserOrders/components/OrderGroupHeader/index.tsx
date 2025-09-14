@@ -26,7 +26,7 @@ export default function OrderGroupHeader({
 				<p className={styles.header__label}>Quantity</p>
 
 				<p className={styles.header__value}>
-					{notationToString(order.amount)} {firstCurrencyName}
+					{notationToString(order.left)} {firstCurrencyName}
 				</p>
 			</div>
 

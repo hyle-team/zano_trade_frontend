@@ -259,6 +259,15 @@ export async function cancelOrder(id: string): Promise<ErrorRes | { success: tru
 		.then((res) => res.data);
 }
 
+export async function cancelTransaction(id: string): Promise<ErrorRes | { success: true }> {
+	return axios
+		.post('/api/transactions/cancel', {
+			token: sessionStorage.getItem('token'),
+			transactionId: id,
+		})
+		.then((res) => res.data);
+}
+
 export async function getCandles(
 	pairId: string,
 	period: Period,

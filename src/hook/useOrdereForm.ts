@@ -10,6 +10,14 @@ interface UseOrderFormParams {
 	assetsRates: Map<string, number>;
 }
 
+function clamp12(str: string) {
+	try {
+		return new Decimal(str || '0').toDecimalPlaces(12, Decimal.ROUND_DOWN).toString();
+	} catch {
+		return '0';
+	}
+}
+
 export function useOrderForm({
 	pairData,
 	balance,
@@ -47,7 +55,7 @@ export function useOrderForm({
 			thisDP: priceDP,
 			totalDP: priceDP,
 			setThisState: setPrice,
-			setTotalState: setTotal,
+			setTotalState: (v: string) => setTotal(clamp12(v)),
 			setThisValid: setPriceValid,
 			setTotalValid,
 		});
@@ -61,7 +69,7 @@ export function useOrderForm({
 			thisDP: amountDP,
 			totalDP: priceDP,
 			setThisState: setAmount,
-			setTotalState: setTotal,
+			setTotalState: (v: string) => setTotal(clamp12(v)),
 			setThisValid: setAmountValid,
 			setTotalValid,
 			balance,

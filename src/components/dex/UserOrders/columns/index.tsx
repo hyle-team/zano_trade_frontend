@@ -66,7 +66,7 @@ export function buildUserColumns({
 			key: 'quantity',
 			header: <>Quantity ({firstCurrencyName})</>,
 			width: '160px',
-			cell: (row) => <p>{notationToString(row.amount)}</p>,
+			cell: (row) => <p>{notationToString(row.left)}</p>,
 		},
 		{
 			key: 'total',
@@ -289,10 +289,7 @@ export function buildMyRequestsColumns({
 			width: '80px',
 			align: 'left',
 			cell: (row) => (
-				<CancelActionCell
-					id={String(row.creator === 'sell' ? row.sell_order_id : row.buy_order_id)}
-					onAfter={onAfter}
-				/>
+				<CancelActionCell type="cancel_tx" id={row.id.toString()} onAfter={onAfter} />
 			),
 		},
 	];
@@ -345,7 +342,7 @@ export function buildOrderHistoryColumns({
 			key: 'quantity',
 			header: <>Quantity ({firstCurrencyName})</>,
 			width: '160px',
-			cell: (row) => <p>{notationToString(row.amount)}</p>,
+			cell: (row) => <p>{notationToString(row.left)}</p>,
 		},
 		{
 			key: 'total',

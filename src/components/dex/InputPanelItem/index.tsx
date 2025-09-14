@@ -30,6 +30,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 		setRangeInputValue,
 		rangeInputValue = '50',
 		balance = 0,
+		zanoBalance = 0,
 		amountValid,
 		priceValid,
 		totalValid,
@@ -73,14 +74,34 @@ function InputPanelItem(props: InputPanelItemProps) {
 	async function postOrder() {
 		const price = new Decimal(priceState);
 		const amount = new Decimal(amountState);
+		const total = new Decimal(totalState);
 
 		const isFull =
 			price.greaterThan(0) &&
 			price.lessThan(1000000000) &&
 			amount.greaterThan(0) &&
-			amount.lessThan(1000000000);
+			amount.lessThan(1000000000) &&
+			total.greaterThan(0);
 
 		if (!isFull) return;
+
+		if (isBuy) {
+			const zanoAmount = new Decimal(zanoBalance);
+			if (zanoAmount.lessThan(total)) {
+				setAlertState('error');
+				setAlertSubtitle('Insufficient ZANO balance');
+				setTimeout(() => setAlertState(null), 3000);
+				return;
+			}
+		} else {
+			const assetAmount = new Decimal(balance);
+			if (assetAmount.lessThan(amount)) {
+				setAlertState('error');
+				setAlertSubtitle(`Insufficient ${firstCurrencyName} balance`);
+				setTimeout(() => setAlertState(null), 3000);
+				return;
+			}
+		}
 
 		const orderData: CreateOrderData = {
 			type: isBuy ? 'buy' : 'sell',
@@ -129,6 +150,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 
 	const buttonText = creatingState ? 'Creating...' : 'Create Order';
 	const isButtonDisabled = !priceValid || !amountValid || !totalValid || creatingState;
+	const showTotalError = priceState !== '' && amountState !== '' && !totalValid;
 
 	return (
 		<div data-tour="input-panel" className={styles.inputPanel}>
@@ -200,8 +222,8 @@ function InputPanelItem(props: InputPanelItemProps) {
 					invalid={!!amountState && !amountValid}
 				/>
 
-				<div>
-					<RangeInput value={rangeInputValue} onInput={onRangeInput} />
+				<div className={classes(isBuy && styles.disabled)}>
+					<RangeInput value={!isBuy ? rangeInputValue : '50'} onInput={onRangeInput} />
 					<div className={styles.inputPanel__body_labels}>
 						<p className={styles.inputPanel__body_labels__item}>0%</p>
 						<p className={styles.inputPanel__body_labels__item}>100%</p>
@@ -219,12 +241,12 @@ function InputPanelItem(props: InputPanelItemProps) {
 
 				<div className={styles.inputPanel__body_total}>
 					<LabeledInput
-						value={notationToString(totalState)}
+						value={amountState && priceState && notationToString(totalState)}
 						setValue={() => undefined}
 						currency={secondCurrencyName}
 						label="Total"
 						readonly={true}
-						invalid={!!totalState && !totalValid}
+						invalid={showTotalError}
 					/>
 
 					<div className={classes(styles.inputPanel__body_labels, styles.mobileWrap)}>

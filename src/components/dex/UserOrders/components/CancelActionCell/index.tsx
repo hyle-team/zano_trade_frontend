@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAlert } from '@/hook/useAlert';
-import { cancelOrder } from '@/utils/methods';
+import { cancelOrder, cancelTransaction } from '@/utils/methods';
 import ActionBtn from '@/components/UI/ActionBtn';
 import { CancelActionCellProps } from './types';
 
@@ -13,7 +13,7 @@ export default function CancelActionCell({ type = 'cancel', id, onAfter }: Cance
 
 		try {
 			setLoading(true);
-			const result = await cancelOrder(id);
+			const result = type === 'cancel' ? await cancelOrder(id) : await cancelTransaction(id);
 			if (!result.success) {
 				setAlertState('error');
 				setAlertSubtitle('Error while cancelling order');
@@ -35,7 +35,7 @@ export default function CancelActionCell({ type = 'cancel', id, onAfter }: Cance
 			disabled={loading}
 			onClick={() => onClick()}
 		>
-			{type === 'cancel' ? 'Cancel' : 'Reject'}
+			{type === 'cancel' || type === 'cancel_tx' ? 'Cancel' : 'Reject'}
 		</ActionBtn>
 	);
 }

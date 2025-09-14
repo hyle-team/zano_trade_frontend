@@ -41,7 +41,7 @@ function Trading() {
 	const fetchUser = useUpdateUser();
 	const [ordersHistory, setOrdersHistory] = useState<PageOrderData[]>([]);
 	const [userOrders, setUserOrders] = useState<OrderRow[]>([]);
-	const [periodsState, setPeriodsState] = useState<PeriodState>(periods[6]);
+	const [periodsState, setPeriodsState] = useState<PeriodState>(periods[4]);
 	const [pairData, setPairData] = useState<PairData | null>(null);
 	const [candles, setCandles] = useState<CandleRow[]>([]);
 	const [trades, setTrades] = useState<Trade[]>([]);
@@ -59,6 +59,7 @@ function Trading() {
 		secondAssetLink,
 		secondAssetUsdPrice,
 		balance,
+		zanoBalance,
 		pairRateUsd,
 	} = useTradeInit({ pairData, pairStats });
 
@@ -116,7 +117,10 @@ function Trading() {
 		setMyOrdersLoading(true);
 
 		try {
-			await Promise.all(userOrders.map((order) => cancelOrder(order.id)));
+			for (const order of userOrders) {
+				await cancelOrder(order.id);
+			}
+
 			await updateUserOrders();
 		} catch (err) {
 			console.error(err);
@@ -160,11 +164,11 @@ function Trading() {
 							ordersBuySell={ordersBuySell}
 							ordersLoading={ordersLoading}
 							filteredOrdersHistory={filteredOrdersHistory}
+							ordersHistory={ordersHistory}
 							trades={trades}
 							tradesLoading={tradesLoading}
 							setOrdersBuySell={setOrdersBuySell}
 							takeOrderClick={onHandleTakeOrder}
-							OrdersHistory={ordersHistory}
 						/>
 					</div>
 
@@ -203,6 +207,7 @@ function Trading() {
 							setRangeInputValue={orderForm.setRangeInputValue}
 							rangeInputValue={orderForm.rangeInputValue}
 							balance={Number(balance)}
+							zanoBalance={Number(zanoBalance)}
 							priceValid={orderForm.priceValid}
 							amountValid={orderForm.amountValid}
 							totalValid={orderForm.totalValid}

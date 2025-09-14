@@ -183,15 +183,15 @@ export function createOrderSorter<T>({ getSide, getPrice }: Getters<T>) {
 	return (a: T, b: T) => {
 		const aSide = getSide(a);
 		const bSide = getSide(b);
-		if (aSide !== bSide) return aSide === 'buy' ? -1 : 1;
+
+		if (aSide !== bSide) {
+			return aSide === 'sell' ? -1 : 1;
+		}
 
 		const ap = new Decimal(getPrice(a));
 		const bp = new Decimal(getPrice(b));
 
-		if (aSide === 'buy') {
-			return bp.comparedTo(ap);
-		}
-		return ap.comparedTo(bp);
+		return bp.comparedTo(ap);
 	};
 }
 

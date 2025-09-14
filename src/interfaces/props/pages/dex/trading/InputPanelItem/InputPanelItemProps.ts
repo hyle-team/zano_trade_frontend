@@ -16,6 +16,7 @@ interface InputPanelItemProps {
 	setRangeInputValue: Dispatch<SetStateAction<string>>;
 	rangeInputValue: string;
 	balance: number | undefined;
+	zanoBalance: number | undefined;
 	amountValid: boolean;
 	priceValid: boolean;
 	totalValid: boolean;
