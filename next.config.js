@@ -3,16 +3,16 @@ const nextConfig = {
 	reactStrictMode: true,
 	async redirects() {
 		return [
+			// {
+			// 	source: '/',
+			// 	destination: '/dex',
+			// 	permanent: false,
+			// },
 			{
-				source: '/',
-				destination: '/dex',
+				source: '/((?!maintenance).*)', // Match everything except "/maintenance"
+				destination: '/maintenance',
 				permanent: false,
 			},
-			// {
-			//   source: '/((?!maintenance).*)', // Match everything except "/maintenance"
-			//   destination: '/maintenance',
-			//   permanent: false,
-			// },
 		];
 	},
 	webpack: (config) => {
