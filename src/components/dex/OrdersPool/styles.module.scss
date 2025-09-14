@@ -1,0 +1,265 @@
+.ordersPool {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	padding: 5px;
+	background: var(--window-bg-color);
+	border: 1px solid var(--delimiter-color);
+	border-radius: 10px;
+
+	&__header {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		padding: 10px;
+
+		&_type {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+
+			.btn {
+				cursor: pointer;
+				width: 20px;
+				height: 20px;
+				border-radius: 4px;
+				font-size: 12px;
+				font-weight: 700;
+				transition: 0.3s opacity ease;
+				color: #ffffff;
+				opacity: 60%;
+
+				&.selected,
+				&:hover {
+					opacity: 100%;
+				}
+
+				&.all {
+					background: linear-gradient(to left, #ff6767 50%, #16d1d6 50%);
+				}
+
+				&.buy {
+					background-color: #16d1d6;
+				}
+
+				&.sell {
+					background-color: #ff6767;
+				}
+			}
+		}
+	}
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+		padding-top: 10px;
+		width: 100%;
+
+		&_orders {
+			width: 100%;
+			height: 410px;
+
+			&.full {
+				height: 480px;
+			}
+
+			.table {
+				width: 100%;
+
+				&__header {
+					position: relative;
+					z-index: 3;
+
+					th {
+						color: var(--table-th-color);
+					}
+				}
+
+				&__body {
+					tr {
+						cursor: pointer;
+						position: relative;
+
+						&:hover {
+							background-color: var(--table-tr-hover-color);
+						}
+
+						&.buy {
+							td {
+								&:last-child {
+									&::before {
+										background-color: var(--dex-buy-percentage);
+									}
+								}
+							}
+						}
+
+						&.sell {
+							td {
+								&:last-child {
+									&::before {
+										background-color: var(--dex-sell-percentage);
+									}
+								}
+							}
+						}
+
+						td {
+							position: static !important;
+
+							&:last-child {
+								&::before {
+									content: '';
+									pointer-events: none;
+									position: absolute;
+									z-index: 1;
+									right: 0;
+									top: 0;
+									width: var(--precentage);
+									height: 100%;
+								}
+							}
+
+							p,
+							span {
+								position: relative;
+								z-index: 2;
+								font-size: 11px;
+								font-weight: 400;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		&_stats {
+			position: absolute;
+			bottom: 15px;
+			left: 50%;
+			transform: translateX(-50%);
+			width: calc(100% - 30px);
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1px;
+
+			.stat_item {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: 12px;
+				line-height: 100%;
+				font-weight: 400;
+				min-width: 60px;
+
+				&.buy {
+					width: var(--width);
+					background-color: var(--dex-buy-percentage);
+					color: #16d1d6;
+
+					.stat_item__badge {
+						background-color: #16d1d6;
+					}
+				}
+
+				&.sell {
+					width: var(--width);
+					background-color: var(--dex-sell-percentage);
+					justify-content: flex-end;
+					color: #ff6767;
+
+					.stat_item__badge {
+						background-color: #ff6767;
+					}
+				}
+
+				&__badge {
+					width: 20px;
+					height: 20px;
+					border-radius: 4px;
+					display: grid;
+					place-content: center;
+					font-size: 12px;
+					font-weight: 700;
+					line-height: 120%;
+					color: #ffffff;
+				}
+			}
+		}
+	}
+}
+
+.tooltip {
+	pointer-events: none;
+	position: fixed;
+	border: 1px solid var(--dex-tooltip-border-color);
+	min-width: 140px;
+	max-width: 300px;
+	padding: 10px;
+	transform: translateX(-50%);
+	background-color: var(--dex-tooltip-bg);
+
+	&__arrow {
+		border-top: 1px solid var(--dex-tooltip-border-color);
+		background-color: var(--dex-tooltip-bg) !important;
+	}
+
+	h6 {
+		color: var(--table-th-color);
+		margin-top: 12px;
+		font-size: 11px;
+		font-weight: 700;
+
+		&:first-child {
+			margin-top: 0;
+		}
+	}
+
+	p {
+		font-size: 12px;
+		font-weight: 400;
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		margin-top: 6px;
+	}
+
+	span {
+		margin-top: 5px;
+		display: block;
+		color: #8d95ae;
+		font-size: 11px;
+		font-weight: 400;
+	}
+}
+
+@media screen and (max-width: 640px) {
+	.ordersPool {
+		padding: 0;
+		border: none;
+		background: transparent;
+
+		&__header {
+			display: none;
+		}
+
+		&__content {
+			padding-top: 0;
+
+			&_orders {
+				height: 350px;
+			}
+
+			&_stats {
+				margin-top: 22px;
+				position: relative;
+				width: 100%;
+			}
+		}
+	}
+
+	.tooltip {
+		display: none;
+	}
+}

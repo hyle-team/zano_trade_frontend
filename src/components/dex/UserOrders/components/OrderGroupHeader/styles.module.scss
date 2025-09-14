@@ -1,0 +1,66 @@
+.header {
+	margin-block: 2px;
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	padding-inline: 12px;
+	padding-block: 6px;
+	background-color: var(--table-group-header-bg);
+
+	&::before {
+		content: '';
+		pointer-events: none;
+		position: absolute;
+		left: 0;
+		top: 50%;
+		transform: translateY(-50%);
+		height: 14px;
+		width: 2px;
+	}
+
+	&.buy {
+		.header__type {
+			color: #16d1d6;
+		}
+
+		&::before {
+			background-color: #16d1d6;
+		}
+	}
+
+	&.sell {
+		.header__type {
+			color: #ff6767;
+		}
+
+		&::before {
+			background-color: #ff6767;
+		}
+	}
+
+	&__item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	&__label,
+	&__value,
+	&__type {
+		font-size: 12px;
+		font-weight: 400;
+
+		&.bold {
+			margin-inline: 2px;
+			font-weight: 500;
+		}
+	}
+
+	&__label {
+		color: var(--table-th-color);
+	}
+
+	&__type {
+		text-transform: capitalize;
+	}
+}

@@ -1,0 +1,33 @@
+.btn {
+	cursor: pointer;
+	border: none;
+	outline: none;
+	padding: 6px 12px;
+	border-radius: 5px;
+	background: var(--action-btn-bg);
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 100%;
+	min-width: max-content;
+
+	&:disabled {
+		cursor: not-allowed;
+		opacity: 0.5 !important;
+	}
+
+	&:hover {
+		background: var(--action-btn-bg);
+	}
+
+	&.primary {
+		color: #1f8feb;
+	}
+
+	&.success {
+		color: #16d1d6;
+	}
+
+	&.danger {
+		color: #ff6767;
+	}
+}

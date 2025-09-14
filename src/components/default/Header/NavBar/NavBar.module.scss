@@ -1,4 +1,25 @@
 .nav {
+	&.lg {
+		a {
+			gap: 8px;
+
+			h6 {
+				font-size: 14px;
+				font-weight: 600;
+				line-height: 140%;
+			}
+
+			svg {
+				transform: scale(0.9);
+			}
+
+			.badge {
+				padding: 3px;
+				min-width: 22px;
+			}
+		}
+	}
+
 	a {
 		display: flex;
 		align-items: center;

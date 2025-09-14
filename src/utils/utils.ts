@@ -86,13 +86,14 @@ export const roundTo = (x: number | string, digits = 7) => {
 	return fixedValue.replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.0+$/, '');
 };
 
-export const notationToString = (notation: number | string) => {
+export const notationToString = (notation: number | string, fixed?: number) => {
 	const decimalValue = new Decimal(notation || '0');
 
-	const fixedValue = decimalValue.toFixed();
+	if (fixed !== undefined) {
+		return decimalValue.toFixed(fixed).replace(/\.?0+$/, '');
+	}
 
-	// Remove trailing zeros
-	return fixedValue;
+	return decimalValue.toFixed();
 };
 
 export const localeTimeLeft = (now: number | null, timestamp: number) => {
@@ -133,9 +134,35 @@ export function isPositiveFloatStr(input: string) {
 	return regExp.test(input);
 }
 
-export function classes(...items: (string | boolean | undefined)[]): string {
+export function formatTime(ts: string | number) {
+	let num = Number(ts);
+
+	if (num < 1e12) num *= 1000;
+	const date = new Date(num);
+
+	if (Number.isNaN(date.getTime())) return '-';
+
+	return date.toLocaleTimeString('ru-RU', { hour12: false });
+}
+
+export function formatTimestamp(ms: number | string) {
+	if (Number.isNaN(Number(ms))) {
+		return 0;
+	}
+
+	const date = new Date(Number(ms));
+	const YYYY = date.getFullYear();
+	const MM = String(date.getMonth() + 1).padStart(2, '0');
+	const DD = String(date.getDate()).padStart(2, '0');
+	const hh = String(date.getHours()).padStart(2, '0');
+	const mm = String(date.getMinutes()).padStart(2, '0');
+	const ss = String(date.getSeconds()).padStart(2, '0');
+	return `${hh}:${mm}:${ss} ${DD}-${MM}-${YYYY}`;
+}
+
+export function classes(...classes: (string | boolean | undefined)[]): string {
 	// boolean for constructions like [predicate] && [className]
-	return items.filter((className) => className).join(' ');
+	return classes.filter((className) => className).join(' ');
 }
 
 export const getAssetIcon = (assetId: string): string => {
@@ -146,6 +173,38 @@ export const getAssetIcon = (assetId: string): string => {
 	}
 	return '/tokens/token.png';
 };
+
+type Getters<T> = {
+	getSide: (_item: T) => 'buy' | 'sell';
+	getPrice: (_item: T) => string | number | Decimal;
+};
+
+export function createOrderSorter<T>({ getSide, getPrice }: Getters<T>) {
+	return (a: T, b: T) => {
+		const aSide = getSide(a);
+		const bSide = getSide(b);
+
+		if (aSide !== bSide) {
+			return aSide === 'sell' ? -1 : 1;
+		}
+
+		const ap = new Decimal(getPrice(a));
+		const bp = new Decimal(getPrice(b));
+
+		return bp.comparedTo(ap);
+	};
+}
+
+export function countByKeyRecord<T>(
+	array: T[],
+	keySelector: (_item: T) => string | number,
+): Record<string, number> {
+	return array.reduce<Record<string, number>>((acc, item) => {
+		const key = String(keySelector(item));
+		acc[key] = (acc[key] ?? 0) + 1;
+		return acc;
+	}, {});
+}
 
 export const ZANO_ASSET_ID = 'd6329b5b1f7c0805b5c345f4957554002a2f557845f64d7645dae0e051a6498a';
 

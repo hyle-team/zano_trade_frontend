@@ -1,0 +1,19 @@
+.asset {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+
+	&__name {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 14px;
+		font-weight: 400;
+	}
+
+	&__address {
+		font-size: 14px;
+		font-weight: 400;
+	}
+}

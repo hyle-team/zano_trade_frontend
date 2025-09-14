@@ -1,0 +1,33 @@
+.alias {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 14px;
+
+	&__text {
+		color: var(--font-main-color) !important;
+	}
+
+	path {
+		fill: none;
+	}
+}
+
+.tooltip {
+	position: absolute;
+	top: 30px;
+	left: 5%;
+	background-color: var(--trade-table-tooltip);
+	z-index: 9999 !important;
+
+	&__text {
+		font-size: 12px !important;
+		color: var(--font-main-color) !important;
+	}
+
+	&__arrow {
+		border-radius: 2px;
+		left: 30% !important;
+		background-color: var(--trade-table-tooltip) !important;
+	}
+}

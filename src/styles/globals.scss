@@ -233,9 +233,8 @@ svg {
 
 .orders-scroll::-webkit-scrollbar {
 	width: 6px;
-
+	height: 6px;
 	background-color: transparent;
-	background-clip: padding-box;
 }
 
 .orders-scroll::-webkit-scrollbar-thumb {

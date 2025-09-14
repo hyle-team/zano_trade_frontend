@@ -1,0 +1,36 @@
+.badge {
+	position: relative;
+
+	&.sm {
+		.badge__link svg {
+			width: 14px;
+			height: 14px;
+		}
+	}
+
+	&__link {
+		margin-top: 4px;
+		cursor: pointer;
+
+		svg {
+			width: 16px;
+			height: 16px;
+		}
+	}
+
+	&__tooltip {
+		padding: 10px;
+		background-color: var(--trade-table-tooltip);
+		font-size: 12px;
+
+		&_text {
+			font-size: 12px !important;
+		}
+
+		&_arrow {
+			border-radius: 2px;
+			left: 50%;
+			background-color: var(--trade-table-tooltip) !important;
+		}
+	}
+}

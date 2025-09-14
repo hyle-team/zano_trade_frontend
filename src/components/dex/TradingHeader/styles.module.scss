@@ -1,0 +1,172 @@
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 25px;
+	position: relative;
+	border: none;
+
+	&__currency {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding-right: 20px;
+		border-right: 1px solid var(--delimiter-color);
+
+		&_icon {
+			min-width: 40px;
+			min-height: 40px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background-color: var(--icon-bg-color);
+			border-radius: 50%;
+
+			> img {
+				width: 24px;
+				height: auto;
+			}
+		}
+
+		&_item {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			gap: 6px;
+
+			.currencyName {
+				font-size: 16px;
+				font-weight: 600;
+
+				span {
+					color: var(--footer-selected-link);
+				}
+			}
+
+			.price {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+
+				&__secondCurrency {
+					font-weight: 400;
+					font-size: 14px;
+
+					&.green {
+						color: #16d1d6;
+					}
+
+					&.red {
+						color: #ff6767;
+					}
+				}
+
+				&__usd {
+					color: var(--footer-selected-link);
+					font-size: 12px;
+					font-weight: 400;
+				}
+			}
+		}
+	}
+
+	&__stats {
+		display: flex;
+		flex-wrap: nowrap;
+		gap: 20px;
+
+		&_assets {
+			display: flex;
+			flex-direction: column;
+			gap: 7px;
+		}
+
+		&_item {
+			padding-left: 20px;
+			border-left: 1px solid var(--delimiter-color);
+		}
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+
+		&_guide {
+			cursor: pointer;
+			background-color: transparent;
+
+			&:hover {
+				background-color: transparent;
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 1180px) {
+	.header {
+		&__currency {
+			border-right: none;
+			padding-right: 0;
+		}
+
+		&__stats_assets {
+			display: none;
+		}
+	}
+}
+
+@media screen and (max-width: 980px) {
+	.header {
+		&__currency {
+			padding-right: 20px;
+			border-right: 1px solid var(--delimiter-color);
+		}
+
+		&__stats_item {
+			padding-left: 0;
+			border-left: none;
+
+			&:last-child {
+				display: none !important;
+			}
+		}
+
+		&__actions_backBtn {
+			min-width: 40px;
+			height: 40px;
+			padding: 0 !important;
+			display: grid;
+			place-content: center;
+
+			span {
+				display: none;
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 720px) {
+	.header__stats_item {
+		&:nth-child(5) {
+			display: none;
+		}
+	}
+}
+
+@media screen and (max-width: 580px) {
+	.header {
+		&__currency {
+			border-right: none;
+			padding-right: 0;
+		}
+
+		&__stats_item {
+			display: none !important;
+		}
+
+		&__actions {
+			gap: 12px;
+		}
+	}
+}

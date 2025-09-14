@@ -320,10 +320,38 @@ export async function getChatChunk(
 		.then((res) => res.data);
 }
 
+export async function getTrades(pairId: string) {
+	return axios
+		.post(`/api/orders/get-trades`, {
+			pairId,
+		})
+		.then((res) => res.data);
+}
+
+export async function getUserPendings() {
+	return axios
+		.post('/api/transactions/get-my-pending', {
+			token: sessionStorage.getItem('token'),
+		})
+		.then((res) => res.data);
+}
+
 export async function getZanoPrice() {
 	return axios
 		.get(
 			'https://explorer.zano.org/api/price?asset_id=d6329b5b1f7c0805b5c345f4957554002a2f557845f64d7645dae0e051a6498a',
 		)
 		.then((res) => res.data);
+}
+
+export async function getMatrixAddresses(addresses: string[]) {
+	try {
+		const { data } = await axios.post('https://messenger.zano.org/api/get-addresses', {
+			addresses,
+		});
+
+		return data;
+	} catch (error) {
+		console.log(error);
+	}
 }

@@ -4,8 +4,21 @@
 	overflow: auto;
 	padding-bottom: 3px;
 
+	&.sm {
+		gap: 5px !important;
+
+		> div {
+			a {
+				font-size: 14px !important;
+				padding: 8px !important;
+				border-radius: 8px !important;
+				line-height: 100%;
+			}
+		}
+	}
+
 	&.tab {
-		gap: 10px;
+		gap: 3px;
 
 		> div {
 			a {
@@ -16,7 +29,8 @@
 				border-radius: 10px;
 
 				&.selected {
-					background-color: #1f8feb1a;
+					background-color: var(--tab-bg-color);
+					color: #fff;
 
 					&::after {
 						display: none;

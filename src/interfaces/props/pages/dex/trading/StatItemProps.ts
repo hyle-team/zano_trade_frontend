@@ -5,6 +5,7 @@ interface StatItemProps {
 	title: string;
 	value: string;
 	coefficient?: number;
+	className?: string;
 }
 
 export default StatItemProps;

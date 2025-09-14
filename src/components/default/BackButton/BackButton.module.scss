@@ -1,4 +1,13 @@
 .back_btn {
 	display: flex;
 	gap: 12px;
+
+	&.sm {
+		padding: 12px 22px;
+
+		span {
+			font-size: 14px;
+			font-weight: 500;
+		}
+	}
 }

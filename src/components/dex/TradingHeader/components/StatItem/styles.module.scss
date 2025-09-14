@@ -1,0 +1,48 @@
+.statItem {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+
+	&__top {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+
+		svg {
+			transform: scale(0.9);
+		}
+
+		&_title {
+			color: var(--footer-selected-link);
+			white-space: nowrap;
+			font-size: 12px;
+			font-weight: 400;
+		}
+	}
+
+	&__content {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+
+		&_val {
+			white-space: nowrap;
+			font-size: 14px;
+			font-weight: 500;
+		}
+
+		&_coefficient {
+			white-space: nowrap;
+			font-size: 14px;
+			font-weight: 500;
+
+			&.green {
+				color: #16d1d6;
+			}
+
+			&.red {
+				color: #ff6767;
+			}
+		}
+	}
+}

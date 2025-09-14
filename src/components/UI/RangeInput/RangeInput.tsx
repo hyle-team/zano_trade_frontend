@@ -38,7 +38,7 @@ function RangeInput(props: RangeInputProps) {
 				className={styles.input__range__tooltip}
 				shown={tooltipShown}
 			>
-				{realValue}%
+				<p>{realValue}%</p>
 			</Tooltip>
 
 			<div
