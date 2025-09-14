@@ -58,6 +58,7 @@ function Trading() {
 		secondAssetLink,
 		secondAssetUsdPrice,
 		balance,
+		zanoBalance,
 		pairRateUsd,
 	} = useTradeInit({ pairData, pairStats });
 
@@ -202,6 +203,7 @@ function Trading() {
 							setRangeInputValue={orderForm.setRangeInputValue}
 							rangeInputValue={orderForm.rangeInputValue}
 							balance={Number(balance)}
+							zanoBalance={Number(zanoBalance)}
 							priceValid={orderForm.priceValid}
 							amountValid={orderForm.amountValid}
 							totalValid={orderForm.totalValid}

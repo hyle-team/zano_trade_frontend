@@ -30,6 +30,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 		setRangeInputValue,
 		rangeInputValue = '50',
 		balance = 0,
+		zanoBalance = 0,
 		amountValid,
 		priceValid,
 		totalValid,
@@ -79,6 +80,24 @@ function InputPanelItem(props: InputPanelItemProps) {
 			total.greaterThan(0);
 
 		if (!isFull) return;
+
+		if (isBuy) {
+			const zanoAmount = new Decimal(zanoBalance);
+			if (zanoAmount.lessThan(total)) {
+				setAlertState('error');
+				setAlertSubtitle('Insufficient ZANO balance');
+				setTimeout(() => setAlertState(null), 3000);
+				return;
+			}
+		} else {
+			const assetAmount = new Decimal(balance);
+			if (assetAmount.lessThan(amount)) {
+				setAlertState('error');
+				setAlertSubtitle(`Insufficient ${firstCurrencyName} balance`);
+				setTimeout(() => setAlertState(null), 3000);
+				return;
+			}
+		}
 
 		const orderData: CreateOrderData = {
 			type: isBuy ? 'buy' : 'sell',
