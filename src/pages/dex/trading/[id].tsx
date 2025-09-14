@@ -116,7 +116,10 @@ function Trading() {
 		setMyOrdersLoading(true);
 
 		try {
-			await Promise.all(userOrders.map((order) => cancelOrder(order.id)));
+			for (const order of userOrders) {
+				await cancelOrder(order.id);
+			}
+
 			await updateUserOrders();
 		} catch (err) {
 			console.error(err);
