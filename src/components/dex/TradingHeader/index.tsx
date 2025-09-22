@@ -57,7 +57,7 @@ const TradingHeader = ({
 		},
 		{
 			Img: VolumeIcon,
-			title: `24h volume (${firstCurrencyName})`,
+			title: `24h volume (${secondCurrencyName})`,
 			value: `${roundTo(notationToString(pairStats?.volume || 0), 4)}`,
 		},
 	];
