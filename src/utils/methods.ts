@@ -81,7 +81,7 @@ export async function findPairID(
 	second: string,
 	host: string | undefined = undefined,
 ): Promise<number | undefined> {
-	const findPairURL = `${host ? `https://${host}` : ''}/api/dex/find-pair`;
+	const findPairURL = `${host ?? ''}/api/dex/find-pair`;
 
 	console.log('Find pair URL:', findPairURL);
 

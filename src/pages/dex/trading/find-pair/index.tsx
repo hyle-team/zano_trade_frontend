@@ -3,6 +3,8 @@ import { GetServerSideProps } from 'next';
 import { findPairID } from '@/utils/methods';
 import styles from '@/styles/404.module.scss';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const { first, second } = context.query;
 
@@ -13,11 +15,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	}
 
 	try {
-		const idFound = await findPairID(
-			first as string,
-			second as string,
-			context.req.headers.host as string,
-		);
+		const idFound = await findPairID(first as string, second as string, API_URL);
 
 		console.log('ID found:', idFound);
 
