@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef, useMemo, useLayoutEffect } from 'react';
 import useAdvancedTheme from '@/hook/useTheme';
 import ReactECharts from 'echarts-for-react';
 import type CandleChartProps from '@/interfaces/props/pages/dex/trading/CandleChartProps/CandleChartProps';
@@ -18,7 +18,6 @@ import {
 function CandleChart(props: CandleChartProps) {
 	const { theme } = useAdvancedTheme();
 	const chartRef = useRef<ReactECharts>(null);
-
 	const [candles, setCandles] = useState<ResultCandle[]>([]);
 	const [isLoaded, setIsLoaded] = useState(false);
 
@@ -148,6 +147,12 @@ function CandleChart(props: CandleChartProps) {
 		};
 	}, [candles, props.period, theme]);
 
+	useLayoutEffect(() => {
+		requestAnimationFrame(() => {
+			window.dispatchEvent(new Event('resize'));
+		});
+	}, []);
+
 	return (
 		<div className={styles.chart}>
 			{/* Header */}
@@ -179,14 +184,16 @@ function CandleChart(props: CandleChartProps) {
 				</div>
 			</div>
 
-			<ReactECharts
-				ref={chartRef}
-				option={option}
-				style={{ height: '100%', width: '100%' }}
-				opts={{ devicePixelRatio: 2 }}
-				lazyUpdate
-				notMerge
-			/>
+			<div className={styles.chart__body}>
+				<ReactECharts
+					ref={chartRef}
+					option={option}
+					style={{ height: '100%', width: '100%' }}
+					opts={{ devicePixelRatio: 2 }}
+					lazyUpdate
+					notMerge
+				/>
+			</div>
 
 			{!candles.length && isLoaded && (
 				<h1 className={styles.chart__lowVolume}>[ Low volume ]</h1>

@@ -7,7 +7,7 @@ import {
 	getTrades,
 } from '@/utils/methods';
 import useUpdateUser from '@/hook/useUpdateUser';
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import CandleRow from '@/interfaces/common/CandleRow';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
@@ -45,9 +45,12 @@ export function useTradingData({
 	const { state } = useContext(Store);
 	const fetchUser = useUpdateUser();
 	const router = useRouter();
-	const [candlesLoaded, setCandlesLoaded] = useState(false);
-	const [ordersLoading, setOrdersLoading] = useState(true);
-	const [tradesLoading, setTradesLoading] = useState(true);
+	const isFirstLoad = useRef(true);
+	const prevPeriod = useRef<string | null>(null);
+
+	const [candlesLoaded, setCandlesLoaded] = useState(true);
+	const [ordersLoading, setOrdersLoading] = useState(false);
+	const [tradesLoading, setTradesLoading] = useState(false);
 	const pairId = typeof router.query.id === 'string' ? router.query.id : '';
 	const loggedIn = !!state.wallet?.connected;
 
@@ -108,17 +111,37 @@ export function useTradingData({
 	}
 
 	useEffect(() => {
+		if (isFirstLoad.current) {
+			isFirstLoad.current = false;
+
+			setOrdersLoading(false);
+			return;
+		}
+
 		fetchPairStats();
 		getPairData();
 		updateOrders();
 	}, []);
 
 	useEffect(() => {
+		if (!prevPeriod.current) {
+			prevPeriod.current = periodsState.code;
+			return;
+		}
+
+		if (prevPeriod.current === periodsState.code) return;
+
+		prevPeriod.current = periodsState.code;
 		fetchCandles();
-	}, [periodsState]);
+	}, [periodsState.code]);
 
 	useEffect(() => {
 		(async () => {
+			if (isFirstLoad.current) {
+				setTradesLoading(false);
+				return;
+			}
+
 			await fetchTrades();
 		})();
 	}, [pairId]);

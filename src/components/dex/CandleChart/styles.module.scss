@@ -40,10 +40,19 @@
 		}
 	}
 
-	> canvas {
+	&__body {
 		width: 100%;
 		height: 100%;
-		cursor: crosshair;
+
+		div,
+		canvas {
+			width: 100% !important;
+			height: 100% !important;
+		}
+
+		canvas {
+			cursor: crosshair;
+		}
 	}
 
 	&__lowVolume {
