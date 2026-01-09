@@ -373,7 +373,7 @@ const UserOrders = ({
 
 	return (
 		<>
-			<div ref={orderListRef} className={styles.userOrders}>
+			<div data-tour="user-orders" ref={orderListRef} className={styles.userOrders}>
 				<div className={styles.userOrders__header}>
 					<Tabs
 						type={isMobile ? 'button' : 'tab'}

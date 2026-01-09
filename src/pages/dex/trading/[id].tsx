@@ -29,6 +29,7 @@ import useTradeInit from '@/hook/useTradeInit';
 import useMatrixAddresses from '@/hook/useMatrixAddresses';
 import takeOrderClick from '@/utils/takeOrderClick';
 import useUpdateUser from '@/hook/useUpdateUser';
+import { GuideProvider } from '@/store/guide-provider';
 
 function Trading() {
 	const { alertState, alertSubtitle, setAlertState } = useAlert();
@@ -141,7 +142,7 @@ function Trading() {
 	};
 
 	return (
-		<>
+		<GuideProvider>
 			<Header isLg={true} />
 
 			<main className={styles.trading}>
@@ -238,7 +239,7 @@ function Trading() {
 				)}
 			</main>
 			<Footer />
-		</>
+		</GuideProvider>
 	);
 }
 
