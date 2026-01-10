@@ -14,16 +14,19 @@ import { useInView } from 'react-intersection-observer';
 import Preloader from '@/components/UI/Preloader/Preloader';
 import { PairSortOption } from '@/interfaces/enum/pair';
 import PairsTable from '@/components/default/PairsTable/PairsTable';
+import axios from 'axios';
+import { API_URL } from '@/constants';
 import DexHeader from './DexHeader/DexHeader';
 import PairsList from './pairs/PairsList/PairsList';
 
-function Dex() {
+function Dex({ initialPairs }: { initialPairs: PairData[] }) {
 	const fetchIdRef = useRef<string>(nanoid());
 	const bottomInView = useRef<boolean>(false);
+	const isFirstLoad = useRef(true);
 
 	const [pairInputState, setPairInputState] = useState('');
-	const [pairs, setPairs] = useState<PairData[]>([]);
-	const [allLoaded, setLoadedState] = useState(false);
+	const [pairs, setPairs] = useState<PairData[]>(initialPairs);
+	const [allLoaded, setLoadedState] = useState(initialPairs.length > 0);
 	const [pagesAmount, setPagesAmount] = useState<number>();
 	const [pageLoading, setPageLoading] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
@@ -36,7 +39,7 @@ function Dex() {
 	});
 
 	useEffect(() => {
-		if (typeof window !== undefined) {
+		if (typeof window !== 'undefined') {
 			const currentState = localStorage.getItem('all_pairs') ?? '';
 
 			if (currentState === '' || currentState === 'true') {
@@ -66,14 +69,14 @@ function Dex() {
 	async function fetchPairs() {
 		const initial = currentPage === 1;
 
-		if (initial) {
-			setLoadedState(false);
-			setPageLoading(false);
-		} else {
-			setPageLoading(true);
-			setLoadedState(true);
+		if (initial && initialPairs.length > 0 && isFirstLoad.current) {
+			isFirstLoad.current = false;
+			return;
 		}
 
+		if (!initial) {
+			setPageLoading(true);
+		}
 		const newFetchId = nanoid();
 		fetchIdRef.current = newFetchId;
 		const result = await getPairsPage(currentPage, pairInputState, whitelistedOnly, sortOption);
@@ -160,6 +163,16 @@ function Dex() {
 			<Footer />
 		</>
 	);
+}
+
+export async function getServerSideProps() {
+	const result = await getPairsPage(1, '', true, PairSortOption.VOLUME_HIGH_TO_LOW);
+
+	return {
+		props: {
+			initialPairs: result.success ? result.data : [],
+		},
+	};
 }
 
 export default Dex;

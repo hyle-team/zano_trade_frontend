@@ -7,8 +7,29 @@ import NextApp, { AppContext, AppProps } from 'next/app';
 import { ThemeProvider } from 'next-themes';
 import GetConfigRes, { GetConfigResData } from '@/interfaces/responses/config/GetConfigRes';
 import inter from '@/utils/font';
+import { API_URL } from '@/constants';
+import NProgress from 'nprogress';
+import { Router } from 'next/router';
 import PageHandler from './PageHandler';
 import NotificationPopups from './NotificationPopups';
+import 'nprogress/nprogress.css';
+
+NProgress.configure({
+	showSpinner: false,
+	trickleSpeed: 200,
+});
+
+Router.events.on('routeChangeStart', () => {
+	NProgress.start();
+});
+
+Router.events.on('routeChangeComplete', () => {
+	NProgress.done();
+});
+
+Router.events.on('routeChangeError', () => {
+	NProgress.done();
+});
 
 function App(data: AppProps & { config?: GetConfigResData }) {
 	const { Component, pageProps } = data;
@@ -63,7 +84,7 @@ App.getInitialProps = async (context: AppContext) => {
 	try {
 		const pageProps = await NextApp.getInitialProps(context);
 
-		const configRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/config`, {
+		const configRes = await fetch(`${API_URL}/api/config`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',

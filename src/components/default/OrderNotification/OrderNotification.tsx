@@ -72,7 +72,9 @@ export default function OrderNotification({
 			</div>
 			<div className={styles['dex__order-notification_delimiter']} />
 			<div className={styles['dex__order-notification_details']}>
-				<Link href={pairLink}>Details</Link>
+				<Link href={pairLink} onClick={onCloseClick}>
+					Details
+				</Link>
 			</div>
 		</div>
 	);
