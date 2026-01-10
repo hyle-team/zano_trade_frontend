@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Tooltip from '@/components/UI/Tooltip/Tooltip';
-import { classes, cutAddress } from '@/utils/utils';
+import { cutAddress } from '@/utils/utils';
 import MatrixConnectionBadge from '@/components/dex/MatrixConnectionBadge';
 import BadgeStatus from '@/components/dex/BadgeStatus';
 import { createPortal } from 'react-dom';
