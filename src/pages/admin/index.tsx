@@ -64,10 +64,13 @@ const AdminPanel: React.FC = () => {
 					})),
 				);
 			} else {
-				message.error('Error fetching featured pairs');
+				message.error({
+					content: 'Error fetching featured pairs',
+					className: styles.message,
+				});
 			}
 		} catch (error) {
-			message.error('Error fetching featured pairs');
+			message.error({ content: 'Error fetching featured pairs', className: styles.message });
 		}
 	};
 
@@ -121,7 +124,10 @@ const AdminPanel: React.FC = () => {
 				});
 			}
 		} catch (error) {
-			message.error('Error adding featured pair');
+			message.error({
+				content: 'Error adding featured pair',
+				className: styles.message,
+			});
 		}
 	};
 
@@ -149,7 +155,7 @@ const AdminPanel: React.FC = () => {
 				}
 			}
 		} catch (error) {
-			message.error('Error removing featured pair');
+			message.error({ content: 'Error removing featured pair', className: styles.message });
 		}
 	};
 

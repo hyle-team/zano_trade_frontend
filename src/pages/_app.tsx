@@ -5,7 +5,8 @@ import Head from 'next/head';
 import { StoreProvider } from '@/store/store-reducer';
 import NextApp, { AppContext, AppProps } from 'next/app';
 import { ThemeProvider } from 'next-themes';
-import GetConfigRes, { GetConfigResData } from '@/interfaces/responses/config/GetConfigRes';
+import axios, { AxiosError } from 'axios';
+import { GetConfigResData } from '@/interfaces/responses/config/GetConfigRes';
 import inter from '@/utils/font';
 import { API_URL } from '@/constants';
 import NProgress from 'nprogress';
@@ -19,8 +20,18 @@ NProgress.configure({
 	trickleSpeed: 200,
 });
 
-Router.events.on('routeChangeStart', () => {
-	NProgress.start();
+Router.events.on('routeChangeStart', (url) => {
+	if (typeof window === 'undefined') return;
+
+	const currentUrl = window.location.href;
+	const nextUrl = new URL(url, window.location.origin).href;
+
+	const currentPath = new URL(currentUrl).pathname;
+	const nextPath = new URL(nextUrl).pathname;
+
+	if (currentPath !== nextPath) {
+		NProgress.start();
+	}
 });
 
 Router.events.on('routeChangeComplete', () => {
@@ -84,27 +95,20 @@ App.getInitialProps = async (context: AppContext) => {
 	try {
 		const pageProps = await NextApp.getInitialProps(context);
 
-		const configRes = await fetch(`${API_URL}/api/config`, {
-			method: 'GET',
+		const configRes = await axios.get(`${API_URL}/api/config`, {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			credentials: 'include',
+			withCredentials: true,
 		});
-
-		if (!configRes.ok) {
-			console.error(`Failed to fetch config: ${configRes.status}`);
-			return pageProps;
-		}
-
-		const configData = (await configRes.json()) as GetConfigRes;
 
 		return {
 			...pageProps,
-			config: configData.data,
+			config: configRes.data.data,
 		};
 	} catch (error) {
-		console.error('Unable to fetch config data:', error);
+		const err = error as AxiosError;
+		console.error('Unable to fetch config data:', err?.response?.status, err?.message);
 
 		return NextApp.getInitialProps(context);
 	}

@@ -8,7 +8,9 @@ import { BadgeStatusProps } from './types';
 
 function BadgeStatus({ type, icon }: BadgeStatusProps) {
 	return (
-		<div className={classes(styles.badge, type === 'high' && styles.high, icon && styles.icon)}>
+		<span
+			className={classes(styles.badge, type === 'high' && styles.high, icon && styles.icon)}
+		>
 			<Image
 				className={styles.badge__img}
 				src={type === 'instant' ? LightningImg : RocketImg}
@@ -19,7 +21,7 @@ function BadgeStatus({ type, icon }: BadgeStatusProps) {
 					{type === 'instant' ? 'instant' : 'high volume'}
 				</span>
 			)}
-		</div>
+		</span>
 	);
 }
 

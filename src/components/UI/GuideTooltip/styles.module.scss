@@ -1,77 +1,77 @@
 .tooltip {
-    transition: none !important;
-    width: 300px;
+	transition: none !important;
+	width: 300px;
 
-    &__body {
-        width: 100%;
-        text-align: center;
-        border-radius: 10px;
-        background-color: #fff;
-        padding: 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
+	&__body {
+		width: 100%;
+		text-align: center;
+		border-radius: 10px;
+		background-color: #fff;
+		padding: 15px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
 
-    &__index {
-        font-size: 20px;
-        font-weight: 600;
-        color: #0c0c3a;
-        line-height: 100%;
-    }
+	&__index {
+		font-size: 20px;
+		font-weight: 600;
+		color: #0c0c3a;
+		line-height: 100%;
+	}
 
-    &__content,
-    &__content p {
-        color: #0c0c3a;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 140%;
-    }
+	&__content,
+	&__content p {
+		color: #0c0c3a;
+		font-size: 14px;
+		font-weight: 400;
+		line-height: 140%;
+	}
 
-    &__btn {
-        padding: 13px;
-        font-size: 14px;
-        font-weight: 500;
-        line-height: 100%;
-    }
+	&__btn {
+		padding: 13px;
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 100%;
+	}
 
-    &__skip {
-        margin-top: 8px;
-        width: 100%;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        line-height: 140%;
-        color: var(--guide-skip-btn);
-        background-color: transparent !important;
-    }
+	&__skip {
+		margin-top: 8px;
+		width: 100%;
+		cursor: pointer;
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 140%;
+		color: var(--guide-skip-btn);
+		background-color: transparent !important;
+	}
 }
 
-@media screen and (max-width:620px) {
-    .tooltip {
-        width: 200px;
+@media screen and (max-width: 620px) {
+	.tooltip {
+		width: 200px;
 
-        &__body {
-            gap: 8px;
-            padding: 10px;
-        }
+		&__body {
+			gap: 8px;
+			padding: 10px;
+		}
 
-        &__content,
-        &__content p {
-            font-size: 12px;
-        }
+		&__content,
+		&__content p {
+			font-size: 12px;
+		}
 
-        &__btn,
-        &__skip {
-            font-size: 12px;
-        }
+		&__btn,
+		&__skip {
+			font-size: 12px;
+		}
 
-        &__btn {
-            padding: 10px;
-        }
+		&__btn {
+			padding: 10px;
+		}
 
-        &__index {
-            font-size: 16px;
-        }
-    }
+		&__index {
+			font-size: 16px;
+		}
+	}
 }

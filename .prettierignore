@@ -6,3 +6,4 @@ coverage
 .env
 *.lock
 submodules/
+migrations/
