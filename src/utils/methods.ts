@@ -24,6 +24,10 @@ import GetChatChunkRes from '@/interfaces/responses/chats/GetChatChunkRes';
 import axios from 'axios';
 import GetPairsPagesAmountRes from '@/interfaces/responses/dex/GetPairsPagesAmountRes';
 import { PairSortOption } from '@/interfaces/enum/pair';
+import { API_URL } from '@/constants';
+
+const isServer = typeof window === 'undefined';
+const baseUrl = isServer ? API_URL : '';
 
 export async function getUser(): Promise<ErrorRes | GetUserRes> {
 	return axios
@@ -185,7 +189,7 @@ export async function getPairsPage(
 	sortOption: PairSortOption,
 ): Promise<ErrorRes | GetPairsPageRes> {
 	return axios
-		.post('/api/dex/get-pairs-page', {
+		.post(`${baseUrl}/api/dex/get-pairs-page`, {
 			page,
 			searchText,
 			whitelistedOnly,
@@ -208,7 +212,7 @@ export async function getPairsPagesAmount(
 
 export async function getPair(id: string): Promise<ErrorRes | GetPairRes> {
 	return axios
-		.post('/api/dex/get-pair', {
+		.post(`${baseUrl}/api/dex/get-pair`, {
 			id,
 		})
 		.then((res) => res.data);
@@ -227,7 +231,7 @@ export async function createOrder(
 
 export async function getOrdersPage(pairId: string): Promise<ErrorRes | GetOrdersPageRes> {
 	return axios
-		.post('/api/orders/get-page', {
+		.post(`${baseUrl}/api/orders/get-page`, {
 			pairId,
 		})
 		.then((res) => res.data);
@@ -273,7 +277,7 @@ export async function getCandles(
 	period: Period,
 ): Promise<ErrorRes | GetCandlesRes> {
 	return axios
-		.post('/api/orders/get-candles', {
+		.post(`${baseUrl}/api/orders/get-candles`, {
 			pairId,
 			period,
 		})
@@ -290,7 +294,7 @@ export async function getChartOrders(pairId: string): Promise<ErrorRes | GetChar
 
 export async function getPairStats(pairId: string): Promise<ErrorRes | GetPairStatsRes> {
 	return axios
-		.post('/api/orders/get-pair-stats', {
+		.post(`${baseUrl}/api/orders/get-pair-stats`, {
 			pairId,
 		})
 		.then((res) => res.data);
@@ -331,7 +335,7 @@ export async function getChatChunk(
 
 export async function getTrades(pairId: string) {
 	return axios
-		.post(`/api/orders/get-trades`, {
+		.post(`${baseUrl}/api/orders/get-trades`, {
 			pairId,
 		})
 		.then((res) => res.data);
