@@ -2,8 +2,7 @@ import { GetServerSideProps } from 'next';
 
 import { findPairID } from '@/utils/methods';
 import styles from '@/styles/404.module.scss';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_URL } from '@/constants';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const { first, second } = context.query;
