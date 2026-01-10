@@ -1,6 +1,8 @@
 import PeriodState from '@/interfaces/states/pages/dex/trading/InputPanelItem/PeriodState';
 import SelectValue from '@/interfaces/states/pages/dex/trading/InputPanelItem/SelectValue';
 
+export const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export const periods: PeriodState[] = [
 	// { name: '1s', code: '1sec' },
 	{ name: '1m', code: '1min' },

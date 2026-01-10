@@ -71,6 +71,11 @@ function InputPanelItem(props: InputPanelItemProps) {
 		setRangeInputValue('50');
 	}
 
+	const numericBalance = Number(balance);
+	const numericZanoBalance = Number(zanoBalance);
+	const hasValidAssetBalance = Number.isFinite(numericBalance);
+	const hasValidZanoBalance = Number.isFinite(numericZanoBalance);
+
 	async function postOrder() {
 		const price = new Decimal(priceState);
 		const amount = new Decimal(amountState);
@@ -85,22 +90,21 @@ function InputPanelItem(props: InputPanelItemProps) {
 
 		if (!isFull) return;
 
+		const assetAmount = new Decimal(hasValidAssetBalance ? String(numericBalance) : '0');
+		const zanoAmount = new Decimal(hasValidZanoBalance ? String(numericZanoBalance) : '0');
+
 		if (isBuy) {
-			const zanoAmount = new Decimal(zanoBalance);
 			if (zanoAmount.lessThan(total)) {
 				setAlertState('error');
 				setAlertSubtitle('Insufficient ZANO balance');
 				setTimeout(() => setAlertState(null), 3000);
 				return;
 			}
-		} else {
-			const assetAmount = new Decimal(balance);
-			if (assetAmount.lessThan(amount)) {
-				setAlertState('error');
-				setAlertSubtitle(`Insufficient ${firstCurrencyName} balance`);
-				setTimeout(() => setAlertState(null), 3000);
-				return;
-			}
+		} else if (assetAmount.lessThan(amount)) {
+			setAlertState('error');
+			setAlertSubtitle(`Insufficient ${firstCurrencyName} balance`);
+			setTimeout(() => setAlertState(null), 3000);
+			return;
 		}
 
 		const orderData: CreateOrderData = {

@@ -5,6 +5,7 @@ import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
 import { BuildColumnsArgs } from './types';
 import TotalUsdCell from '../../TotalUsdCell';
 import styles from '../styles.module.scss';
+import BadgeStatus from '../../BadgeStatus';
 
 export function buildOrderPoolColumns({
 	firstCurrencyName,
@@ -16,8 +17,16 @@ export function buildOrderPoolColumns({
 			header: <>Price ({secondCurrencyName})</>,
 			width: '80px',
 			cell: (row) => (
-				<p style={{ color: row.type === 'buy' ? '#16D1D6' : '#FF6767' }}>
+				<p
+					style={{
+						color: row.type === 'buy' ? '#16D1D6' : '#FF6767',
+						display: 'flex',
+						alignItems: 'center',
+						gap: 8,
+					}}
+				>
 					{notationToString(row.price, 8)}
+					{row.isInstant && <BadgeStatus type="instant" icon />}
 				</p>
 			),
 		},

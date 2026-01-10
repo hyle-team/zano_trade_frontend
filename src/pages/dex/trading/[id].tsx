@@ -3,7 +3,14 @@ import Footer from '@/components/default/Footer/Footer';
 import Header from '@/components/default/Header/Header';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
 import { useCallback, useState } from 'react';
-import { cancelOrder } from '@/utils/methods';
+import {
+	cancelOrder,
+	getCandles,
+	getOrdersPage,
+	getPair,
+	getPairStats,
+	getTrades,
+} from '@/utils/methods';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import Alert from '@/components/UI/Alert/Alert';
 import PeriodState from '@/interfaces/states/pages/dex/trading/InputPanelItem/PeriodState';
@@ -30,24 +37,33 @@ import useMatrixAddresses from '@/hook/useMatrixAddresses';
 import takeOrderClick from '@/utils/takeOrderClick';
 import useUpdateUser from '@/hook/useUpdateUser';
 import { GuideProvider } from '@/store/guide-provider';
+import { GetServerSidePropsContext } from 'next';
+import { TradingProps } from '@/interfaces/props/pages/dex/trading/TradingProps';
 
-function Trading() {
+function Trading({
+	initialOrders,
+	initialPair,
+	initialStats,
+	initialTrades,
+	initialCandles,
+}: TradingProps) {
 	const { alertState, alertSubtitle, setAlertState } = useAlert();
 	const { elementRef: orderListRef, scrollToElement: scrollToOrdersList } =
 		useScroll<HTMLDivElement>();
 	const { elementRef: orderFormRef, scrollToElement: scrollToOrderForm } =
 		useScroll<HTMLDivElement>();
 
+	const [pairData, setPairData] = useState<PairData | null>(initialPair);
+	const [pairStats, setPairStats] = useState<PairStats | null>(initialStats);
+	const [ordersHistory, setOrdersHistory] = useState<PageOrderData[]>(initialOrders);
+	const [candles, setCandles] = useState<CandleRow[]>(initialCandles);
+	const [trades, setTrades] = useState<Trade[]>(initialTrades);
+
 	const fetchUser = useUpdateUser();
-	const [ordersHistory, setOrdersHistory] = useState<PageOrderData[]>([]);
 	const [userOrders, setUserOrders] = useState<OrderRow[]>([]);
 	const [periodsState, setPeriodsState] = useState<PeriodState>(periods[4]);
-	const [pairData, setPairData] = useState<PairData | null>(null);
-	const [candles, setCandles] = useState<CandleRow[]>([]);
-	const [trades, setTrades] = useState<Trade[]>([]);
 	const [myOrdersLoading, setMyOrdersLoading] = useState(true);
 	const [ordersBuySell, setOrdersBuySell] = useState(buySellValues[0]);
-	const [pairStats, setPairStats] = useState<PairStats | null>(null);
 	const [applyTips, setApplyTips] = useState<ApplyTip[]>([]);
 	const matrixAddresses = useMatrixAddresses(ordersHistory);
 	const [orderFormType, setOrderFormType] = useState(buySellValues[1]);
@@ -241,6 +257,28 @@ function Trading() {
 			<Footer />
 		</GuideProvider>
 	);
+}
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+	const pairId = ctx.params?.id as string;
+
+	const [pairRes, statsRes, ordersRes, tradesRes, candlesRes] = await Promise.all([
+		getPair(pairId),
+		getPairStats(pairId),
+		getOrdersPage(pairId),
+		getTrades(pairId),
+		getCandles(pairId, '1h'),
+	]);
+
+	return {
+		props: {
+			initialPair: pairRes.success ? pairRes.data : null,
+			initialStats: statsRes.success ? statsRes.data : null,
+			initialOrders: ordersRes.success ? ordersRes.data : [],
+			initialTrades: tradesRes.success ? tradesRes.data : [],
+			initialCandles: candlesRes.success ? candlesRes.data : [],
+		},
+	};
 }
 
 export default Trading;

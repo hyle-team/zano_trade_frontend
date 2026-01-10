@@ -78,48 +78,29 @@
 				&__body {
 					tr {
 						cursor: pointer;
-						position: relative;
+						position: relative !important;
 
 						&:hover {
 							background-color: var(--table-tr-hover-color);
 						}
 
 						&.buy {
-							td {
-								&:last-child {
-									&::before {
-										background-color: var(--dex-buy-percentage);
-									}
-								}
-							}
+							background: linear-gradient(
+								to left,
+								var(--dex-buy-percentage) var(--precentage),
+								transparent var(--precentage)
+							);
 						}
 
 						&.sell {
-							td {
-								&:last-child {
-									&::before {
-										background-color: var(--dex-sell-percentage);
-									}
-								}
-							}
+							background: linear-gradient(
+								to left,
+								var(--dex-sell-percentage) var(--precentage),
+								transparent var(--precentage)
+							);
 						}
 
 						td {
-							position: static !important;
-
-							&:last-child {
-								&::before {
-									content: '';
-									pointer-events: none;
-									position: absolute;
-									z-index: 1;
-									right: 0;
-									top: 0;
-									width: var(--precentage);
-									height: 100%;
-								}
-							}
-
 							p,
 							span {
 								position: relative;
@@ -199,6 +180,7 @@
 	padding: 10px;
 	transform: translateX(-50%);
 	background-color: var(--dex-tooltip-bg);
+	transition: none !important;
 
 	&__arrow {
 		border-top: 1px solid var(--dex-tooltip-border-color);

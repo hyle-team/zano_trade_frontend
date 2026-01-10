@@ -33,7 +33,7 @@ main {
 	padding: 80px 100px;
 
 	&.with-separators {
-		> * {
+		>* {
 			padding: 40px 0;
 			border-bottom: 1px solid var(--delimiter-color);
 
@@ -115,7 +115,7 @@ h6 {
 }
 
 h1,
-h1 > * {
+h1>* {
 	color: var(--font-main-color);
 	font-size: 48px;
 }
@@ -174,8 +174,9 @@ svg {
 }
 
 @media screen and (max-width: 700px) {
+
 	h1,
-	h1 > * {
+	h1>* {
 		font-size: 32px;
 	}
 }
@@ -275,4 +276,18 @@ svg {
 	.ant-switch-handle::before {
 		background-color: #1f8feb !important;
 	}
+}
+
+#nprogress {
+	pointer-events: none;
+}
+
+#nprogress .bar {
+	background: #1f8feb;
+	position: fixed;
+	z-index: 9999;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 3px;
 }
