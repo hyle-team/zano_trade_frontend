@@ -1,4 +1,4 @@
-import { ReactComponent as DropdownArrowIcon } from '@/assets/images/UI/dropdown_arrow.svg';
+import DropdownArrowIcon from '@/assets/images/UI/dropdown_arrow.svg';
 import { useContext, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { nanoid } from 'nanoid';

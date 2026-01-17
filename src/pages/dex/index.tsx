@@ -1,7 +1,6 @@
 import styles from '@/styles/Dex.module.scss';
-import Footer from '@/components/default/Footer/Footer';
 import Header from '@/components/default/Header/Header';
-import { ReactComponent as HistoryIcon } from '@/assets/images/UI/history_icon.svg';
+import HistoryIcon from '@/assets/images/UI/history_icon.svg';
 import { useEffect, useRef, useState } from 'react';
 import Button from '@/components/UI/Button/Button';
 import Link from 'next/link';
@@ -14,8 +13,7 @@ import { useInView } from 'react-intersection-observer';
 import Preloader from '@/components/UI/Preloader/Preloader';
 import { PairSortOption } from '@/interfaces/enum/pair';
 import PairsTable from '@/components/default/PairsTable/PairsTable';
-import axios from 'axios';
-import { API_URL } from '@/constants';
+import { Footer } from '@/zano_ui/src';
 import DexHeader from './DexHeader/DexHeader';
 import PairsList from './pairs/PairsList/PairsList';
 

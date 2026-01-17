@@ -1,4 +1,4 @@
-import { ReactComponent as ArrowWhiteIcon } from '@/assets/images/UI/arrow_white.svg';
+import ArrowWhiteIcon from '@/assets/images/UI/arrow_white.svg';
 import Button from '@/components/UI/Button/Button';
 import { useRouter } from 'next/router';
 import { classes } from '@/utils/utils';

@@ -1,6 +1,6 @@
-import { ReactComponent as DropdownArrowIcon } from '@/assets/images/UI/dropdown_arrow.svg';
-import { ReactComponent as SearchIcon } from '@/assets/images/UI/search_icon.svg';
-import { ReactComponent as StarIcon } from '@/assets/images/UI/star_icon.svg';
+import DropdownArrowIcon from '@/assets/images/UI/dropdown_arrow.svg';
+import SearchIcon from '@/assets/images/UI/search_icon.svg';
+import StarIcon from '@/assets/images/UI/star_icon.svg';
 import Image from 'next/image';
 import { useState, useEffect, useRef, useContext, MouseEvent } from 'react';
 import { Store } from '@/store/store-reducer';

@@ -1,4 +1,4 @@
-import paginationArrowIcon from '@/assets/images/UI/pagination_arrow.svg';
+import paginationArrowIcon from '@/assets/images/UI/pagination_arrow.svg?url';
 import Button from '@/components/UI/Button/Button';
 import { nanoid } from 'nanoid';
 import PaginationProps from '@/interfaces/props/pages/p2p/components/Pagination/PaginationProps';

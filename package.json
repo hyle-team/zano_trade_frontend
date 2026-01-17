@@ -11,7 +11,8 @@
 		"eslint": "eslint . --ext .js,.ts,.tsx,.jsx --fix",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
-		"prepare": "husky"
+		"prepare": "husky",
+		"submodule": "git submodule update --init --recursive"
 	},
 	"lint-staged": {
 		"*.{js,jsx,ts,tsx}": [

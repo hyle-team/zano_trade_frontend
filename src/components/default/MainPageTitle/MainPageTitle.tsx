@@ -1,4 +1,4 @@
-import { ReactComponent as ArrowRight } from '@/assets/images/UI/arrow_blue_right.svg';
+import ArrowRight from '@/assets/images/UI/arrow_blue_right.svg';
 import { Store } from '@/store/store-reducer';
 import { useContext } from 'react';
 import MainPageTitleProps from '@/interfaces/props/components/default/MainPageTitle/MainPageTitleProps';

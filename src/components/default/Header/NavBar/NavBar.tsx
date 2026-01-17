@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import { ReactComponent as TradeIcon } from '@/assets/images/UI/trade_icon.svg';
-import { ReactComponent as SwapIcon } from '@/assets/images/UI/swap_icon.svg';
-import { ReactComponent as PersonsIcon } from '@/assets/images/UI/persons_icon.svg';
+import TradeIcon from '@/assets/images/UI/trade_icon.svg';
+import SwapIcon from '@/assets/images/UI/swap_icon.svg';
+import PersonsIcon from '@/assets/images/UI/persons_icon.svg';
 import NavItemProps from '@/interfaces/props/components/default/Header/NavBar/NavItemProps';
 import NavBarProps from '@/interfaces/props/components/default/Header/NavBar/NavBarProps';
 import NotificationIndicator from '@/components/UI/NotificationIndicator/NotificationIndicator';

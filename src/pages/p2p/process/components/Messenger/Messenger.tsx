@@ -1,8 +1,8 @@
 import Image from 'next/image';
-import { ReactComponent as DetailsIcon } from '@/assets/images/UI/walletsettings_icon.svg';
-import { ReactComponent as PlusIcon } from '@/assets/images/UI/plus.svg';
-import sendIcon from '@/assets/images/UI/send.svg';
-import crossSmallIcon from '@/assets/images/UI/cross_icon_small.svg';
+import DetailsIcon from '@/assets/images/UI/walletsettings_icon.svg';
+import PlusIcon from '@/assets/images/UI/plus.svg';
+import sendIcon from '@/assets/images/UI/send.svg?url';
+import crossSmallIcon from '@/assets/images/UI/cross_icon_small.svg?url';
 import Input from '@/components/UI/Input/Input';
 import Button from '@/components/UI/Button/Button';
 import ProfileWidget from '@/components/UI/ProfileWidget/ProfileWidget';
