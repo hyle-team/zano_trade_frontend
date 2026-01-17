@@ -1,11 +1,11 @@
 import React from 'react';
-import logoImg from '@/assets/images/UI/logo_block.svg';
-import logoImgWhite from '@/assets/images/UI/logo_block_dark.svg';
+import logoImg from '@/assets/images/UI/logo_block.svg?url';
+import logoImgWhite from '@/assets/images/UI/logo_block_dark.svg?url';
 import useAdvancedTheme from '@/hook/useTheme';
 import Image from 'next/image';
-import { ReactComponent as TelegramIcon } from '@/assets/images/UI/social/telegram.svg';
-import { ReactComponent as DisconrdIcon } from '@/assets/images/UI/social/discord.svg';
-import { ReactComponent as TwitterIcon } from '@/assets/images/UI/social/twitter.svg';
+import TelegramIcon from '@/assets/images/UI/social/telegram.svg';
+import DisconrdIcon from '@/assets/images/UI/social/discord.svg';
+import TwitterIcon from '@/assets/images/UI/social/twitter.svg';
 import Link from 'next/link';
 import styles from './styles.module.scss';
 

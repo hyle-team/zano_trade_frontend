@@ -1,9 +1,8 @@
 import styles from '@/styles/Home.module.scss';
-import Footer from '@/components/default/Footer/Footer';
 import Header from '@/components/default/Header/Header';
 import Marketplace from '@/pages/p2p/components/Marketplace/Marketplace';
-import { ReactComponent as OffersIcon } from '@/assets/images/UI/offers.svg';
-import { ReactComponent as PlusIcon } from '@/assets/images/UI/plus.svg';
+import OffersIcon from '@/assets/images/UI/offers.svg';
+import PlusIcon from '@/assets/images/UI/plus.svg';
 import { useContext, useEffect, useState } from 'react';
 import { getStats } from '@/utils/methods';
 import Button from '@/components/UI/Button/Button';
@@ -17,6 +16,7 @@ import { GetServerSidePropsContext } from 'next';
 import HomeProps from '@/interfaces/props/pages/p2p/HomeProps';
 import OfferData from '@/interfaces/responses/offers/OfferData';
 import { useRouter } from 'next/router';
+import { Footer } from '@/zano_ui/src';
 
 function Home(props: HomeProps) {
 	const [offers, setOffers] = useState<OfferData[]>([]);

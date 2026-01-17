@@ -1,10 +1,10 @@
 import React, { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import styles from '@/styles/Dex.module.scss';
-import { ReactComponent as SearchLogo } from '@/assets/images/UI/search_icon.svg';
-import { ReactComponent as RefreshIcon } from '@/assets/images/UI/refrash_small_icon.svg';
-import { ReactComponent as InfoSmallIcon } from '@/assets/images/UI/info_outlined.svg';
-import { ReactComponent as DropdownArrowIcon } from '@/assets/images/UI/dropdown_arrow_small.svg';
-import { ReactComponent as FilterIcon } from '@/assets/images/UI/filter_icon.svg';
+import SearchLogo from '@/assets/images/UI/search_icon.svg';
+import RefreshIcon from '@/assets/images/UI/refrash_small_icon.svg';
+import InfoSmallIcon from '@/assets/images/UI/info_outlined.svg';
+import DropdownArrowIcon from '@/assets/images/UI/dropdown_arrow_small.svg';
+import FilterIcon from '@/assets/images/UI/filter_icon.svg';
 import Input from '@/components/UI/Input/Input';
 import { Switch } from '@/components/UI/Switch/Switch';
 import { IconDropdown } from '@/components/UI/IconDropdown/IconDropdown';
