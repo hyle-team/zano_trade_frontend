@@ -17,8 +17,16 @@ const nextConfig = {
 	},
 	webpack: (config) => {
 		config.module.rules.push({
-			test: /\.svg$/,
-			use: ['@svgr/webpack', 'url-loader'],
+			test: /\.svg$/i,
+			resourceQuery: /url/, // *.svg?url
+			type: 'asset/resource',
+		});
+
+		config.module.rules.push({
+			test: /\.svg$/i,
+			issuer: /\.[jt]sx?$/,
+			resourceQuery: { not: [/url/] },
+			use: ['@svgr/webpack'],
 		});
 
 		return config;

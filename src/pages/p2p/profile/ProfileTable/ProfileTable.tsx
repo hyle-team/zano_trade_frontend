@@ -1,12 +1,12 @@
 import EmptyLink from '@/components/UI/EmptyLink/EmptyLink';
 import DepositTitle from '@/components/UI/DepositTitle/DepositTitle';
-import { ReactComponent as NoOffersIcon } from '@/assets/images/UI/no_offers.svg';
-import { ReactComponent as NoChatsIcon } from '@/assets/images/UI/no_chats.svg';
+import NoOffersIcon from '@/assets/images/UI/no_offers.svg';
+import NoChatsIcon from '@/assets/images/UI/no_chats.svg';
 import { toStandardDateString } from '@/utils/utils';
 import ProfileWidget from '@/components/UI/ProfileWidget/ProfileWidget';
 import PairText from '@/components/UI/PairText/PairText';
 import Button from '@/components/UI/Button/Button';
-import { ReactComponent as DeleteIcon } from '@/assets/images/UI/delete.svg';
+import DeleteIcon from '@/assets/images/UI/delete.svg';
 import NotificationIndicator from '@/components/UI/NotificationIndicator/NotificationIndicator';
 import { useContext, useState } from 'react';
 import { Store } from '@/store/store-reducer';
@@ -156,7 +156,7 @@ function ProfileTable(props: ProfileTableProps) {
 							</div>
 						)}
 
-						{/* {categoryState === "my-offers" && 
+						{/* {categoryState === "my-offers" &&
                             <Button
                                 className={styles.row__button__iconed}
                                 onClick={() => setPopupState(true)}

@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import Button from '@/components/UI/Button/Button';
-import { ReactComponent as DeleteIcon } from '@/assets/images/UI/delete.svg';
-import { ReactComponent as NoOffersIcon } from '@/assets/images/UI/no_offers.svg';
+import DeleteIcon from '@/assets/images/UI/delete.svg';
+import NoOffersIcon from '@/assets/images/UI/no_offers.svg';
 import EmptyLink from '@/components/UI/EmptyLink/EmptyLink';
 import { notationToString, toStandardDateString } from '@/utils/utils';
 import { cancelOrder, getUserOrders } from '@/utils/methods';

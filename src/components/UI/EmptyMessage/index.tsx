@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReactComponent as NoOffersIcon } from '@/assets/images/UI/no_offers.svg';
+import NoOffersIcon from '@/assets/images/UI/no_offers.svg';
 import { classes } from '@/utils/utils';
 import styles from './styles.module.scss';
 import { EmptyMessageProps } from './types';

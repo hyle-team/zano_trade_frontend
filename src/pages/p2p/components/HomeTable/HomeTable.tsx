@@ -1,6 +1,6 @@
 import EmptyLink from '@/components/UI/EmptyLink/EmptyLink';
-import { ReactComponent as ArrowIcon } from '@/assets/images/UI/arrow.svg';
-import { ReactComponent as NoOffersIcon } from '@/assets/images/UI/no_offers.svg';
+import ArrowIcon from '@/assets/images/UI/arrow.svg';
+import NoOffersIcon from '@/assets/images/UI/no_offers.svg';
 import ProfileWidget from '@/components/UI/ProfileWidget/ProfileWidget';
 import PairText from '@/components/UI/PairText/PairText';
 import Button from '@/components/UI/Button/Button';

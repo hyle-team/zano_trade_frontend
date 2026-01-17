@@ -1,0 +1,3 @@
+[submodule "submodules/zano_ui"]
+	path = submodules/zano_ui
+	url = https://github.com/PRavaga/zano_ui.git

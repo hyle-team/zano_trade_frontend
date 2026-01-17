@@ -1,5 +1,4 @@
 import styles from '@/styles/Trading.module.scss';
-import Footer from '@/components/default/Footer/Footer';
 import Header from '@/components/default/Header/Header';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
 import { useCallback, useState } from 'react';
@@ -39,6 +38,7 @@ import useUpdateUser from '@/hook/useUpdateUser';
 import { GuideProvider } from '@/store/guide-provider';
 import { GetServerSidePropsContext } from 'next';
 import { TradingProps } from '@/interfaces/props/pages/dex/trading/TradingProps';
+import { Footer } from '@/zano_ui/src';
 
 function Trading({
 	initialOrders,

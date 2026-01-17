@@ -1,17 +1,17 @@
-import logoImg from '@/assets/images/UI/logo_block.svg';
-import logoImgWhite from '@/assets/images/UI/logo_block_dark.svg';
-import { ReactComponent as LogOutIcon } from '@/assets/images/UI/logout.svg';
-import { ReactComponent as BurgerIcon } from '@/assets/images/UI/hamburger_icon.svg';
-import { ReactComponent as BurgerCrossIcon } from '@/assets/images/UI/burger_cross.svg';
+import logoImg from '@/assets/images/UI/logo_block.svg?url';
+import logoImgWhite from '@/assets/images/UI/logo_block_dark.svg?url';
+import LogOutIcon from '@/assets/images/UI/logout.svg';
+import BurgerIcon from '@/assets/images/UI/hamburger_icon.svg';
+import BurgerCrossIcon from '@/assets/images/UI/burger_cross.svg';
 import React, { useRef, useState, useEffect, useContext } from 'react';
-import { ReactComponent as EyeIcon } from '@/assets/images/UI/eye.svg';
-import { ReactComponent as EyeCloseIcon } from '@/assets/images/UI/eye_close.svg';
-import zanoIcon from '@/assets/images/UI/zano.svg';
-import bitcoinWhiteIcon from '@/assets/images/UI/wbtc.svg';
-import sunIcon from '@/assets/images/UI/sun_icon.svg';
-import moonIcon from '@/assets/images/UI/moon_icon.svg';
-import ethWhiteIcon from '@/assets/images/UI/weth.svg';
-import customWhiteIcon from '@/assets/images/UI/tsds.svg';
+import EyeIcon from '@/assets/images/UI/eye.svg';
+import EyeCloseIcon from '@/assets/images/UI/eye_close.svg';
+import zanoIcon from '@/assets/images/UI/zano.svg?url';
+import bitcoinWhiteIcon from '@/assets/images/UI/wbtc.svg?url';
+import sunIcon from '@/assets/images/UI/sun_icon.svg?url';
+import moonIcon from '@/assets/images/UI/moon_icon.svg?url';
+import ethWhiteIcon from '@/assets/images/UI/weth.svg?url';
+import customWhiteIcon from '@/assets/images/UI/tsds.svg?url';
 import Link from 'next/link';
 import Tooltip from '@/components/UI/Tooltip/Tooltip';
 import Button from '@/components/UI/Button/Button';
@@ -28,7 +28,7 @@ import Decimal from 'decimal.js';
 import socket from '@/utils/socket';
 import { OrderDataWithPair } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import { useRouter } from 'next/router';
-import zanoImg from '@/assets/images/UI/zano.svg';
+import zanoImg from '@/assets/images/UI/zano.svg?url';
 import useUpdateUser from '@/hook/useUpdateUser';
 import NavBar from './NavBar/NavBar';
 import styles from './Header.module.scss';
@@ -139,7 +139,7 @@ function Header({ isLg }: { isLg?: boolean }) {
 							title="ZANO"
 							amount={Number(assets.find((e) => e.ticker === 'ZANO')?.balance) || 0}
 						></Row>
-						{/* <img 
+						{/* <img
                             onClick={() => setBalanceState(!balanceSeen)}
                             src={balanceSeen ? eyeCloseIcon : eyeIcon} alt="see"
                             style={!balanceSeen ? {opacity: "0.6"} : {}}

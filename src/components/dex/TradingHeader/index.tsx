@@ -1,10 +1,10 @@
-import { ReactComponent as ClockIcon } from '@/assets/images/UI/clock_icon.svg';
-import { ReactComponent as UpIcon } from '@/assets/images/UI/up_icon.svg';
-import { ReactComponent as DownIcon } from '@/assets/images/UI/down_icon.svg';
-import { ReactComponent as VolumeIcon } from '@/assets/images/UI/volume_icon.svg';
+import ClockIcon from '@/assets/images/UI/clock_icon.svg';
+import UpIcon from '@/assets/images/UI/up_icon.svg';
+import DownIcon from '@/assets/images/UI/down_icon.svg';
+import VolumeIcon from '@/assets/images/UI/volume_icon.svg';
 import BackButton from '@/components/default/BackButton/BackButton';
 import { roundTo, notationToString, classes } from '@/utils/utils';
-import questionIcon from '@/assets/images/UI/question.svg';
+import questionIcon from '@/assets/images/UI/question.svg?url';
 import Image from 'next/image';
 import { useTour } from '@/store/guide-provider';
 import styles from './styles.module.scss';
