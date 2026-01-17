@@ -1,11 +1,11 @@
 import styles from '@/styles/User.module.scss';
 import Header from '@/components/default/Header/Header';
-import Footer from '@/components/default/Footer/Footer';
-import infoBlueIcon from '@/assets/images/UI/info_blue.svg';
-import zanoIcon from '@/assets/images/UI/zano.svg';
+import infoBlueIcon from '@/assets/images/UI/info_blue.svg?url';
+import zanoIcon from '@/assets/images/UI/zano.svg?url';
 import Offers from '@/components/default/Offers/Offers';
 import BackButton from '@/components/default/BackButton/BackButton';
 import { nanoid } from 'nanoid';
+import { Footer } from '@/zano_ui/src';
 
 function User() {
 	// const userInfo = {

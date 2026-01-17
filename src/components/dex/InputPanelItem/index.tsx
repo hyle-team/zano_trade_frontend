@@ -10,7 +10,7 @@ import InputPanelItemProps from '@/interfaces/props/pages/dex/trading/InputPanel
 import CreateOrderData from '@/interfaces/fetch-data/create-order/CreateOrderData';
 import Decimal from 'decimal.js';
 import Alert from '@/components/UI/Alert/Alert';
-import infoIcon from '@/assets/images/UI/info_alert_icon.svg';
+import infoIcon from '@/assets/images/UI/info_alert_icon.svg?url';
 import Image from 'next/image';
 import { useAlert } from '@/hook/useAlert';
 import { buySellValues } from '@/constants';

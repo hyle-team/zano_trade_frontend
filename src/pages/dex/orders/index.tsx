@@ -1,6 +1,5 @@
 import styles from '@/styles/Orders.module.scss';
 import Header from '@/components/default/Header/Header';
-import Footer from '@/components/default/Footer/Footer';
 import PageTitle from '@/components/default/PageTitle/PageTitle';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
 import { useEffect, useState } from 'react';
@@ -14,6 +13,7 @@ import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
 import PairValue from '@/interfaces/props/pages/dex/orders/PairValue';
 import DateState from '@/interfaces/common/DateState';
 import useUpdateUser from '@/hook/useUpdateUser';
+import { Footer } from '@/zano_ui/src';
 import OrdersTable from './OrdersTable/OrdersTable';
 
 function Orders() {

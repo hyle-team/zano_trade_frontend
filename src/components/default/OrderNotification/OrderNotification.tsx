@@ -1,6 +1,6 @@
 import { OrderDataWithPair } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import Button from '@/components/UI/Button/Button';
-import { ReactComponent as CrossIcon } from '@/assets/images/UI/dex_cross_icon.svg';
+import CrossIcon from '@/assets/images/UI/dex_cross_icon.svg';
 import Image from 'next/image';
 import { notationToString, tradingKnownCurrencies } from '@/utils/utils';
 import Link from 'next/link';

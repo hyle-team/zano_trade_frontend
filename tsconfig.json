@@ -2,7 +2,8 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@/zano_ui/*": ["./submodules/zano_ui/*"]
 		},
 		/* Visit https://aka.ms/tsconfig to read more about this file */
 		/* Projects */

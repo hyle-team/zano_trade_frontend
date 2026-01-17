@@ -1,5 +1,5 @@
 import Button from '@/components/UI/Button/Button';
-import { ReactComponent as RefreshIcon } from '@/assets/images/UI/refresh_icon.svg';
+import RefreshIcon from '@/assets/images/UI/refresh_icon.svg';
 import Input from '@/components/UI/Input/Input';
 import CurrencyDropdown from '@/components/UI/CurrencyDropdown/CurrencyDropdown';
 import FiltersProps from '@/interfaces/props/components/UI/Filters/FiltersProps';

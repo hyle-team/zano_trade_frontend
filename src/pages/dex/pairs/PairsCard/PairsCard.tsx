@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { ReactComponent as ArrowRight } from '@/assets/images/UI/arrow_right.svg';
+import ArrowRight from '@/assets/images/UI/arrow_right.svg';
 import { Store } from '@/store/store-reducer';
 import PairData from '@/interfaces/common/PairData';
 import { getAssetIcon, notationToString, roundTo } from '@/utils/utils';

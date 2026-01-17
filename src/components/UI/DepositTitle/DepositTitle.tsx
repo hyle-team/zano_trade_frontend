@@ -1,4 +1,4 @@
-import { ReactComponent as LockIcon } from '@/assets/images/UI/lock.svg';
+import LockIcon from '@/assets/images/UI/lock.svg';
 import styles from './DepositTitle.module.scss';
 import EmptyLink from '../EmptyLink/EmptyLink';
 

@@ -1,11 +1,10 @@
 import styles from '@/styles/Swap.module.scss';
 import Header from '@/components/default/Header/Header';
-import Footer from '@/components/default/Footer/Footer';
 import MainPageTitle from '@/components/default/MainPageTitle/MainPageTitle';
-import { ReactComponent as HistoryIcon } from '@/assets/images/UI/history_icon.svg';
-import { ReactComponent as ExchangeIcon } from '@/assets/images/UI/change_icon.svg';
-import zanoWhiteIcon from '@/assets/images/UI/zano_white.svg';
-import tickIcon from '@/assets/images/UI/tick_icon.svg';
+import HistoryIcon from '@/assets/images/UI/history_icon.svg';
+import ExchangeIcon from '@/assets/images/UI/change_icon.svg';
+import zanoWhiteIcon from '@/assets/images/UI/zano_white.svg?url';
+import tickIcon from '@/assets/images/UI/tick_icon.svg?url';
 import Link from 'next/link';
 import Button from '@/components/UI/Button/Button';
 import { nanoid } from 'nanoid';
@@ -19,6 +18,7 @@ import CurvePairChart from '@/components/UI/CurvePairChart/CurvePairChart';
 import SwapItemProps from '@/interfaces/props/pages/swap/SwapItemProps';
 import CurrencyRow from '@/interfaces/common/CurrencyRow';
 import { useRouter } from 'next/router';
+import { Footer } from '@/zano_ui/src';
 
 function Swap() {
 	const { state } = useContext(Store);

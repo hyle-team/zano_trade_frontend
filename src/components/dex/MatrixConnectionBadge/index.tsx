@@ -1,7 +1,7 @@
 import Tooltip from '@/components/UI/Tooltip/Tooltip';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ReactComponent as ConnectionIcon } from '@/assets/images/UI/connection.svg';
+import ConnectionIcon from '@/assets/images/UI/connection.svg';
 import { classes } from '@/utils/utils';
 import styles from './styles.module.scss';
 import { MatrixConnectionBadgeProps } from './types';

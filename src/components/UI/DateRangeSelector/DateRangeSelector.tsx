@@ -1,5 +1,5 @@
-import { ReactComponent as CalendarIcon } from '@/assets/images/UI/callendar.svg';
-import { ReactComponent as CalendarArrowIcon } from '@/assets/images/UI/calendar_arrow.svg';
+import CalendarIcon from '@/assets/images/UI/callendar.svg';
+import CalendarArrowIcon from '@/assets/images/UI/calendar_arrow.svg';
 import { useRef, useState, useEffect, ReactNode } from 'react';
 import { nanoid } from 'nanoid';
 import { toStandardDateString } from '@/utils/utils';
