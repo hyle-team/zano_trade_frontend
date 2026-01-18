@@ -97,7 +97,7 @@ function Home(props: HomeProps) {
 					/>
 				)}
 			</main>
-			<Footer />
+			<Footer className="no-svg-style" />
 		</>
 	);
 }

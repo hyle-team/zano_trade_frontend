@@ -254,7 +254,7 @@ function Trading({
 					/>
 				)}
 			</main>
-			<Footer />
+			<Footer className="no-svg-style" />
 		</GuideProvider>
 	);
 }

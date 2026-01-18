@@ -78,7 +78,7 @@ function Policy() {
 					</ul>
 				</div>
 			</main>
-			<Footer />
+			<Footer className="no-svg-style" />
 		</>
 	);
 }

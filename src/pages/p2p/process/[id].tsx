@@ -10,7 +10,7 @@ function Process() {
 			<main className={styles.main}>
 				<ProcessContent />
 			</main>
-			<Footer />
+			<Footer className="no-svg-style" />
 		</>
 	);
 }
