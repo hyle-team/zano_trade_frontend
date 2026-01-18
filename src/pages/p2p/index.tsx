@@ -12,7 +12,6 @@ import Popup from '@/components/UI/Popup/Popup';
 import CreateOfferPopup from '@/components/default/CreateOfferPopup/CreateOfferPopup';
 import Link from 'next/link';
 import MainPageTitle from '@/components/default/MainPageTitle/MainPageTitle';
-import { GetServerSidePropsContext } from 'next';
 import HomeProps from '@/interfaces/props/pages/p2p/HomeProps';
 import OfferData from '@/interfaces/responses/offers/OfferData';
 import { useRouter } from 'next/router';
@@ -103,8 +102,8 @@ function Home(props: HomeProps) {
 	);
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-	const stats = await getStats(context.req.headers.host);
+export async function getServerSideProps() {
+	const stats = await getStats();
 
 	return {
 		props: {
