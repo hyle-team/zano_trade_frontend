@@ -74,8 +74,8 @@ export async function getPage(
 		.then((res) => res.data);
 }
 
-export async function getStats(host: string | undefined = undefined): Promise<GetStatsRes> {
-	return (await fetch(`${host ? `https://${host}` : ''}/api/offers/get-stats`).then((res) =>
+export async function getStats(): Promise<GetStatsRes> {
+	return (await fetch(`${baseUrl}/api/offers/get-stats`).then((res) =>
 		res.json(),
 	)) as GetStatsRes;
 }
