@@ -11,12 +11,13 @@
 		"eslint": "eslint . --ext .js,.ts,.tsx,.jsx --fix",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
-		"prepare": "husky"
+		"prepare": "husky",
+		"submodule": "git submodule update --init --recursive"
 	},
 	"lint-staged": {
 		"*.{js,jsx,ts,tsx}": [
 			"prettier --write",
-			"eslint --fix --config .eslintrc.json"
+			"eslint --fix --config .eslintrc.cjs"
 		]
 	},
 	"dependencies": {

@@ -1,9 +1,9 @@
 import styles from '@/styles/Policy.module.scss';
 import Header from '@/components/default/Header/Header';
-import Footer from '@/components/default/Footer/Footer';
 import Link from 'next/link';
 import PageTitle from '@/components/default/PageTitle/PageTitle';
 import { nanoid } from 'nanoid';
+import { Footer } from '@/zano_ui/src';
 
 function Policy() {
 	const contentList: string[] = Array(5).fill('Donec tellus felis, egestas ac tortor in;');

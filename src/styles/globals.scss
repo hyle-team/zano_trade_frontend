@@ -148,17 +148,17 @@ h6 {
 }
 
 svg {
-	&:not(.stroked) {
-		* {
-			fill: var(--font-main-color);
-		}
+	// &:not(.stroked) {
+	// 	* {
+	// 		fill: var(--font-main-color);
+	// 	}
 
-		&.dimmed {
-			* {
-				fill: var(--font-dimmed-color);
-			}
-		}
-	}
+	// 	&.dimmed {
+	// 		* {
+	// 			fill: var(--font-dimmed-color);
+	// 		}
+	// 	}
+	// }
 
 	&.stroked {
 		* {

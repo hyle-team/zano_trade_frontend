@@ -3,7 +3,7 @@ import { memo, useContext, useMemo } from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
-import { ReactComponent as ClockIcon } from '@/assets/images/UI/clock_icon.svg';
+import ClockIcon from '@/assets/images/UI/clock_icon.svg';
 import { Store } from '@/store/store-reducer';
 import PairData from '@/interfaces/common/PairData';
 import { ContextState } from '@/interfaces/common/ContextValue';

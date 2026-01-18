@@ -1,4 +1,6 @@
 import '@/styles/globals.scss';
+import '@/zano_ui/src/styles/globals.scss';
+import '@/zano_ui/src/styles/variables.scss';
 import '@/styles/themes/light.scss';
 import '@/styles/themes/dark.scss';
 import Head from 'next/head';

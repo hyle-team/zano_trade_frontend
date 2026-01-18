@@ -1,6 +1,5 @@
 import styles from '@/styles/Profile.module.scss';
 import Header from '@/components/default/Header/Header';
-import Footer from '@/components/default/Footer/Footer';
 import Dropdown from '@/components/UI/Dropdown/Dropdown';
 import PageTitle from '@/components/default/PageTitle/PageTitle';
 import DateRangeSelector from '@/components/UI/DateRangeSelector/DateRangeSelector';
@@ -12,6 +11,7 @@ import CategoriesState from '@/interfaces/states/pages/p2p/profile/CategoriesSta
 import FiltersState, { BuySell } from '@/interfaces/states/pages/p2p/profile/FiltersState';
 import { UserChatData } from '@/interfaces/responses/user/GetUserRes';
 import OffersStateElement from '@/interfaces/states/pages/p2p/profile/OffersState';
+import { Footer } from '@/zano_ui/src';
 import ProfileTable from './ProfileTable/ProfileTable';
 
 function Profile() {
@@ -201,9 +201,9 @@ function Profile() {
 							setValue={(e) => setFilters({ ...filters, date: e })}
 						/>
 					</div>
-					{/* <Offers 
-                        extended 
-                        withEditor={categoryState.code === "my-offers"} 
+					{/* <Offers
+                        extended
+                        withEditor={categoryState.code === "my-offers"}
                         offers={filteredOffers}
                         categoryState={categoryState.code}
                     /> */}
