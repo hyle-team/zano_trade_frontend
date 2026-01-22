@@ -269,7 +269,7 @@ function Orders() {
 					/>
 				)}
 			</main>
-			<Footer />
+			<Footer className="no-svg-style" />
 		</>
 	);
 }

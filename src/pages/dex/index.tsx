@@ -158,7 +158,8 @@ function Dex({ initialPairs }: { initialPairs: PairData[] }) {
 					<div ref={inViewRef}>{pageLoading && <Preloader />}</div>
 				</div>
 			</main>
-			<Footer />
+
+			<Footer className="no-svg-style" />
 		</>
 	);
 }
