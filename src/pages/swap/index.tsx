@@ -256,7 +256,7 @@ function Swap() {
 					</div>
 				</div>
 			</main>
-			<Footer />
+			<Footer className="no-svg-style" />
 		</>
 	);
 }

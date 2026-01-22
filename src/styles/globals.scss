@@ -33,7 +33,7 @@ main {
 	padding: 80px 100px;
 
 	&.with-separators {
-		> * {
+		>* {
 			padding: 40px 0;
 			border-bottom: 1px solid var(--delimiter-color);
 
@@ -115,7 +115,7 @@ h6 {
 }
 
 h1,
-h1 > * {
+h1>* {
 	color: var(--font-main-color);
 	font-size: 48px;
 }
@@ -147,18 +147,19 @@ h6 {
 	-webkit-text-fill-color: transparent;
 }
 
-svg {
-	// &:not(.stroked) {
-	// 	* {
-	// 		fill: var(--font-main-color);
-	// 	}
+svg:not(.stroked):not(.no-svg-style svg) {
+	* {
+		fill: var(--font-main-color);
+	}
+}
 
-	// 	&.dimmed {
-	// 		* {
-	// 			fill: var(--font-dimmed-color);
-	// 		}
-	// 	}
-	// }
+
+svg {
+	&.dimmed {
+		* {
+			fill: var(--font-dimmed-color);
+		}
+	}
 
 	&.stroked {
 		* {
@@ -174,8 +175,9 @@ svg {
 }
 
 @media screen and (max-width: 700px) {
+
 	h1,
-	h1 > * {
+	h1>* {
 		font-size: 32px;
 	}
 }
