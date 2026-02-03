@@ -5,6 +5,7 @@ import ArrowRight from '@/assets/images/UI/arrow_right.svg';
 import { Store } from '@/store/store-reducer';
 import PairData from '@/interfaces/common/PairData';
 import { getAssetIcon, notationToString, roundTo } from '@/utils/utils';
+import TooltipWrapper from '@/components/UI/TooltipWrapper';
 import styles from './PairsCard.module.scss';
 
 interface IProps {
@@ -59,7 +60,9 @@ export default function PairsCard({ pair }: IProps) {
 					<span>{secondCurrency.name}</span>
 				</div>
 				{isFeatured && (
-					<Image src="/ui/featured.svg" alt="featured" width={24} height={24} />
+					<TooltipWrapper text="Featured">
+						<Image src="/ui/featured.svg" alt="featured" width={24} height={24} />
+					</TooltipWrapper>
 				)}
 			</div>
 			<div className={styles.card__body}>

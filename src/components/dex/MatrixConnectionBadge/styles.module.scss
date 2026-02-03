@@ -16,6 +16,10 @@
 			width: 16px;
 			height: 16px;
 		}
+
+		svg:not(.stroked):not(.no-svg-style svg) * {
+			fill: transparent;
+		}
 	}
 
 	&__tooltip {
