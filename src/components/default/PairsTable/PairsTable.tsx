@@ -88,22 +88,22 @@ function PairsTable({ data }: IProps) {
 								<span>{quote.name}</span>
 							</div>
 
-							{featured && (
-								<TooltipWrapper text="Featured">
+							{whitelisted && (
+								<TooltipWrapper text="Whitelisted">
 									<Image
-										src="/ui/featured.svg"
-										alt="featured"
+										src="/ui/whitelisted.svg"
+										alt="whitelisted"
 										width={18}
 										height={18}
 									/>
 								</TooltipWrapper>
 							)}
 
-							{whitelisted && (
-								<TooltipWrapper text="Whitelisted">
+							{featured && (
+								<TooltipWrapper text="Featured">
 									<Image
-										src="/ui/whitelisted.svg"
-										alt="whitelisted"
+										src="/ui/featured.svg"
+										alt="featured"
 										width={18}
 										height={18}
 									/>

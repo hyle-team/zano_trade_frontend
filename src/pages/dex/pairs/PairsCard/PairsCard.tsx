@@ -60,14 +60,14 @@ export default function PairsCard({ pair }: IProps) {
 					<span>/</span>
 					<span>{secondCurrency.name}</span>
 				</div>
-				{isFeatured && (
-					<TooltipWrapper text="Featured">
-						<Image src="/ui/featured.svg" alt="featured" width={24} height={24} />
-					</TooltipWrapper>
-				)}
 				{isWhitelisted && (
 					<TooltipWrapper text="Whitelisted">
 						<Image src="/ui/whitelisted.svg" alt="whitelisted" width={24} height={24} />
+					</TooltipWrapper>
+				)}
+				{isFeatured && (
+					<TooltipWrapper text="Featured">
+						<Image src="/ui/featured.svg" alt="featured" width={24} height={24} />
 					</TooltipWrapper>
 				)}
 			</div>

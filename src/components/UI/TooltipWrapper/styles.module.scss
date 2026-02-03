@@ -2,6 +2,8 @@
 	cursor: pointer;
 	position: relative;
 	width: max-content;
+	display: grid;
+	place-content: center;
 
 	&:hover {
 		.tooltip__text {
