@@ -10,6 +10,7 @@ interface PairData {
 	low?: number;
 	volume: number;
 	featured: boolean;
+	whitelisted: boolean;
 }
 
 export default PairData;

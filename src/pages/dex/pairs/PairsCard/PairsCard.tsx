@@ -20,6 +20,7 @@ export default function PairsCard({ pair }: IProps) {
 	const secondCurrency = pair.second_currency;
 
 	const isFeatured = pair.featured;
+	const isWhitelisted = pair.whitelisted;
 
 	const secondAssetUsdPrice = state.assetsRates.get(secondCurrency.asset_id || '') ?? 0;
 
@@ -62,6 +63,11 @@ export default function PairsCard({ pair }: IProps) {
 				{isFeatured && (
 					<TooltipWrapper text="Featured">
 						<Image src="/ui/featured.svg" alt="featured" width={24} height={24} />
+					</TooltipWrapper>
+				)}
+				{isWhitelisted && (
+					<TooltipWrapper text="Whitelisted">
+						<Image src="/ui/whitelisted.svg" alt="whitelisted" width={24} height={24} />
 					</TooltipWrapper>
 				)}
 			</div>

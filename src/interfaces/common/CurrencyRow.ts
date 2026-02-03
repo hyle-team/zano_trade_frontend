@@ -19,6 +19,7 @@ interface CurrencyRow {
 	type?: CurrencyType;
 	asset_id?: string | null;
 	asset_info?: Asset;
+	whitelisted: boolean;
 }
 
 export default CurrencyRow;

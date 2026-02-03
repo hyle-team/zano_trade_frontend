@@ -42,6 +42,7 @@ function transformPairsToRows(pairs: PairData[], state: ContextState): Row[] {
 			volume,
 			volumeUSD,
 			featured: pair.featured,
+			whitelisted: pair.whitelisted,
 			code: tradingKnownCurrencies.includes(pair.first_currency?.code)
 				? pair.first_currency?.code
 				: 'tsds',
