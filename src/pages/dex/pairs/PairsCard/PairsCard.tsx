@@ -5,6 +5,7 @@ import ArrowRight from '@/assets/images/UI/arrow_right.svg';
 import { Store } from '@/store/store-reducer';
 import PairData from '@/interfaces/common/PairData';
 import { getAssetIcon, notationToString, roundTo } from '@/utils/utils';
+import TooltipWrapper from '@/components/UI/TooltipWrapper';
 import styles from './PairsCard.module.scss';
 
 interface IProps {
@@ -19,6 +20,7 @@ export default function PairsCard({ pair }: IProps) {
 	const secondCurrency = pair.second_currency;
 
 	const isFeatured = pair.featured;
+	const isWhitelisted = pair.whitelisted;
 
 	const secondAssetUsdPrice = state.assetsRates.get(secondCurrency.asset_id || '') ?? 0;
 
@@ -58,8 +60,15 @@ export default function PairsCard({ pair }: IProps) {
 					<span>/</span>
 					<span>{secondCurrency.name}</span>
 				</div>
+				{isWhitelisted && (
+					<TooltipWrapper text="Whitelisted">
+						<Image src="/ui/whitelisted.svg" alt="whitelisted" width={24} height={24} />
+					</TooltipWrapper>
+				)}
 				{isFeatured && (
-					<Image src="/ui/featured.svg" alt="featured" width={24} height={24} />
+					<TooltipWrapper text="Featured">
+						<Image src="/ui/featured.svg" alt="featured" width={24} height={24} />
+					</TooltipWrapper>
 				)}
 			</div>
 			<div className={styles.card__body}>

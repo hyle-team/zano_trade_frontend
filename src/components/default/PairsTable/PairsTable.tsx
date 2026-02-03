@@ -8,6 +8,8 @@ import { Store } from '@/store/store-reducer';
 import PairData from '@/interfaces/common/PairData';
 import { ContextState } from '@/interfaces/common/ContextValue';
 import { tradingKnownCurrencies, roundTo, notationToString, getAssetIcon } from '@/utils/utils';
+import Tooltip from '@/components/UI/Tooltip/Tooltip';
+import TooltipWrapper from '@/components/UI/TooltipWrapper';
 import styles from './PairsTable.module.scss';
 import { Row } from './types';
 
@@ -40,6 +42,7 @@ function transformPairsToRows(pairs: PairData[], state: ContextState): Row[] {
 			volume,
 			volumeUSD,
 			featured: pair.featured,
+			whitelisted: pair.whitelisted,
 			code: tradingKnownCurrencies.includes(pair.first_currency?.code)
 				? pair.first_currency?.code
 				: 'tsds',
@@ -69,6 +72,7 @@ function PairsTable({ data }: IProps) {
 						pair: { base, quote },
 						featured,
 						assetId,
+						whitelisted,
 					} = row.original;
 					return (
 						<div className={styles.pair_cell}>
@@ -84,13 +88,26 @@ function PairsTable({ data }: IProps) {
 								<span>{quote.name}</span>
 							</div>
 
+							{whitelisted && (
+								<TooltipWrapper text="Whitelisted">
+									<Image
+										src="/ui/whitelisted.svg"
+										alt="whitelisted"
+										width={18}
+										height={18}
+									/>
+								</TooltipWrapper>
+							)}
+
 							{featured && (
-								<Image
-									src="/ui/featured.svg"
-									alt="featured"
-									width={24}
-									height={24}
-								/>
+								<TooltipWrapper text="Featured">
+									<Image
+										src="/ui/featured.svg"
+										alt="featured"
+										width={18}
+										height={18}
+									/>
+								</TooltipWrapper>
 							)}
 						</div>
 					);
