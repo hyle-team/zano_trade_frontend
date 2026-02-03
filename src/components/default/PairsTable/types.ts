@@ -18,5 +18,6 @@ export type Row = {
 	volume: number;
 	volumeUSD: string;
 	featured: boolean;
+	whitelisted: boolean;
 	code: string;
 };

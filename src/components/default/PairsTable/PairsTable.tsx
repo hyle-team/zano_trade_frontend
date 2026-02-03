@@ -72,6 +72,7 @@ function PairsTable({ data }: IProps) {
 						pair: { base, quote },
 						featured,
 						assetId,
+						whitelisted,
 					} = row.original;
 					return (
 						<div className={styles.pair_cell}>
@@ -92,6 +93,17 @@ function PairsTable({ data }: IProps) {
 									<Image
 										src="/ui/featured.svg"
 										alt="featured"
+										width={18}
+										height={18}
+									/>
+								</TooltipWrapper>
+							)}
+
+							{whitelisted && (
+								<TooltipWrapper text="Whitelisted">
+									<Image
+										src="/ui/whitelisted.svg"
+										alt="whitelisted"
 										width={18}
 										height={18}
 									/>
