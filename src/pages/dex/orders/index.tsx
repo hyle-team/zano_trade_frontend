@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import Dropdown from '@/components/UI/Dropdown/Dropdown';
 import DateRangeSelector from '@/components/UI/DateRangeSelector/DateRangeSelector';
 import Button from '@/components/UI/Button/Button';
-import { cancelOrder, getUserOrders } from '@/utils/methods';
+import * as fetchMethods from '@/utils/methods';
 import Alert from '@/components/UI/Alert/Alert';
 import AlertType from '@/interfaces/common/AlertType';
 import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
@@ -14,7 +14,11 @@ import PairValue from '@/interfaces/props/pages/dex/orders/PairValue';
 import DateState from '@/interfaces/common/DateState';
 import useUpdateUser from '@/hook/useUpdateUser';
 import { Footer } from '@/zano_ui/src';
+import { GetUserOrdersBodyStatus } from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
+import Decimal from 'decimal.js';
 import OrdersTable from './OrdersTable/OrdersTable';
+
+const ORDERS_PER_PAGE = 10;
 
 function Orders() {
 	const fetchUser = useUpdateUser();
@@ -42,6 +46,8 @@ function Orders() {
 		},
 	];
 
+	const [initialized, setInitialized] = useState(false);
+
 	const [pairsValues, setPairsValues] = useState<PairValue[]>([{ name: 'All pairs', code: '' }]);
 
 	const [pairDropdownValue, setPairDropdownState] = useState(pairsValues[0]);
@@ -62,61 +68,73 @@ function Orders() {
 	const [orders, setOrders] = useState<UserOrderData[]>([]);
 
 	useEffect(() => {
-		async function getOrders() {
-			setAlertState('loading');
-			setAlertSubtitle('Loading orders data...');
+		async function initPairsDropdown() {
+			try {
+				const getUserOrdersAllPairsRes = await fetchMethods.getUserOrdersAllPairs();
 
-			const result = await getUserOrders();
+				if (!getUserOrdersAllPairsRes.success) {
+					throw new Error('Error fetching pairs for orders');
+				}
 
-			if (!result.success) {
+				const ordersPairs = getUserOrdersAllPairsRes.data;
+
+				const statePairs = ordersPairs.map((e) => ({
+					name: `${e.firstCurrency.ticker}/${e.secondCurrency.ticker}`,
+					code: new Decimal(e.id).toFixed(),
+				}));
+
+				setPairsValues([{ name: 'All pairs', code: '' }, ...statePairs]);
+			} catch (error) {
+				console.error('Error while initPairsDropdown:', error);
+			}
+		}
+
+		async function initOrders() {
+			const getUserOrdersRes = await fetchMethods.getUserOrders({
+				limit: ORDERS_PER_PAGE,
+				offset: 0,
+				filterInfo: {
+					status: GetUserOrdersBodyStatus.ACTIVE,
+				},
+			});
+
+			if (!getUserOrdersRes.success) {
+				throw new Error('Error fetching user orders');
+			}
+
+			setOrders(getUserOrdersRes.data);
+			return getUserOrdersRes.data;
+		}
+
+		async function initialize() {
+			try {
+				setAlertState('loading');
+				setAlertSubtitle('Loading orders data...');
+
+				// Simulate loading time
+				await new Promise((resolve) => setTimeout(resolve, 1000));
+
+				await fetchUser();
+
+				await initPairsDropdown();
+
+				await initOrders();
+
+				setInitialized(true);
+				setAlertState(null);
+				setAlertSubtitle('');
+			} catch (error) {
+				console.error('Error during initialization:', error);
+
 				setAlertState('error');
 				setAlertSubtitle('Error loading orders data');
 				await new Promise((resolve) => setTimeout(resolve, 2000));
 				setAlertState(null);
 				setAlertSubtitle('');
-				return;
-			}
-
-			fetchUser();
-
-			setOrders(result.data);
-
-			function getPairsFromOrders(orders: UserOrderData[]) {
-				const pairs = [
-					{
-						code: '',
-						name: 'All pairs',
-					},
-				];
-
-				for (let i = 0; i < orders.length; i++) {
-					const pair = {
-						name: `${orders[i].first_currency.name}/${orders[i].second_currency.name}`,
-						code: orders[i].pair_id,
-					};
-
-					if (!pairs.find((e) => e.code === pair.code)) pairs.push(pair);
-				}
-
-				return pairs;
-			}
-
-			const pairs = getPairsFromOrders(result.data);
-
-			setPairsValues(pairs);
-			setPairDropdownState(pairs[0]);
-
-			setAlertState(null);
-			setAlertSubtitle('');
-
-			const { success, data } = await getUserOrders();
-
-			if (success) {
-				setOrders(data);
 			}
 		}
 
-		getOrders();
+		initialize();
 	}, []);
 
 	function buySellFilter(e: UserOrderData) {
@@ -174,7 +192,7 @@ function Orders() {
 		const results = await (async () => {
 			const res = [];
 			for (const order of activeOrders) {
-				res.push(await cancelOrder(order.id).catch(() => null));
+				res.push(await fetchMethods.cancelOrder(order.id).catch(() => null));
 			}
 			return res;
 		})();
@@ -192,7 +210,7 @@ function Orders() {
 			setAlertSubtitle('');
 		}, 2000);
 
-		const { success, data } = await getUserOrders();
+		const { success, data } = await fetchMethods.getUserOrders();
 
 		if (success) {
 			setOrders(data);
