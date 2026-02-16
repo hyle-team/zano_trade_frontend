@@ -25,6 +25,7 @@ import axios from 'axios';
 import GetPairsPagesAmountRes from '@/interfaces/responses/dex/GetPairsPagesAmountRes';
 import { PairSortOption } from '@/interfaces/enum/pair';
 import { API_URL } from '@/constants';
+import { GetUserOrdersData } from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
 
 const isServer = typeof window === 'undefined';
 const baseUrl = isServer ? API_URL : '';
@@ -246,10 +247,27 @@ export async function getUserOrdersPage(pairId: string): Promise<ErrorRes | GetU
 		.then((res) => res.data);
 }
 
-export async function getUserOrders(): Promise<ErrorRes | GetUserOrdersRes> {
+export async function getUserOrders({
+	limit,
+	offset,
+	filterInfo: { status, type, date },
+}: GetUserOrdersData): Promise<ErrorRes | GetUserOrdersRes> {
 	return axios
-		.post('/api/orders/get', {
+		.patch('/api/orders/get', {
 			token: sessionStorage.getItem('token'),
+
+			limit,
+			offset,
+			filterInfo: {
+				status,
+				type,
+				date: date
+					? {
+							from: date.from,
+							to: date.to,
+						}
+					: undefined,
+			},
 		})
 		.then((res) => res.data);
 }
