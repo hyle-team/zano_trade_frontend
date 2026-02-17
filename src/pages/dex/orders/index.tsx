@@ -281,6 +281,37 @@ function Orders() {
 
 	const activeOrders = orders.filter((e) => e.status === 'active');
 
+	async function deleteOrder(orderId: string) {
+		setAlertState('loading');
+		setAlertSubtitle('Canceling order...');
+
+		const result = await fetchMethods.cancelOrder(orderId);
+
+		if (!result.success) {
+			setAlertState('error');
+			setAlertSubtitle('Error canceling order');
+
+			setTimeout(() => {
+				setAlertState(null);
+				setAlertSubtitle('');
+			}, 2000);
+
+			return;
+		}
+
+		setAlertState('success');
+		setAlertSubtitle('Order canceled');
+
+		setTimeout(() => {
+			setAlertState(null);
+			setAlertSubtitle('');
+		}, 2000);
+
+		setOrders((prev) => prev.filter((e) => e.id !== orderId));
+		setLastOrderOffset((prev) => Math.max(prev - 1, 0));
+		setTotalOrdersCount((prev) => (prev !== undefined ? prev - 1 : prev));
+	}
+
 	async function cancelAllOrders() {
 		setAlertState('loading');
 		setAlertSubtitle('Canceling all orders...');
@@ -371,10 +402,8 @@ function Orders() {
 
 					<OrdersTable
 						value={orders}
-						setAlertState={setAlertState}
-						setAlertSubtitle={setAlertSubtitle}
-						setOrders={setOrders}
 						category={categoryState.code}
+						deleteOrder={deleteOrder}
 					/>
 
 					<div className={styles['orders__preloader-wrapper']} ref={inViewRef}>
