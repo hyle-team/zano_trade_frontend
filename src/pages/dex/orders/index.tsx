@@ -16,12 +16,21 @@ import useUpdateUser from '@/hook/useUpdateUser';
 import { Footer } from '@/zano_ui/src';
 import { GetUserOrdersBodyStatus } from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
 import Decimal from 'decimal.js';
+import { useInView } from 'react-intersection-observer';
+import Preloader from '@/components/UI/Preloader/Preloader';
 import OrdersTable from './OrdersTable/OrdersTable';
 
 const ORDERS_PER_PAGE = 10;
 
 function Orders() {
 	const fetchUser = useUpdateUser();
+
+	const { ref: inViewRef } = useInView({
+		threshold: 0,
+		onChange: (inView) => {
+			console.log('In view:', inView);
+		},
+	});
 
 	const ordersCategories = [
 		{
@@ -278,6 +287,10 @@ function Orders() {
 						setOrders={setOrders}
 						category={categoryState.code}
 					/>
+
+					<div className={styles['orders__preloader-wrapper']} ref={inViewRef}>
+						<Preloader />
+					</div>
 				</div>
 				{alertState && (
 					<Alert
