@@ -21,6 +21,7 @@ import {
 import Decimal from 'decimal.js';
 import { useInView } from 'react-intersection-observer';
 import Preloader from '@/components/UI/Preloader/Preloader';
+import { CancelAllBodyOrderType } from '@/interfaces/fetch-data/cancel-all-orders/CancelAllData';
 import OrdersTable from './OrdersTable/OrdersTable';
 
 const ORDERS_PER_PAGE = 10;
@@ -75,7 +76,7 @@ function Orders() {
 	const [totalOrdersCount, setTotalOrdersCount] = useState<number | undefined>(undefined);
 	const [orderPageLoading, setOrderPageLoading] = useState(false);
 
-	function deriveFiltersFromState() {
+	function deriveGetUserOrdersFiltersFromState() {
 		const status =
 			categoryState.code === 'active-orders'
 				? GetUserOrdersBodyStatus.ACTIVE
@@ -119,8 +120,46 @@ function Orders() {
 		};
 	}
 
+	function deriveCancelAllOrdersFiltersFromState() {
+		const type = (() => {
+			if (buyDropdownValue.name === 'Buy & Sell') {
+				return undefined;
+			}
+
+			return buyDropdownValue.name === 'Buy'
+				? CancelAllBodyOrderType.BUY
+				: CancelAllBodyOrderType.SELL;
+		})();
+
+		const pairId =
+			pairDropdownValue.code === ''
+				? undefined
+				: new Decimal(pairDropdownValue.code).toNumber();
+
+		const date = (() => {
+			if (!dateRange.first || !dateRange.last) return undefined;
+
+			const firstDate = new Date(dateRange.first);
+			const lastDate = new Date(dateRange.last);
+
+			firstDate.setHours(0, 0, 0, 0);
+			lastDate.setHours(23, 59, 59, 999);
+
+			return {
+				from: firstDate.getTime(),
+				to: lastDate.getTime(),
+			};
+		})();
+
+		return {
+			type,
+			pairId,
+			date,
+		};
+	}
+
 	async function addNewOrdersPage() {
-		const { status, type, pairId, date } = deriveFiltersFromState();
+		const { status, type, pairId, date } = deriveGetUserOrdersFiltersFromState();
 
 		const getUserOrdersRes = await fetchMethods.getUserOrders({
 			limit: ORDERS_PER_PAGE,
@@ -202,7 +241,7 @@ function Orders() {
 	}
 
 	async function initOrders() {
-		const { status, type, pairId, date } = deriveFiltersFromState();
+		const { status, type, pairId, date } = deriveGetUserOrdersFiltersFromState();
 
 		const getUserOrdersRes = await fetchMethods.getUserOrders({
 			limit: ORDERS_PER_PAGE,
@@ -279,15 +318,34 @@ function Orders() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const activeOrders = orders.filter((e) => e.status === 'active');
-
 	async function deleteOrder(orderId: string) {
-		setAlertState('loading');
-		setAlertSubtitle('Canceling order...');
+		try {
+			setAlertState('loading');
+			setAlertSubtitle('Canceling order...');
 
-		const result = await fetchMethods.cancelOrder(orderId);
+			// Simulate loading time
+			await new Promise((resolve) => setTimeout(resolve, 500));
 
-		if (!result.success) {
+			const result = await fetchMethods.cancelOrder(orderId);
+
+			if (!result.success) {
+				throw new Error('ERROR_CANCELING_ORDER');
+			}
+
+			setAlertState('success');
+			setAlertSubtitle('Order canceled');
+
+			setTimeout(() => {
+				setAlertState(null);
+				setAlertSubtitle('');
+			}, 2000);
+
+			setOrders((prev) => prev.filter((e) => e.id !== orderId));
+			setLastOrderOffset((prev) => Math.max(prev - 1, 0));
+			setTotalOrdersCount((prev) => (prev !== undefined ? prev - 1 : prev));
+		} catch (error) {
+			console.error('Error canceling order:', error);
+
 			setAlertState('error');
 			setAlertSubtitle('Error canceling order');
 
@@ -295,58 +353,42 @@ function Orders() {
 				setAlertState(null);
 				setAlertSubtitle('');
 			}, 2000);
-
-			return;
 		}
-
-		setAlertState('success');
-		setAlertSubtitle('Order canceled');
-
-		setTimeout(() => {
-			setAlertState(null);
-			setAlertSubtitle('');
-		}, 2000);
-
-		setOrders((prev) => prev.filter((e) => e.id !== orderId));
-		setLastOrderOffset((prev) => Math.max(prev - 1, 0));
-		setTotalOrdersCount((prev) => (prev !== undefined ? prev - 1 : prev));
 	}
 
 	async function cancelAllOrders() {
-		setAlertState('loading');
-		setAlertSubtitle('Canceling all orders...');
+		try {
+			setAlertState('loading');
+			setAlertSubtitle('Canceling all orders...');
 
-		// const results = await Promise.allSettled(
-		// 	activeOrders.map(async (e) => {
-		// 		await cancelOrder(e.id);
-		// 	}),
-		// );
+			// Simulate loading time
+			await new Promise((resolve) => setTimeout(resolve, 500));
 
-		const results = await (async () => {
-			const res = [];
-			for (const order of activeOrders) {
-				res.push(await fetchMethods.cancelOrder(order.id).catch(() => null));
+			const { type, pairId, date } = deriveCancelAllOrdersFiltersFromState();
+
+			const cancelAllRes = await fetchMethods.cancelAllOrders({
+				filterInfo: {
+					type,
+					pairId,
+					date,
+				},
+			});
+
+			if (!cancelAllRes.success) {
+				throw new Error('Error canceling all orders');
 			}
-			return res;
-		})();
 
-		if (results.some((e) => e === null)) {
+			await initialize();
+		} catch (error) {
+			console.error('Error canceling all orders:', error);
+
 			setAlertState('error');
-			setAlertSubtitle('Some of the orders were not canceled');
-		} else {
-			setAlertState('success');
-			setAlertSubtitle('All orders canceled');
-		}
+			setAlertSubtitle('Error canceling all orders');
 
-		setTimeout(() => {
-			setAlertState(null);
-			setAlertSubtitle('');
-		}, 2000);
-
-		const { success, data } = await fetchMethods.getUserOrders();
-
-		if (success) {
-			setOrders(data);
+			setTimeout(() => {
+				setAlertState(null);
+				setAlertSubtitle('');
+			}, 2000);
 		}
 	}
 
