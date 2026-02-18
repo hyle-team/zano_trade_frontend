@@ -76,6 +76,8 @@ function Orders() {
 	const [totalOrdersCount, setTotalOrdersCount] = useState<number | undefined>(undefined);
 	const [orderPageLoading, setOrderPageLoading] = useState(false);
 
+	const isFinishedCategory = categoryState.code === 'history';
+
 	function deriveGetUserOrdersFiltersFromState() {
 		const status =
 			categoryState.code === 'active-orders'
@@ -436,9 +438,11 @@ function Orders() {
 								<DateRangeSelector value={dateRange} setValue={setDateRange} />
 							</div>
 
-							<Button transparent onClick={cancelAllOrders}>
-								Cancel all orders
-							</Button>
+							{!isFinishedCategory && (
+								<Button transparent onClick={cancelAllOrders}>
+									Cancel all orders
+								</Button>
+							)}
 						</div>
 					</div>
 
