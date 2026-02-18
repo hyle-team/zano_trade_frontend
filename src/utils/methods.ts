@@ -253,7 +253,7 @@ export async function getUserOrdersPage(pairId: string): Promise<ErrorRes | GetU
 export async function getUserOrders({
 	limit,
 	offset,
-	filterInfo: { status, type, date },
+	filterInfo: { pairId, status, type, date },
 }: GetUserOrdersData): Promise<ErrorRes | GetUserOrdersRes> {
 	return axios
 		.patch('/api/orders/get', {
@@ -262,6 +262,7 @@ export async function getUserOrders({
 			limit,
 			offset,
 			filterInfo: {
+				pairId,
 				status,
 				type,
 				date: date
