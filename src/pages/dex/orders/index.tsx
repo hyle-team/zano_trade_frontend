@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import Dropdown from '@/components/UI/Dropdown/Dropdown';
 import DateRangeSelector from '@/components/UI/DateRangeSelector/DateRangeSelector';
 import Button from '@/components/UI/Button/Button';
-import { cancelOrder, getUserOrders } from '@/utils/methods';
+import * as fetchMethods from '@/utils/methods';
 import Alert from '@/components/UI/Alert/Alert';
 import AlertType from '@/interfaces/common/AlertType';
 import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
@@ -14,7 +14,17 @@ import PairValue from '@/interfaces/props/pages/dex/orders/PairValue';
 import DateState from '@/interfaces/common/DateState';
 import useUpdateUser from '@/hook/useUpdateUser';
 import { Footer } from '@/zano_ui/src';
+import {
+	GetUserOrdersBodyStatus,
+	GetUserOrdersBodyType,
+} from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
+import Decimal from 'decimal.js';
+import { useInView } from 'react-intersection-observer';
+import Preloader from '@/components/UI/Preloader/Preloader';
+import { CancelAllBodyOrderType } from '@/interfaces/fetch-data/cancel-all-orders/CancelAllData';
 import OrdersTable from './OrdersTable/OrdersTable';
+
+const ORDERS_PER_PAGE = 10;
 
 function Orders() {
 	const fetchUser = useUpdateUser();
@@ -42,6 +52,8 @@ function Orders() {
 		},
 	];
 
+	const [initialized, setInitialized] = useState(false);
+
 	const [pairsValues, setPairsValues] = useState<PairValue[]>([{ name: 'All pairs', code: '' }]);
 
 	const [pairDropdownValue, setPairDropdownState] = useState(pairsValues[0]);
@@ -60,142 +72,325 @@ function Orders() {
 	});
 
 	const [orders, setOrders] = useState<UserOrderData[]>([]);
+	const [lastOrderOffset, setLastOrderOffset] = useState(0);
+	const [totalOrdersCount, setTotalOrdersCount] = useState<number | undefined>(undefined);
+	const [orderPageLoading, setOrderPageLoading] = useState(false);
 
-	useEffect(() => {
-		async function getOrders() {
-			setAlertState('loading');
-			setAlertSubtitle('Loading orders data...');
+	const isFinishedCategory = categoryState.code === 'history';
 
-			const result = await getUserOrders();
+	function deriveGetUserOrdersFiltersFromState() {
+		const status =
+			categoryState.code === 'active-orders'
+				? GetUserOrdersBodyStatus.ACTIVE
+				: GetUserOrdersBodyStatus.FINISHED;
 
-			if (!result.success) {
-				setAlertState('error');
-				setAlertSubtitle('Error loading orders data');
-				await new Promise((resolve) => setTimeout(resolve, 2000));
-				setAlertState(null);
-				setAlertSubtitle('');
+		const type = (() => {
+			if (buyDropdownValue.name === 'Buy & Sell') {
+				return undefined;
+			}
+
+			return buyDropdownValue.name === 'Buy'
+				? GetUserOrdersBodyType.BUY
+				: GetUserOrdersBodyType.SELL;
+		})();
+
+		const pairId =
+			pairDropdownValue.code === ''
+				? undefined
+				: new Decimal(pairDropdownValue.code).toNumber();
+
+		const date = (() => {
+			if (!dateRange.first || !dateRange.last) return undefined;
+
+			const firstDate = new Date(dateRange.first);
+			const lastDate = new Date(dateRange.last);
+
+			firstDate.setHours(0, 0, 0, 0);
+			lastDate.setHours(23, 59, 59, 999);
+
+			return {
+				from: firstDate.getTime(),
+				to: lastDate.getTime(),
+			};
+		})();
+
+		return {
+			status,
+			type,
+			pairId,
+			date,
+		};
+	}
+
+	function deriveCancelAllOrdersFiltersFromState() {
+		const type = (() => {
+			if (buyDropdownValue.name === 'Buy & Sell') {
+				return undefined;
+			}
+
+			return buyDropdownValue.name === 'Buy'
+				? CancelAllBodyOrderType.BUY
+				: CancelAllBodyOrderType.SELL;
+		})();
+
+		const pairId =
+			pairDropdownValue.code === ''
+				? undefined
+				: new Decimal(pairDropdownValue.code).toNumber();
+
+		const date = (() => {
+			if (!dateRange.first || !dateRange.last) return undefined;
+
+			const firstDate = new Date(dateRange.first);
+			const lastDate = new Date(dateRange.last);
+
+			firstDate.setHours(0, 0, 0, 0);
+			lastDate.setHours(23, 59, 59, 999);
+
+			return {
+				from: firstDate.getTime(),
+				to: lastDate.getTime(),
+			};
+		})();
+
+		return {
+			type,
+			pairId,
+			date,
+		};
+	}
+
+	async function addNewOrdersPage() {
+		const { status, type, pairId, date } = deriveGetUserOrdersFiltersFromState();
+
+		const getUserOrdersRes = await fetchMethods.getUserOrders({
+			limit: ORDERS_PER_PAGE,
+			offset: lastOrderOffset,
+			filterInfo: {
+				status,
+				type,
+				pairId,
+				date,
+			},
+		});
+
+		if (!getUserOrdersRes.success) {
+			throw new Error('Error fetching user orders');
+		}
+
+		const newOrders = getUserOrdersRes.data;
+		const newOrdersAmount = newOrders.length;
+
+		setOrders((prev) => [...prev, ...newOrders]);
+		setLastOrderOffset((prev) => prev + newOrdersAmount);
+		setTotalOrdersCount(getUserOrdersRes.totalItemsCount);
+	}
+
+	const { ref: inViewRef } = useInView({
+		threshold: 0,
+		onChange: async (inView) => {
+			if (!inView || !initialized) {
 				return;
 			}
 
-			fetchUser();
-
-			setOrders(result.data);
-
-			function getPairsFromOrders(orders: UserOrderData[]) {
-				const pairs = [
-					{
-						code: '',
-						name: 'All pairs',
-					},
-				];
-
-				for (let i = 0; i < orders.length; i++) {
-					const pair = {
-						name: `${orders[i].first_currency.name}/${orders[i].second_currency.name}`,
-						code: orders[i].pair_id,
-					};
-
-					if (!pairs.find((e) => e.code === pair.code)) pairs.push(pair);
-				}
-
-				return pairs;
+			if (totalOrdersCount !== undefined && lastOrderOffset >= totalOrdersCount) {
+				return;
 			}
 
-			const pairs = getPairsFromOrders(result.data);
-
-			setPairsValues(pairs);
-			setPairDropdownState(pairs[0]);
-
-			setAlertState(null);
-			setAlertSubtitle('');
-
-			const { success, data } = await getUserOrders();
-
-			if (success) {
-				setOrders(data);
+			if (orderPageLoading) {
+				return;
 			}
+
+			setOrderPageLoading(true);
+
+			try {
+				await addNewOrdersPage();
+			} catch (error) {
+				console.error('Error fetching new orders page:', error);
+
+				setAlertState('error');
+				setAlertSubtitle('Error loading more orders');
+
+				await new Promise((resolve) => setTimeout(resolve, 2000));
+
+				setAlertState(null);
+				setAlertSubtitle('');
+			} finally {
+				setOrderPageLoading(false);
+			}
+		},
+	});
+
+	async function initPairsDropdown() {
+		try {
+			const getUserOrdersAllPairsRes = await fetchMethods.getUserOrdersAllPairs();
+
+			if (!getUserOrdersAllPairsRes.success) {
+				throw new Error('Error fetching pairs for orders');
+			}
+
+			const ordersPairs = getUserOrdersAllPairsRes.data;
+
+			const statePairs = ordersPairs.map((e) => ({
+				name: `${e.firstCurrency.ticker}/${e.secondCurrency.ticker}`,
+				code: new Decimal(e.id).toFixed(),
+			}));
+
+			setPairsValues([{ name: 'All pairs', code: '' }, ...statePairs]);
+		} catch (error) {
+			console.error('Error while initPairsDropdown:', error);
+		}
+	}
+
+	async function initOrders() {
+		const { status, type, pairId, date } = deriveGetUserOrdersFiltersFromState();
+
+		const getUserOrdersRes = await fetchMethods.getUserOrders({
+			limit: ORDERS_PER_PAGE,
+			offset: 0,
+			filterInfo: {
+				status,
+				type,
+				pairId,
+				date,
+			},
+		});
+
+		if (!getUserOrdersRes.success) {
+			throw new Error('Error fetching user orders');
 		}
 
-		getOrders();
+		const newOrders = getUserOrdersRes.data;
+		const newOrdersAmount = newOrders.length;
+
+		setOrders(newOrders);
+		setLastOrderOffset(newOrdersAmount);
+		setTotalOrdersCount(getUserOrdersRes.totalItemsCount);
+
+		return newOrders;
+	}
+
+	async function initialize() {
+		try {
+			setAlertState('loading');
+			setAlertSubtitle('Loading orders data...');
+
+			setOrders([]);
+			setLastOrderOffset(0);
+			setTotalOrdersCount(undefined);
+
+			// Simulate loading time
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+
+			await fetchUser();
+
+			await initPairsDropdown();
+
+			await initOrders();
+
+			setInitialized(true);
+			setAlertState(null);
+			setAlertSubtitle('');
+		} catch (error) {
+			console.error('Error during initialization:', error);
+
+			setAlertState('error');
+			setAlertSubtitle('Error loading orders data');
+			await new Promise((resolve) => setTimeout(resolve, 2000));
+			setAlertState(null);
+			setAlertSubtitle('');
+		}
+	}
+
+	useEffect(() => {
+		async function onFilterChange() {
+			if (!initialized) {
+				return;
+			}
+
+			await initialize();
+		}
+
+		onFilterChange();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [buyDropdownValue, pairDropdownValue, dateRange, categoryState]);
+
+	useEffect(() => {
+		initialize();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	function buySellFilter(e: UserOrderData) {
-		if (buyDropdownValue.name === 'Buy & Sell') return true;
+	async function deleteOrder(orderId: string) {
+		try {
+			setAlertState('loading');
+			setAlertSubtitle('Canceling order...');
 
-		if (buyDropdownValue.name === 'Buy') return e.type === 'buy';
+			// Simulate loading time
+			await new Promise((resolve) => setTimeout(resolve, 500));
 
-		if (buyDropdownValue.name === 'Sell') return e.type === 'sell';
-	}
+			const result = await fetchMethods.cancelOrder(orderId);
 
-	function pairFilter(e: UserOrderData) {
-		if (!pairDropdownValue) return true;
+			if (!result.success) {
+				throw new Error('ERROR_CANCELING_ORDER');
+			}
 
-		return !pairDropdownValue.code || e.pair_id === pairDropdownValue.code;
-	}
+			setAlertState('success');
+			setAlertSubtitle('Order canceled');
 
-	function dateFilter(e: UserOrderData) {
-		if (!dateRange.first || !dateRange.last) return true;
-		const firstDate = new Date(dateRange.first);
-		const lastDate = new Date(dateRange.last);
+			setTimeout(() => {
+				setAlertState(null);
+				setAlertSubtitle('');
+			}, 2000);
 
-		const timestamp = parseInt(e.timestamp, 10);
+			setOrders((prev) => prev.filter((e) => e.id !== orderId));
+			setLastOrderOffset((prev) => Math.max(prev - 1, 0));
+			setTotalOrdersCount((prev) => (prev !== undefined ? prev - 1 : prev));
+		} catch (error) {
+			console.error('Error canceling order:', error);
 
-		firstDate.setHours(0, 0, 0, 0);
-		lastDate.setHours(24, 0, 0, 0);
+			setAlertState('error');
+			setAlertSubtitle('Error canceling order');
 
-		if (!dateRange.first && !dateRange.last) return true;
-
-		if (dateRange.first && !dateRange.last) return timestamp >= firstDate.getTime();
-
-		if (!dateRange.first && dateRange.last) return timestamp <= lastDate.getTime();
-
-		return timestamp >= firstDate.getTime() && timestamp <= lastDate.getTime();
-	}
-
-	function categoryFilter(e: UserOrderData) {
-		if (categoryState.code === 'active-orders') {
-			return e.status === 'active';
+			setTimeout(() => {
+				setAlertState(null);
+				setAlertSubtitle('');
+			}, 2000);
 		}
-		return e.status === 'finished';
 	}
-
-	const activeOrders = orders.filter((e) => e.status === 'active');
 
 	async function cancelAllOrders() {
-		setAlertState('loading');
-		setAlertSubtitle('Canceling all orders...');
+		try {
+			setAlertState('loading');
+			setAlertSubtitle('Canceling all orders...');
 
-		// const results = await Promise.allSettled(
-		// 	activeOrders.map(async (e) => {
-		// 		await cancelOrder(e.id);
-		// 	}),
-		// );
+			// Simulate loading time
+			await new Promise((resolve) => setTimeout(resolve, 500));
 
-		const results = await (async () => {
-			const res = [];
-			for (const order of activeOrders) {
-				res.push(await cancelOrder(order.id).catch(() => null));
+			const { type, pairId, date } = deriveCancelAllOrdersFiltersFromState();
+
+			const cancelAllRes = await fetchMethods.cancelAllOrders({
+				filterInfo: {
+					type,
+					pairId,
+					date,
+				},
+			});
+
+			if (!cancelAllRes.success) {
+				throw new Error('Error canceling all orders');
 			}
-			return res;
-		})();
 
-		if (results.some((e) => e === null)) {
+			await initialize();
+		} catch (error) {
+			console.error('Error canceling all orders:', error);
+
 			setAlertState('error');
-			setAlertSubtitle('Some of the orders were not canceled');
-		} else {
-			setAlertState('success');
-			setAlertSubtitle('All orders canceled');
-		}
+			setAlertSubtitle('Error canceling all orders');
 
-		setTimeout(() => {
-			setAlertState(null);
-			setAlertSubtitle('');
-		}, 2000);
-
-		const { success, data } = await getUserOrders();
-
-		if (success) {
-			setOrders(data);
+			setTimeout(() => {
+				setAlertState(null);
+				setAlertSubtitle('');
+			}, 2000);
 		}
 	}
 
@@ -243,23 +438,23 @@ function Orders() {
 								<DateRangeSelector value={dateRange} setValue={setDateRange} />
 							</div>
 
-							<Button transparent onClick={cancelAllOrders}>
-								Cancel all orders
-							</Button>
+							{!isFinishedCategory && (
+								<Button transparent onClick={cancelAllOrders}>
+									Cancel all orders
+								</Button>
+							)}
 						</div>
 					</div>
 
 					<OrdersTable
-						value={orders
-							.filter(buySellFilter)
-							.filter(pairFilter)
-							.filter(dateFilter)
-							.filter(categoryFilter)}
-						setAlertState={setAlertState}
-						setAlertSubtitle={setAlertSubtitle}
-						setOrders={setOrders}
+						value={orders}
 						category={categoryState.code}
+						deleteOrder={deleteOrder}
 					/>
+
+					<div className={styles['orders__preloader-wrapper']} ref={inViewRef}>
+						{orderPageLoading && <Preloader />}
+					</div>
 				</div>
 				{alertState && (
 					<Alert

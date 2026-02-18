@@ -4,7 +4,6 @@ import DeleteIcon from '@/assets/images/UI/delete.svg';
 import NoOffersIcon from '@/assets/images/UI/no_offers.svg';
 import EmptyLink from '@/components/UI/EmptyLink/EmptyLink';
 import { notationToString, toStandardDateString } from '@/utils/utils';
-import { cancelOrder, getUserOrders } from '@/utils/methods';
 import OrdersTableProps from '@/interfaces/props/pages/dex/orders/OrdersTable/OrdersTableProps';
 import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
 import Decimal from 'decimal.js';
@@ -15,7 +14,7 @@ import styles from './OrdersTable.module.scss';
 function OrdersTable(props: OrdersTableProps) {
 	const orders = props.value || [];
 
-	const { setAlertState, setAlertSubtitle, setOrders, category } = props;
+	const { deleteOrder, category } = props;
 
 	const isActive = category === 'active-orders';
 
@@ -26,31 +25,6 @@ function OrdersTable(props: OrdersTableProps) {
 		const secondCurrencyName = orderData?.second_currency?.name || '';
 
 		const timestampDate = new Date(parseInt(orderData.timestamp, 10));
-
-		async function deleteOrder() {
-			setAlertState('loading');
-			setAlertSubtitle('Canceling order...');
-			const result = await cancelOrder(orderData.id);
-
-			if (result.success) {
-				setAlertState('success');
-				setAlertSubtitle('Order canceled');
-			} else {
-				setAlertState('error');
-				setAlertSubtitle('Error canceling order');
-			}
-
-			setTimeout(() => {
-				setAlertState(null);
-				setAlertSubtitle('');
-			}, 2000);
-
-			const { success, data } = await getUserOrders();
-
-			if (success) {
-				setOrders(data);
-			}
-		}
 
 		const amount = (
 			isActive
@@ -150,7 +124,7 @@ function OrdersTable(props: OrdersTableProps) {
 						<Button
 							key={nanoid(16)}
 							className={styles.delete__button}
-							onClick={deleteOrder}
+							onClick={() => deleteOrder(orderData.id)}
 						>
 							<DeleteIcon />
 						</Button>

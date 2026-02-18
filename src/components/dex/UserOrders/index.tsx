@@ -16,6 +16,7 @@ import { countByKeyRecord, createOrderSorter } from '@/utils/utils';
 import ApplyTip from '@/interfaces/common/ApplyTip';
 import { useQuerySyncedTab } from '@/hook/useQuerySyncedTab';
 import { useMediaQuery } from '@/hook/useMediaQuery';
+import { GetUserOrdersBodyStatus } from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
 import { UserOrdersProps } from './types';
 import styles from './styles.module.scss';
 import {
@@ -73,7 +74,7 @@ const UserOrders = ({
 				length: offers.length,
 			},
 			{
-				title: 'History',
+				title: 'History - Last 100 Items',
 				type: 'history',
 				length: ordersHistory.length,
 			},
@@ -105,7 +106,13 @@ const UserOrders = ({
 		})();
 
 		(async () => {
-			const result = await getUserOrders();
+			const result = await getUserOrders({
+				limit: 100,
+				offset: 0,
+				filterInfo: {
+					status: GetUserOrdersBodyStatus.FINISHED,
+				},
+			});
 
 			if (!result.success) {
 				setAlertState('error');
@@ -116,9 +123,7 @@ const UserOrders = ({
 				return;
 			}
 
-			const filteredOrdersHistory = result.data
-				.filter((s) => s.pair_id === pairData?.id)
-				.filter((s) => s.status === 'finished');
+			const filteredOrdersHistory = result.data.filter((s) => s.status === 'finished');
 
 			fetchUser();
 

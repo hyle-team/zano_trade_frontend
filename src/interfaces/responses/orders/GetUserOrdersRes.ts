@@ -19,6 +19,7 @@ interface UserOrderData {
 
 interface GetUserOrdersRes {
 	success: true;
+	totalItemsCount: number;
 	data: UserOrderData[];
 }
 
