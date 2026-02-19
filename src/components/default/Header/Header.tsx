@@ -18,7 +18,7 @@ import Button from '@/components/UI/Button/Button';
 
 import { useWindowWidth } from '@react-hook/window-size';
 import ConnectButton from '@/components/UI/ConnectButton/ConnectButton';
-import { classes, notationToString, setWalletCredentials, shortenAddress } from '@/utils/utils';
+import { classes, notationToString, shortenAddress } from '@/utils/utils';
 import useAdvancedTheme from '@/hook/useTheme';
 
 import { Store } from '@/store/store-reducer';
@@ -54,7 +54,6 @@ function Header({ isLg }: { isLg?: boolean }) {
 
 	function logout() {
 		sessionStorage.removeItem('token');
-		setWalletCredentials(undefined);
 		updateWalletState(dispatch, null);
 	}
 
