@@ -8,7 +8,8 @@ import OrdersTableProps from '@/interfaces/props/pages/dex/orders/OrdersTable/Or
 import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
 import Decimal from 'decimal.js';
 import Tooltip from '@/components/UI/Tooltip/Tooltip';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { Store } from '@/store/store-reducer';
 import styles from './OrdersTable.module.scss';
 
 function OrdersTable(props: OrdersTableProps) {
@@ -19,23 +20,50 @@ function OrdersTable(props: OrdersTableProps) {
 	const isActive = category === 'active-orders';
 
 	function Row(props: { orderData: UserOrderData }) {
+		const { state } = useContext(Store);
 		const { orderData } = props;
 
 		const firstCurrencyName = orderData?.first_currency?.name || '';
 		const secondCurrencyName = orderData?.second_currency?.name || '';
 
+		const secondCurrencyId = orderData.second_currency.asset_id ?? undefined;
+
 		const timestampDate = new Date(parseInt(orderData.timestamp, 10));
 
-		const amount = (
-			isActive
-				? new Decimal(orderData.amount)
-				: new Decimal(orderData.amount).minus(orderData.left)
-		).toString();
-		const total = (
-			isActive
-				? new Decimal(orderData.total)
-				: new Decimal(orderData.amount).minus(orderData.left).mul(orderData.price)
-		).toString();
+		const secondAssetUsdPriceNumber = secondCurrencyId
+			? state.assetsRates.get(secondCurrencyId)
+			: undefined;
+		const secondAssetUsdPrice = secondAssetUsdPriceNumber
+			? new Decimal(secondAssetUsdPriceNumber)
+			: undefined;
+
+		const pairRateNumber = orderData.pair.rate;
+		const pairRate = pairRateNumber !== undefined ? new Decimal(pairRateNumber) : undefined;
+
+		const firstCurrencyUsdPrice =
+			pairRate && secondAssetUsdPrice ? pairRate.mul(secondAssetUsdPrice) : undefined;
+
+		const actualAmount = isActive
+			? new Decimal(orderData.amount)
+			: new Decimal(orderData.amount).minus(orderData.left);
+
+		const actualTotal = isActive
+			? new Decimal(orderData.total)
+			: new Decimal(orderData.amount).minus(orderData.left).mul(orderData.price);
+
+		const amountUSD = firstCurrencyUsdPrice
+			? firstCurrencyUsdPrice.mul(actualAmount)
+			: undefined;
+		const priceUSD = secondAssetUsdPrice ? secondAssetUsdPrice.mul(orderData.price) : undefined;
+		const totalUSD = secondAssetUsdPrice ? secondAssetUsdPrice.mul(actualTotal) : undefined;
+
+		const amountPresentation: string = notationToString(actualAmount.toFixed());
+		const pricePresentation: string = notationToString(orderData.price);
+		const totalPresentation: string = notationToString(actualTotal.toFixed());
+
+		const amountUSDPresentation: string = amountUSD ? amountUSD.toFixed(2) : 'N/A';
+		const priceUSDPresentation: string = priceUSD ? priceUSD.toFixed(2) : 'N/A';
+		const totalUSDPresentation: string = totalUSD ? totalUSD.toFixed(2) : 'N/A';
 
 		function CurrencyTableData({
 			header,
@@ -102,21 +130,21 @@ function OrdersTable(props: OrdersTableProps) {
 				</td>
 
 				<CurrencyTableData
-					price={notationToString(5.23)}
+					price={priceUSDPresentation}
 					header="Price"
-					value={notationToString(orderData.price)}
+					value={pricePresentation}
 					currency={secondCurrencyName}
 				/>
 				<CurrencyTableData
-					price={notationToString(5.23)}
+					price={amountUSDPresentation}
 					header="Amount"
-					value={notationToString(amount)}
+					value={amountPresentation}
 					currency={firstCurrencyName}
 				/>
 				<CurrencyTableData
-					price={notationToString(5.23)}
+					price={totalUSDPresentation}
 					header="Total"
-					value={notationToString(total)}
+					value={totalPresentation}
 					currency={secondCurrencyName}
 				/>
 				{isActive && (
