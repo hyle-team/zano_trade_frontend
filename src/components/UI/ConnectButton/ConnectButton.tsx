@@ -6,8 +6,6 @@ import useUpdateUser from '@/hook/useUpdateUser';
 import AlertType from '@/interfaces/common/AlertType';
 import ConnectButtonProps from '@/interfaces/props/components/UI/ConnectButton/ConnectButtonProps';
 import ZanoWindow from '@/interfaces/common/ZanoWindow';
-import { getSavedWalletCredentials, setWalletCredentials } from '@/utils/utils';
-import { uuid } from 'uuidv4';
 import Button from '../Button/Button';
 
 function ConnectButton(props: ConnectButtonProps) {
@@ -28,40 +26,50 @@ function ConnectButton(props: ConnectButtonProps) {
 				await (window as unknown as ZanoWindow).zano.request('GET_WALLET_DATA')
 			).data;
 
-			if (!walletData?.address) {
+			const walletAddress = walletData?.address;
+			const walletAlias = walletData?.alias;
+
+			if (!walletAddress) {
 				throw new Error('Companion is offline');
 			}
 
-			if (!walletData?.alias) {
+			if (!walletAlias) {
 				throw new Error('Alias not found');
 			}
 
-			let nonce = '';
-			let signature = '';
-			let publicKey = '';
-
-			const existingWallet = getSavedWalletCredentials();
-
-			if (existingWallet) {
-				nonce = existingWallet.nonce;
-				signature = existingWallet.signature;
-				publicKey = existingWallet.publicKey;
-			} else {
-				const generatedNonce = uuid();
-				const signResult = await (window as unknown as ZanoWindow).zano.request(
-					'REQUEST_MESSAGE_SIGN',
-					{ message: generatedNonce },
-					null,
-				);
-
-				if (!signResult?.data?.result) {
-					throw new Error('Sign denied');
-				}
-
-				nonce = generatedNonce;
-				signature = signResult.data.result.sig;
-				publicKey = signResult.data.result.pkey;
+			if (typeof walletAddress !== 'string' || typeof walletAlias !== 'string') {
+				throw new Error('Invalid wallet data');
 			}
+
+			const authRequestRes = await fetch('/api/auth/request-auth', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					address: walletAddress,
+					alias: walletAlias,
+				}),
+			}).then((res) => res.json());
+
+			const authMessage = authRequestRes?.data;
+
+			if (!authRequestRes.success || typeof authMessage !== 'string') {
+				throw new Error('Unknown error during auth request');
+			}
+
+			const signResult = await (window as unknown as ZanoWindow).zano.request(
+				'REQUEST_MESSAGE_SIGN',
+				{ message: authMessage },
+				null,
+			);
+
+			if (!signResult?.data?.result) {
+				throw new Error('Sign denied');
+			}
+
+			const signature = signResult.data.result.sig;
+			const publicKey = signResult.data.result.pkey;
 
 			const result = await fetch('/api/auth', {
 				method: 'POST',
@@ -70,25 +78,17 @@ function ConnectButton(props: ConnectButtonProps) {
 				},
 				body: JSON.stringify({
 					data: {
-						alias: walletData.alias,
-						address: walletData.address,
+						alias: walletAlias,
+						address: walletAddress,
 						signature,
 						publicKey,
-						message: nonce,
+						message: authMessage,
 					},
 				}),
 			}).then((res) => res.json());
 
 			if (!result?.success) {
 				throw new Error('Server auth error');
-			}
-
-			if (!existingWallet) {
-				setWalletCredentials({
-					publicKey,
-					signature,
-					nonce,
-				});
 			}
 
 			sessionStorage.setItem('token', result?.data);
@@ -105,7 +105,6 @@ function ConnectButton(props: ConnectButtonProps) {
 			setAlertState('error');
 			setAlertErrMessage((error as { message: string }).message);
 			setTimeout(() => setAlertState(null), 3000);
-			setWalletCredentials(undefined);
 		}
 	}
 

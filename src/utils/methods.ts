@@ -25,6 +25,10 @@ import axios from 'axios';
 import GetPairsPagesAmountRes from '@/interfaces/responses/dex/GetPairsPagesAmountRes';
 import { PairSortOption } from '@/interfaces/enum/pair';
 import { API_URL } from '@/constants';
+import { GetUserOrdersData } from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
+import GetUserOrdersAllPairsRes from '@/interfaces/responses/orders/GetUserOrdersAllPairsRes';
+import { CancelAllData } from '@/interfaces/fetch-data/cancel-all-orders/CancelAllData';
+import CancelAllRes from '@/interfaces/responses/orders/CancelAllRes';
 
 const isServer = typeof window === 'undefined';
 const baseUrl = isServer ? API_URL : '';
@@ -246,9 +250,35 @@ export async function getUserOrdersPage(pairId: string): Promise<ErrorRes | GetU
 		.then((res) => res.data);
 }
 
-export async function getUserOrders(): Promise<ErrorRes | GetUserOrdersRes> {
+export async function getUserOrders({
+	limit,
+	offset,
+	filterInfo: { pairId, status, type, date },
+}: GetUserOrdersData): Promise<ErrorRes | GetUserOrdersRes> {
 	return axios
-		.post('/api/orders/get', {
+		.patch('/api/orders/get', {
+			token: sessionStorage.getItem('token'),
+
+			limit,
+			offset,
+			filterInfo: {
+				pairId,
+				status,
+				type,
+				date: date
+					? {
+							from: date.from,
+							to: date.to,
+						}
+					: undefined,
+			},
+		})
+		.then((res) => res.data);
+}
+
+export async function getUserOrdersAllPairs(): Promise<ErrorRes | GetUserOrdersAllPairsRes> {
+	return axios
+		.patch('/api/orders/get-user-orders-pairs', {
 			token: sessionStorage.getItem('token'),
 		})
 		.then((res) => res.data);
@@ -305,6 +335,26 @@ export async function applyOrder(orderData: ApplyOrderData): Promise<ErrorRes | 
 		.post('/api/orders/apply-order', {
 			token: sessionStorage.getItem('token'),
 			orderData,
+		})
+		.then((res) => res.data);
+}
+
+export async function cancelAllOrders({
+	filterInfo: { pairId, type, date },
+}: CancelAllData): Promise<ErrorRes | CancelAllRes> {
+	return axios
+		.patch('/api/orders/cancel-all', {
+			token: sessionStorage.getItem('token'),
+			filterInfo: {
+				pairId,
+				type,
+				date: date
+					? {
+							from: date.from,
+							to: date.to,
+						}
+					: undefined,
+			},
 		})
 		.then((res) => res.data);
 }
