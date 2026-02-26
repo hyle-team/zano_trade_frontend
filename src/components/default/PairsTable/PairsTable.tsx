@@ -7,15 +7,27 @@ import ClockIcon from '@/assets/images/UI/clock_icon.svg';
 import { Store } from '@/store/store-reducer';
 import PairData from '@/interfaces/common/PairData';
 import { ContextState } from '@/interfaces/common/ContextValue';
-import { tradingKnownCurrencies, roundTo, notationToString, getAssetIcon } from '@/utils/utils';
-import Tooltip from '@/components/UI/Tooltip/Tooltip';
+import {
+	tradingKnownCurrencies,
+	roundTo,
+	notationToString,
+	getAssetIcon,
+	ZANO_ASSET_ID,
+} from '@/utils/utils';
 import TooltipWrapper from '@/components/UI/TooltipWrapper';
 import styles from './PairsTable.module.scss';
 import { Row } from './types';
 
-function transformPairsToRows(pairs: PairData[], state: ContextState): Row[] {
+function transformPairsToRows(
+	pairs: PairData[],
+	state: ContextState,
+	initialZanoUsd: number | null,
+): Row[] {
 	return pairs.map((pair) => {
-		const secondAssetUsdPrice = state.assetsRates.get(pair.second_currency.asset_id || '') ?? 0;
+		const assetId = pair.second_currency.asset_id || '';
+		const secondAssetUsdPrice =
+			state.assetsRates.get(assetId) ??
+			(assetId === ZANO_ASSET_ID ? (initialZanoUsd ?? 0) : 0);
 
 		const price = Number(roundTo(notationToString(pair.rate ?? 0)));
 		const currentPriceUSD = secondAssetUsdPrice ? price : 0;
@@ -52,15 +64,16 @@ function transformPairsToRows(pairs: PairData[], state: ContextState): Row[] {
 
 interface IProps {
 	data: PairData[];
+	initialZanoUsd: number | null;
 }
 
-function PairsTable({ data }: IProps) {
+function PairsTable({ data, initialZanoUsd }: IProps) {
 	const router = useRouter();
 	const { state } = useContext(Store);
 
 	const rows = useMemo(() => {
-		return transformPairsToRows(data, state);
-	}, [data, state.assetsRates]);
+		return transformPairsToRows(data, state, initialZanoUsd);
+	}, [data, state.assetsRates, initialZanoUsd]);
 
 	const columns = useMemo<ColumnDef<Row>[]>(
 		() => [

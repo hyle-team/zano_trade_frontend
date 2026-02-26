@@ -4,15 +4,16 @@ import { useRouter } from 'next/router';
 import ArrowRight from '@/assets/images/UI/arrow_right.svg';
 import { Store } from '@/store/store-reducer';
 import PairData from '@/interfaces/common/PairData';
-import { getAssetIcon, notationToString, roundTo } from '@/utils/utils';
+import { getAssetIcon, notationToString, roundTo, ZANO_ASSET_ID } from '@/utils/utils';
 import TooltipWrapper from '@/components/UI/TooltipWrapper';
 import styles from './PairsCard.module.scss';
 
 interface IProps {
 	pair: PairData;
+	initialZanoUsd: number | null;
 }
 
-export default function PairsCard({ pair }: IProps) {
+export default function PairsCard({ pair, initialZanoUsd }: IProps) {
 	const router = useRouter();
 	const { state } = useContext(Store);
 
@@ -22,7 +23,9 @@ export default function PairsCard({ pair }: IProps) {
 	const isFeatured = pair.featured;
 	const isWhitelisted = pair.whitelisted;
 
-	const secondAssetUsdPrice = state.assetsRates.get(secondCurrency.asset_id || '') ?? 0;
+	const secondAssetUsdPrice =
+		state.assetsRates.get(secondCurrency.asset_id || '') ??
+		(secondCurrency.asset_id === ZANO_ASSET_ID ? (initialZanoUsd ?? 0) : 0);
 
 	const price = Number(roundTo(notationToString(pair.rate ?? 0), 4));
 	const currentPriceUSD = secondAssetUsdPrice ? price : 0;

@@ -6,7 +6,7 @@ import Button from '@/components/UI/Button/Button';
 import Link from 'next/link';
 import { nanoid } from 'nanoid';
 import MainPageTitle from '@/components/default/MainPageTitle/MainPageTitle';
-import { getPairsPage, getPairsPagesAmount } from '@/utils/methods';
+import { getPairsPage, getPairsPagesAmount, getZanoPrice } from '@/utils/methods';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import PairData from '@/interfaces/common/PairData';
 import { useInView } from 'react-intersection-observer';
@@ -17,7 +17,13 @@ import { Footer } from '@/zano_ui/src';
 import DexHeader from './DexHeader/DexHeader';
 import PairsList from './pairs/PairsList/PairsList';
 
-function Dex({ initialPairs }: { initialPairs: PairData[] }) {
+function Dex({
+	initialPairs,
+	initialZanoUsd,
+}: {
+	initialPairs: PairData[];
+	initialZanoUsd: number | null;
+}) {
 	const fetchIdRef = useRef<string>(nanoid());
 	const bottomInView = useRef<boolean>(false);
 	const isFirstLoad = useRef(true);
@@ -149,8 +155,8 @@ function Dex({ initialPairs }: { initialPairs: PairData[] }) {
 					/>
 					{allLoaded ? (
 						<>
-							<PairsTable data={pairs} />
-							<PairsList data={pairs} />
+							<PairsTable data={pairs} initialZanoUsd={initialZanoUsd} />
+							<PairsList data={pairs} initialZanoUsd={initialZanoUsd} />
 						</>
 					) : (
 						<ContentPreloader className={styles.dex__preloader} />
@@ -165,13 +171,22 @@ function Dex({ initialPairs }: { initialPairs: PairData[] }) {
 }
 
 export async function getServerSideProps() {
-	const result = await getPairsPage(1, '', true, PairSortOption.VOLUME_HIGH_TO_LOW);
+	const [pairsRes, priceRes] = await Promise.all([
+		getPairsPage(1, '', true, PairSortOption.VOLUME_HIGH_TO_LOW),
+		getZanoPrice(),
+	]);
+
+	let initialZanoUsd: number | null = null;
+
+	if (priceRes?.success && typeof priceRes.data?.usd === 'number') {
+		initialZanoUsd = priceRes.data.usd;
+	}
 
 	return {
 		props: {
-			initialPairs: result.success ? result.data : [],
+			initialPairs: pairsRes.success ? pairsRes.data : [],
+			initialZanoUsd,
 		},
 	};
 }
-
 export default Dex;
