@@ -5,13 +5,14 @@ import PairsCard from '../PairsCard/PairsCard';
 
 interface IProps {
 	data: PairData[];
+	initialZanoUsd: number | null;
 }
 
-export default function PairsList({ data }: IProps) {
+export default function PairsList({ data, initialZanoUsd }: IProps) {
 	return (
 		<div className={styles.list}>
 			{data.map((pair) => (
-				<PairsCard key={pair.id} pair={pair} />
+				<PairsCard key={pair.id} pair={pair} initialZanoUsd={initialZanoUsd} />
 			))}
 		</div>
 	);
