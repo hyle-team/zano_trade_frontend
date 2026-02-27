@@ -8,6 +8,15 @@ import ConnectButtonProps from '@/interfaces/props/components/UI/ConnectButton/C
 import ZanoWindow from '@/interfaces/common/ZanoWindow';
 import Button from '../Button/Button';
 
+enum ConnectErrorMessage {
+	NO_EXTENSION = 'Zano Companion extension is not installed',
+	COMPANION_OFFLINE = 'Companion is offline',
+	ALIAS_NOT_FOUND = 'Alias not found',
+	INVALID_WALLET_DATA = 'Invalid wallet data',
+	SIGN_DENIED = 'Sign denied',
+	SERVER_AUTH_ERROR = 'Server authentication error',
+}
+
 function ConnectButton(props: ConnectButtonProps) {
 	const [alertState, setAlertState] = useState<AlertType>(null);
 	const [alertErrMessage, setAlertErrMessage] = useState<string>();
@@ -22,6 +31,11 @@ function ConnectButton(props: ConnectButtonProps) {
 		try {
 			setAlertState('loading');
 			await new Promise((resolve) => setTimeout(resolve, 1000));
+
+			if (!('zano' in window)) {
+				throw new Error(ConnectErrorMessage.NO_EXTENSION);
+			}
+
 			const walletData = (
 				await (window as unknown as ZanoWindow).zano.request('GET_WALLET_DATA')
 			).data;
@@ -30,15 +44,15 @@ function ConnectButton(props: ConnectButtonProps) {
 			const walletAlias = walletData?.alias;
 
 			if (!walletAddress) {
-				throw new Error('Companion is offline');
+				throw new Error(ConnectErrorMessage.COMPANION_OFFLINE);
 			}
 
 			if (!walletAlias) {
-				throw new Error('Alias not found');
+				throw new Error(ConnectErrorMessage.ALIAS_NOT_FOUND);
 			}
 
 			if (typeof walletAddress !== 'string' || typeof walletAlias !== 'string') {
-				throw new Error('Invalid wallet data');
+				throw new Error(ConnectErrorMessage.INVALID_WALLET_DATA);
 			}
 
 			const authRequestRes = await fetch('/api/auth/request-auth', {
@@ -55,7 +69,7 @@ function ConnectButton(props: ConnectButtonProps) {
 			const authMessage = authRequestRes?.data;
 
 			if (!authRequestRes.success || typeof authMessage !== 'string') {
-				throw new Error('Unknown error during auth request');
+				throw new Error(ConnectErrorMessage.SERVER_AUTH_ERROR);
 			}
 
 			const signResult = await (window as unknown as ZanoWindow).zano.request(
@@ -65,7 +79,7 @@ function ConnectButton(props: ConnectButtonProps) {
 			);
 
 			if (!signResult?.data?.result) {
-				throw new Error('Sign denied');
+				throw new Error(ConnectErrorMessage.SIGN_DENIED);
 			}
 
 			const signature = signResult.data.result.sig;
@@ -88,7 +102,7 @@ function ConnectButton(props: ConnectButtonProps) {
 			}).then((res) => res.json());
 
 			if (!result?.success) {
-				throw new Error('Server auth error');
+				throw new Error(ConnectErrorMessage.SERVER_AUTH_ERROR);
 			}
 
 			sessionStorage.setItem('token', result?.data);
@@ -102,8 +116,16 @@ function ConnectButton(props: ConnectButtonProps) {
 			setAlertState('success');
 			setTimeout(() => setAlertState(null), 3000);
 		} catch (error) {
+			const errorMessage = (error as Error).message;
+
+			const knownError = Object.values(ConnectErrorMessage).some(
+				(msg) => msg === errorMessage,
+			)
+				? errorMessage
+				: 'Internal error occurred. Please try again.';
+
 			setAlertState('error');
-			setAlertErrMessage((error as { message: string }).message);
+			setAlertErrMessage(knownError);
 			setTimeout(() => setAlertState(null), 3000);
 		}
 	}
