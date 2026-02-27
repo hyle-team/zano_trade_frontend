@@ -116,11 +116,14 @@ function ConnectButton(props: ConnectButtonProps) {
 			setAlertState('success');
 			setTimeout(() => setAlertState(null), 3000);
 		} catch (error) {
-			const errorMessage = (error as Error).message;
+			const errorMessage =
+				'message' in (error as Error) ? (error as Error).message : undefined;
 
-			const knownError = Object.values(ConnectErrorMessage).some(
-				(msg) => msg === errorMessage,
-			)
+			const isErrorKnown =
+				errorMessage !== undefined &&
+				Object.values(ConnectErrorMessage).some((msg) => msg === errorMessage);
+
+			const knownError = isErrorKnown
 				? errorMessage
 				: 'Internal error occurred. Please try again.';
 
