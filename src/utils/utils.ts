@@ -111,16 +111,6 @@ export const localeTimeLeft = (now: number | null, timestamp: number) => {
 	return `${intToStrFixedLen(hours)}:${intToStrFixedLen(minutes)}:${intToStrFixedLen(seconds)}`;
 };
 
-export function getSavedWalletCredentials() {
-	const savedWallet = localStorage.getItem('wallet');
-	if (!savedWallet) return undefined;
-	try {
-		return JSON.parse(savedWallet) as WalletCredentials;
-	} catch {
-		return undefined;
-	}
-}
-
 export function setWalletCredentials(credentials: WalletCredentials | undefined) {
 	if (credentials) {
 		localStorage.setItem('wallet', JSON.stringify(credentials));

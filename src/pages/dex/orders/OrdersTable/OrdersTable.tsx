@@ -4,64 +4,66 @@ import DeleteIcon from '@/assets/images/UI/delete.svg';
 import NoOffersIcon from '@/assets/images/UI/no_offers.svg';
 import EmptyLink from '@/components/UI/EmptyLink/EmptyLink';
 import { notationToString, toStandardDateString } from '@/utils/utils';
-import { cancelOrder, getUserOrders } from '@/utils/methods';
 import OrdersTableProps from '@/interfaces/props/pages/dex/orders/OrdersTable/OrdersTableProps';
 import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
 import Decimal from 'decimal.js';
 import Tooltip from '@/components/UI/Tooltip/Tooltip';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { Store } from '@/store/store-reducer';
 import styles from './OrdersTable.module.scss';
 
 function OrdersTable(props: OrdersTableProps) {
 	const orders = props.value || [];
 
-	const { setAlertState, setAlertSubtitle, setOrders, category } = props;
+	const { deleteOrder, category } = props;
 
 	const isActive = category === 'active-orders';
 
 	function Row(props: { orderData: UserOrderData }) {
+		const { state } = useContext(Store);
 		const { orderData } = props;
 
 		const firstCurrencyName = orderData?.first_currency?.name || '';
 		const secondCurrencyName = orderData?.second_currency?.name || '';
 
+		const secondCurrencyId = orderData.second_currency.asset_id ?? undefined;
+
 		const timestampDate = new Date(parseInt(orderData.timestamp, 10));
 
-		async function deleteOrder() {
-			setAlertState('loading');
-			setAlertSubtitle('Canceling order...');
-			const result = await cancelOrder(orderData.id);
+		const secondAssetUsdPriceNumber = secondCurrencyId
+			? state.assetsRates.get(secondCurrencyId)
+			: undefined;
+		const secondAssetUsdPrice = secondAssetUsdPriceNumber
+			? new Decimal(secondAssetUsdPriceNumber)
+			: undefined;
 
-			if (result.success) {
-				setAlertState('success');
-				setAlertSubtitle('Order canceled');
-			} else {
-				setAlertState('error');
-				setAlertSubtitle('Error canceling order');
-			}
+		const pairRateNumber = orderData.pair.rate;
+		const pairRate = pairRateNumber !== undefined ? new Decimal(pairRateNumber) : undefined;
 
-			setTimeout(() => {
-				setAlertState(null);
-				setAlertSubtitle('');
-			}, 2000);
+		const firstCurrencyUsdPrice =
+			pairRate && secondAssetUsdPrice ? pairRate.mul(secondAssetUsdPrice) : undefined;
 
-			const { success, data } = await getUserOrders();
+		const actualAmount = isActive
+			? new Decimal(orderData.amount)
+			: new Decimal(orderData.amount).minus(orderData.left);
 
-			if (success) {
-				setOrders(data);
-			}
-		}
+		const actualTotal = isActive
+			? new Decimal(orderData.total)
+			: new Decimal(orderData.amount).minus(orderData.left).mul(orderData.price);
 
-		const amount = (
-			isActive
-				? new Decimal(orderData.amount)
-				: new Decimal(orderData.amount).minus(orderData.left)
-		).toString();
-		const total = (
-			isActive
-				? new Decimal(orderData.total)
-				: new Decimal(orderData.amount).minus(orderData.left).mul(orderData.price)
-		).toString();
+		const amountUSD = firstCurrencyUsdPrice
+			? firstCurrencyUsdPrice.mul(actualAmount)
+			: undefined;
+		const priceUSD = secondAssetUsdPrice ? secondAssetUsdPrice.mul(orderData.price) : undefined;
+		const totalUSD = secondAssetUsdPrice ? secondAssetUsdPrice.mul(actualTotal) : undefined;
+
+		const amountPresentation: string = notationToString(actualAmount.toFixed());
+		const pricePresentation: string = notationToString(orderData.price);
+		const totalPresentation: string = notationToString(actualTotal.toFixed());
+
+		const amountUSDPresentation: string = amountUSD ? amountUSD.toFixed(2) : 'N/A';
+		const priceUSDPresentation: string = priceUSD ? priceUSD.toFixed(2) : 'N/A';
+		const totalUSDPresentation: string = totalUSD ? totalUSD.toFixed(2) : 'N/A';
 
 		function CurrencyTableData({
 			header,
@@ -128,21 +130,21 @@ function OrdersTable(props: OrdersTableProps) {
 				</td>
 
 				<CurrencyTableData
-					price={notationToString(5.23)}
+					price={priceUSDPresentation}
 					header="Price"
-					value={notationToString(orderData.price)}
+					value={pricePresentation}
 					currency={secondCurrencyName}
 				/>
 				<CurrencyTableData
-					price={notationToString(5.23)}
+					price={amountUSDPresentation}
 					header="Amount"
-					value={notationToString(amount)}
+					value={amountPresentation}
 					currency={firstCurrencyName}
 				/>
 				<CurrencyTableData
-					price={notationToString(5.23)}
+					price={totalUSDPresentation}
 					header="Total"
-					value={notationToString(total)}
+					value={totalPresentation}
 					currency={secondCurrencyName}
 				/>
 				{isActive && (
@@ -150,7 +152,7 @@ function OrdersTable(props: OrdersTableProps) {
 						<Button
 							key={nanoid(16)}
 							className={styles.delete__button}
-							onClick={deleteOrder}
+							onClick={() => deleteOrder(orderData.id)}
 						>
 							<DeleteIcon />
 						</Button>
