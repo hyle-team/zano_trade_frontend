@@ -9,10 +9,12 @@ interface InputPanelItemProps {
 	priceState: string;
 	amountState: string;
 	totalState: string;
+	minPerApplyAmountState: string;
 	buySellState: SelectValue;
 	setBuySellState: Dispatch<SetStateAction<SelectValue>>;
 	setPriceFunction: (_value: string) => void;
 	setAmountFunction: (_value: string) => void;
+	setMinPerApplyAmountFunction: (_value: string) => void;
 	setRangeInputValue: Dispatch<SetStateAction<string>>;
 	rangeInputValue: string;
 	balance: number | undefined;
@@ -20,9 +22,11 @@ interface InputPanelItemProps {
 	amountValid: boolean;
 	priceValid: boolean;
 	totalValid: boolean;
+	minPerApplyAmountValid: boolean;
 	totalUsd: string | undefined;
 	scrollToOrderList: () => void;
 	onAfter: () => Promise<void>;
+	resetForm: () => void;
 }
 
 export default InputPanelItemProps;
