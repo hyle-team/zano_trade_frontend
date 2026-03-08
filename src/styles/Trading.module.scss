@@ -17,7 +17,6 @@
 		margin-top: 16px;
 		display: flex;
 		gap: 10px;
-		height: 550px;
 
 		&_trades {
 			max-width: 415px;
@@ -79,14 +78,3 @@
 	}
 }
 
-@media screen and (max-width: 640px) {
-	.trading__top {
-		height: 380px;
-	}
-}
-
-@media screen and (max-width: 580px) {
-	.trading__top {
-		height: 370px;
-	}
-}

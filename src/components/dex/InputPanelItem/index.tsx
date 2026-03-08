@@ -226,6 +226,17 @@ function InputPanelItem(props: InputPanelItemProps) {
 					invalid={!!amountState && !amountValid}
 				/>
 
+				<LabeledInput
+					value="1000"
+					setValue={() => {}}
+					// value={amountState && priceState && notationToString(totalState)}
+					// setValue={() => undefined}
+					currency={firstCurrencyName}
+					label="Min Per Apply Amount (Optional)"
+					// readonly={true}
+					// invalid={showTotalError}
+				/>
+
 				<div className={classes(isBuy && styles.disabled)}>
 					<RangeInput value={!isBuy ? rangeInputValue : '50'} onInput={onRangeInput} />
 					<div className={styles.inputPanel__body_labels}>
