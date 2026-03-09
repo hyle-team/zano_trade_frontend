@@ -90,6 +90,14 @@
 			display: flex;
 			flex-direction: column;
 			gap: 10px;
+
+			&_direction {
+				min-width: 75px;
+			}
+
+			&_timestamp {
+				min-width: 80px;
+			}
 		}
 
 		&__pair {

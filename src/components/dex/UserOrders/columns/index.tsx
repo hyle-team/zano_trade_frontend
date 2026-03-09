@@ -69,6 +69,16 @@ export function buildUserColumns({
 			cell: (row) => <p>{notationToString(row.left)}</p>,
 		},
 		{
+			key: 'min_per_apply_amount',
+			header: <>Min Per Apply ({firstCurrencyName})</>,
+			width: '160px',
+			cell: (row) => (
+				<p>
+					{row.min_per_apply_amount ? notationToString(row.min_per_apply_amount) : 'No'}
+				</p>
+			),
+		},
+		{
 			key: 'total',
 			header: <>Total ({secondCurrencyName})</>,
 			width: '180px',
