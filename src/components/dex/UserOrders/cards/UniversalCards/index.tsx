@@ -106,22 +106,37 @@ export default function UniversalCards(props: UniversalCardsProps) {
 								{formatTimestamp(Number(row.timestamp))}
 							</p>
 						</div>
-						<div className={classes(styles.card__col, styles.card__price)}>
+						<div
+							className={classes(
+								styles.card__col,
+								type !== 'history' ? styles.card__price : undefined,
+							)}
+						>
 							<p className={styles.card__label}>Price ({secondCurrencyName})</p>
 							<p className={styles.card__value}>{notationToString(row.price)}</p>
 						</div>
-						<div className={styles.card__col}>
-							<p className={styles.card__label}>Quantity ({firstCurrencyName})</p>
-							<p className={styles.card__value}>
-								{notationToString(row.amount ?? row.left)}
-							</p>
-						</div>
+						{type === 'orders' && (
+							<div className={styles.card__col}>
+								<p className={styles.card__label}>Quantity ({firstCurrencyName})</p>
+								<p className={styles.card__value}>
+									{notationToString(row.amount ?? row.left)}
+								</p>
+							</div>
+						)}
 					</div>
 				);
 
 				const Metrics = (
 					<>
-						{type === 'orders' && (
+						{type !== 'orders' && (
+							<div className={styles.card__col}>
+								<p className={styles.card__label}>Quantity ({firstCurrencyName})</p>
+								<p className={styles.card__value}>
+									{notationToString(row.amount ?? row.left)}
+								</p>
+							</div>
+						)}
+						{(type === 'orders' || type === 'history') && (
 							<div className={styles.card__col}>
 								<p className={styles.card__label}>Min ({firstCurrencyName})</p>
 								<p className={styles.card__value}>
@@ -140,12 +155,18 @@ export default function UniversalCards(props: UniversalCardsProps) {
 								secondAssetUsdPrice={secondAssetUsdPrice}
 							/>
 						</div>
-						<div
-							className={classes(styles.card__col, styles.card__price, styles.mobile)}
-						>
-							<p className={styles.card__label}>Price ({secondCurrencyName})</p>
-							<p className={styles.card__value}>{notationToString(row.price)}</p>
-						</div>
+						{type !== 'history' && (
+							<div
+								className={classes(
+									styles.card__col,
+									styles.card__price,
+									styles.mobile,
+								)}
+							>
+								<p className={styles.card__label}>Price ({secondCurrencyName})</p>
+								<p className={styles.card__value}>{notationToString(row.price)}</p>
+							</div>
+						)}
 					</>
 				);
 
