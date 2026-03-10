@@ -7,6 +7,12 @@ import OrderFormOutput from '@/interfaces/common/orderFormOutput';
 import { handleInputChange } from '@/utils/handleInputChange';
 import { isPositiveFloatStr } from '@/utils/utils';
 
+enum FieldValidationResult {
+	DO_NOT_WRITE = 'DO_NOT_WRITE',
+	INVALID = 'INVALID',
+	VALID = 'VALID',
+}
+
 interface UseOrderFormParams {
 	pairData: PairData | null;
 	balance: string | undefined;
@@ -84,21 +90,35 @@ export function useOrderForm({
 			balance,
 			setRangeInputValue,
 		});
+
+		const minPerApplyAmountValidationResult = validateMinPerApplyAmount({
+			inputValue: minPerApplyAmount,
+			amount: inputValue,
+		});
+
+		if (minPerApplyAmountValidationResult !== FieldValidationResult.DO_NOT_WRITE) {
+			const isValid = minPerApplyAmountValidationResult === FieldValidationResult.VALID;
+
+			setMinPerApplyAmountValid(isValid);
+		}
 	}
 
-	function onMinPerApplyAmountChange(inputValue: string) {
+	function validateMinPerApplyAmount({
+		inputValue,
+		amount,
+	}: {
+		inputValue: string;
+		amount: string;
+	}): FieldValidationResult {
 		try {
 			if (inputValue !== '' && !isPositiveFloatStr(inputValue)) {
-				return;
+				return FieldValidationResult.DO_NOT_WRITE;
 			}
-
-			setMinPerApplyAmount(inputValue);
 
 			const { valid: validTokensInput } = validateTokensInput(inputValue, amountDP);
 
 			if (!validTokensInput) {
-				setMinPerApplyAmountValid(false);
-				return;
+				return FieldValidationResult.INVALID;
 			}
 
 			const amountDecimal = new Decimal(amount);
@@ -107,14 +127,26 @@ export function useOrderForm({
 			const minPerApplyGreaterThanAmount = minPerApplyAmountDecimal.gt(amountDecimal);
 
 			if (minPerApplyGreaterThanAmount) {
-				setMinPerApplyAmountValid(false);
-				return;
+				return FieldValidationResult.INVALID;
 			}
 
-			setMinPerApplyAmountValid(true);
+			return FieldValidationResult.VALID;
 		} catch {
-			setMinPerApplyAmountValid(false);
+			return FieldValidationResult.INVALID;
 		}
+	}
+
+	function onMinPerApplyAmountChange(inputValue: string) {
+		const validationResult = validateMinPerApplyAmount({ inputValue, amount });
+
+		if (validationResult === FieldValidationResult.DO_NOT_WRITE) {
+			return;
+		}
+
+		const isValid = validationResult === FieldValidationResult.VALID;
+
+		setMinPerApplyAmount(inputValue);
+		setMinPerApplyAmountValid(isValid);
 	}
 
 	function resetForm() {
