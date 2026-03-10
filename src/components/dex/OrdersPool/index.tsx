@@ -226,7 +226,7 @@ const OrdersPool = (props: OrdersPoolProps) => {
 									}}
 									responsive={{
 										query: '(max-width: 640px)',
-										hiddenKeys: ['total'],
+										hiddenKeys: ['total', 'min_per_apply_amount'],
 										alignOverride: { quantity: 'right' },
 										tableLayout: 'auto',
 									}}
