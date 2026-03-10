@@ -23,10 +23,12 @@ function InputPanelItem(props: InputPanelItemProps) {
 		priceState = '',
 		amountState = '',
 		totalState = '',
+		minPerApplyAmountState,
 		buySellState = buySellValues[0],
 		setBuySellState,
 		setPriceFunction,
 		setAmountFunction,
+		setMinPerApplyAmountFunction,
 		setRangeInputValue,
 		rangeInputValue = '50',
 		balance = 0,
@@ -34,10 +36,12 @@ function InputPanelItem(props: InputPanelItemProps) {
 		amountValid,
 		priceValid,
 		totalValid,
+		minPerApplyAmountValid,
 		totalUsd,
 		scrollToOrderList,
 		currencyNames,
 		onAfter,
+		resetForm,
 	} = props;
 
 	const { state } = useContext(Store);
@@ -65,18 +69,17 @@ function InputPanelItem(props: InputPanelItemProps) {
 		});
 	}
 
-	function resetForm() {
-		setPriceFunction('');
-		setAmountFunction('');
-		setRangeInputValue('50');
-	}
-
 	const numericBalance = Number(balance);
 	const numericZanoBalance = Number(zanoBalance);
 	const hasValidAssetBalance = Number.isFinite(numericBalance);
 	const hasValidZanoBalance = Number.isFinite(numericZanoBalance);
 
 	async function postOrder() {
+		const isMinPerApplyAmountSet = minPerApplyAmountState !== '';
+		const minPerApplyAmount = isMinPerApplyAmountSet
+			? new Decimal(minPerApplyAmountState)
+			: undefined;
+
 		const price = new Decimal(priceState);
 		const amount = new Decimal(amountState);
 		const total = new Decimal(totalState);
@@ -113,6 +116,8 @@ function InputPanelItem(props: InputPanelItemProps) {
 			price: price.toString(),
 			amount: amount.toString(),
 			pairId: typeof router.query.id === 'string' ? router.query.id : '',
+			minPerApplyAmount:
+				minPerApplyAmount !== undefined ? minPerApplyAmount.toFixed() : undefined,
 		};
 
 		setCreatingState(true);
@@ -153,7 +158,16 @@ function InputPanelItem(props: InputPanelItemProps) {
 	}
 
 	const buttonText = creatingState ? 'Creating...' : 'Create Order';
-	const isButtonDisabled = !priceValid || !amountValid || !totalValid || creatingState;
+
+	const isMinPerApplyAmountValidForCreation =
+		minPerApplyAmountState === '' || minPerApplyAmountValid;
+
+	const isButtonDisabled =
+		!priceValid ||
+		!amountValid ||
+		!totalValid ||
+		!isMinPerApplyAmountValidForCreation ||
+		creatingState;
 	const showTotalError = priceState !== '' && amountState !== '' && !totalValid;
 
 	return (
@@ -224,6 +238,14 @@ function InputPanelItem(props: InputPanelItemProps) {
 					currency={firstCurrencyName}
 					label="Quantity"
 					invalid={!!amountState && !amountValid}
+				/>
+
+				<LabeledInput
+					value={minPerApplyAmountState}
+					setValue={setMinPerApplyAmountFunction}
+					currency={firstCurrencyName}
+					label="Min Per Apply Amount (Optional)"
+					invalid={minPerApplyAmountState !== '' && !minPerApplyAmountValid}
 				/>
 
 				<div className={classes(isBuy && styles.disabled)}>

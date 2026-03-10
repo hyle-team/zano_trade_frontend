@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import Decimal from 'decimal.js';
+import { validateTokensInput } from 'shared/utils';
+
 import PairData from '@/interfaces/common/PairData';
 import OrderFormOutput from '@/interfaces/common/orderFormOutput';
 import { handleInputChange } from '@/utils/handleInputChange';
+import { isPositiveFloatStr } from '@/utils/utils';
 
 interface UseOrderFormParams {
 	pairData: PairData | null;
@@ -27,9 +30,15 @@ export function useOrderForm({
 	const [amount, setAmount] = useState('');
 	const [total, setTotal] = useState('');
 
+	// Optional fields
+	const [minPerApplyAmount, setMinPerApplyAmount] = useState('');
+
 	const [priceValid, setPriceValid] = useState(false);
 	const [amountValid, setAmountValid] = useState(false);
 	const [totalValid, setTotalValid] = useState(false);
+
+	// Optional field validity
+	const [minPerApplyAmountValid, setMinPerApplyAmountValid] = useState(false);
 
 	const [totalUsd, setTotalUsd] = useState<string | undefined>(undefined);
 	const [rangeInputValue, setRangeInputValue] = useState('50');
@@ -42,7 +51,7 @@ export function useOrderForm({
 			const totalDecimal = new Decimal(total);
 			const zanoPrice = assetsRates.get(pairData?.second_currency?.asset_id || '');
 			setTotalUsd(zanoPrice ? totalDecimal.mul(zanoPrice).toFixed(2) : undefined);
-		} catch (err) {
+		} catch {
 			setTotalUsd(undefined);
 		}
 	}, [total, assetsRates, pairData?.second_currency?.asset_id]);
@@ -77,10 +86,42 @@ export function useOrderForm({
 		});
 	}
 
+	function onMinPerApplyAmountChange(inputValue: string) {
+		try {
+			if (inputValue !== '' && !isPositiveFloatStr(inputValue)) {
+				return;
+			}
+
+			setMinPerApplyAmount(inputValue);
+
+			const { valid: validTokensInput } = validateTokensInput(inputValue, amountDP);
+
+			if (!validTokensInput) {
+				setMinPerApplyAmountValid(false);
+				return;
+			}
+
+			const amountDecimal = new Decimal(amount);
+			const minPerApplyAmountDecimal = new Decimal(inputValue);
+
+			const minPerApplyGreaterThanAmount = minPerApplyAmountDecimal.gt(amountDecimal);
+
+			if (minPerApplyGreaterThanAmount) {
+				setMinPerApplyAmountValid(false);
+				return;
+			}
+
+			setMinPerApplyAmountValid(true);
+		} catch {
+			setMinPerApplyAmountValid(false);
+		}
+	}
+
 	function resetForm() {
 		setPrice('');
 		setAmount('');
 		setTotal('');
+		setMinPerApplyAmount('');
 		setPriceValid(false);
 		setAmountValid(false);
 		setTotalValid(false);
@@ -91,20 +132,25 @@ export function useOrderForm({
 		price,
 		amount,
 		total,
+		minPerApplyAmount,
 		priceValid,
 		amountValid,
 		totalValid,
+		minPerApplyAmountValid,
 		totalUsd,
 		rangeInputValue,
 		setRangeInputValue,
 		onPriceChange,
 		onAmountChange,
+		onMinPerApplyAmountChange,
 		resetForm,
 		setTotal,
 		setPrice,
 		setAmount,
+		setMinPerApplyAmount,
 		setPriceValid,
 		setAmountValid,
 		setTotalValid,
+		setMinPerApplyAmountValid,
 	};
 }
