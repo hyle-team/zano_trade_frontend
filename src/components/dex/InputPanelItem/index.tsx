@@ -18,6 +18,8 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import styles from './styles.module.scss';
 import LabeledInput from './components/LabeledInput';
 
+const MAX_ORDERS_PER_SIDE = 10;
+
 function InputPanelItem(props: InputPanelItemProps) {
 	const {
 		priceState = '',
@@ -42,6 +44,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 		currencyNames,
 		onAfter,
 		resetForm,
+		userOrdersOfThisSideAmount,
 	} = props;
 
 	const { state } = useContext(Store);
@@ -177,13 +180,23 @@ function InputPanelItem(props: InputPanelItemProps) {
 	const isMinPerApplyAmountValidForCreation =
 		minPerApplyAmountState === '' || minPerApplyAmountValid;
 
+	const tooManyOrders = userOrdersOfThisSideAmount >= MAX_ORDERS_PER_SIDE;
+
 	const isButtonDisabled =
 		!priceValid ||
 		!amountValid ||
 		!totalValid ||
 		!isMinPerApplyAmountValidForCreation ||
+		tooManyOrders ||
 		creatingState;
 	const showTotalError = priceState !== '' && amountState !== '' && !totalValid;
+
+	const createButtonErrorLabel = (() => {
+		if (tooManyOrders) {
+			return 'Too many orders for this side';
+		}
+		return undefined;
+	})();
 
 	return (
 		<div data-tour="input-panel" className={styles.inputPanel}>
@@ -300,20 +313,26 @@ function InputPanelItem(props: InputPanelItemProps) {
 						</p>
 					</div>
 				</div>
-				{state.wallet?.connected ? (
-					<Button
-						disabled={isButtonDisabled}
-						onClick={postOrder}
-						className={classes(
-							styles.inputPanel__body_btn,
-							isBuy ? styles.buy : styles.sell,
-						)}
-					>
-						{buttonText}
-					</Button>
-				) : (
-					<ConnectButton className={styles.inputPanel__body_btn} />
-				)}
+				<div className={styles.inputPanel__body_btnWrapper}>
+					{state.wallet?.connected ? (
+						<Button
+							disabled={isButtonDisabled}
+							onClick={postOrder}
+							className={classes(
+								styles.inputPanel__body_btn,
+								isBuy ? styles.buy : styles.sell,
+							)}
+						>
+							{buttonText}
+						</Button>
+					) : (
+						<ConnectButton className={styles.inputPanel__body_btn} />
+					)}
+
+					{createButtonErrorLabel !== undefined && (
+						<p className={styles.inputPanel__body_btnLabel}>{createButtonErrorLabel}</p>
+					)}
+				</div>
 			</div>
 		</div>
 	);
