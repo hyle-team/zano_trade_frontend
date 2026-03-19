@@ -75,70 +75,85 @@ function InputPanelItem(props: InputPanelItemProps) {
 	const hasValidZanoBalance = Number.isFinite(numericZanoBalance);
 
 	async function postOrder() {
-		const isMinPerApplyAmountSet = minPerApplyAmountState !== '';
-		const minPerApplyAmount = isMinPerApplyAmountSet
-			? new Decimal(minPerApplyAmountState)
-			: undefined;
+		try {
+			const isMinPerApplyAmountSet = minPerApplyAmountState !== '';
+			const minPerApplyAmount = isMinPerApplyAmountSet
+				? new Decimal(minPerApplyAmountState)
+				: undefined;
 
-		const price = new Decimal(priceState);
-		const amount = new Decimal(amountState);
-		const total = new Decimal(totalState);
+			const price = new Decimal(priceState);
+			const amount = new Decimal(amountState);
+			const total = new Decimal(totalState);
 
-		const isFull =
-			price.greaterThan(0) &&
-			price.lessThan(1000000000) &&
-			amount.greaterThan(0) &&
-			amount.lessThan(1000000000) &&
-			total.greaterThan(0);
+			const isFull =
+				price.greaterThan(0) &&
+				price.lessThan(1000000000) &&
+				amount.greaterThan(0) &&
+				amount.lessThan(1000000000) &&
+				total.greaterThan(0);
 
-		if (!isFull) return;
+			if (!isFull) return;
 
-		const assetAmount = new Decimal(hasValidAssetBalance ? String(numericBalance) : '0');
-		const zanoAmount = new Decimal(hasValidZanoBalance ? String(numericZanoBalance) : '0');
+			const assetAmount = new Decimal(hasValidAssetBalance ? String(numericBalance) : '0');
+			const zanoAmount = new Decimal(hasValidZanoBalance ? String(numericZanoBalance) : '0');
 
-		if (isBuy) {
-			if (zanoAmount.lessThan(total)) {
+			if (isBuy) {
+				if (zanoAmount.lessThan(total)) {
+					setAlertState('error');
+					setAlertSubtitle('Insufficient ZANO balance');
+					setTimeout(() => setAlertState(null), 3000);
+					return;
+				}
+			} else if (assetAmount.lessThan(amount)) {
 				setAlertState('error');
-				setAlertSubtitle('Insufficient ZANO balance');
+				setAlertSubtitle(`Insufficient ${firstCurrencyName} balance`);
 				setTimeout(() => setAlertState(null), 3000);
 				return;
 			}
-		} else if (assetAmount.lessThan(amount)) {
-			setAlertState('error');
-			setAlertSubtitle(`Insufficient ${firstCurrencyName} balance`);
-			setTimeout(() => setAlertState(null), 3000);
-			return;
-		}
 
-		const orderData: CreateOrderData = {
-			type: isBuy ? 'buy' : 'sell',
-			side: 'limit',
-			price: price.toString(),
-			amount: amount.toString(),
-			pairId: typeof router.query.id === 'string' ? router.query.id : '',
-			minPerApplyAmount:
-				minPerApplyAmount !== undefined ? minPerApplyAmount.toFixed() : undefined,
-		};
+			const orderData: CreateOrderData = {
+				type: isBuy ? 'buy' : 'sell',
+				side: 'limit',
+				price: price.toString(),
+				amount: amount.toString(),
+				pairId: typeof router.query.id === 'string' ? router.query.id : '',
+				minPerApplyAmount:
+					minPerApplyAmount !== undefined ? minPerApplyAmount.toFixed() : undefined,
+			};
 
-		setCreatingState(true);
-		const result = await createOrder(orderData);
-		setCreatingState(false);
+			setCreatingState(true);
+			const result = await createOrder(orderData);
+			setCreatingState(false);
 
-		if (result.success) {
-			if (result.data?.immediateMatch) {
-				setHasImmediateMatch(true);
-				goToTab();
-				scrollToOrderList();
-			}
-			onAfter();
-			resetForm();
-		} else {
-			setAlertState('error');
-			if (result.data === 'Same order') {
-				setAlertSubtitle('Order already exists');
+			if (result.success) {
+				if (result.data?.immediateMatch) {
+					setHasImmediateMatch(true);
+					goToTab();
+					scrollToOrderList();
+				}
+				onAfter();
+				resetForm();
 			} else {
-				setAlertSubtitle('Failed to create order');
+				setAlertState('error');
+				if (result.data === 'Same order') {
+					setAlertSubtitle('Order already exists');
+				} else if (result.data === 'Too many orders') {
+					setAlertSubtitle('Too many opened orders for this pair and side');
+				} else {
+					setAlertSubtitle('Failed to create order');
+				}
+
+				setTimeout(() => {
+					setAlertState(null);
+					setAlertSubtitle('');
+				}, 3000);
 			}
+		} catch (error) {
+			console.error('Error creating order:', error);
+
+			setCreatingState(false);
+			setAlertState('error');
+			setAlertSubtitle('Failed to create order');
 
 			setTimeout(() => {
 				setAlertState(null);
