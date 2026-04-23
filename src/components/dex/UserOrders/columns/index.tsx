@@ -352,7 +352,7 @@ export function buildOrderHistoryColumns({
 			key: 'quantity',
 			header: <>Quantity ({firstCurrencyName})</>,
 			width: '160px',
-			cell: (row) => <p>{notationToString(row.left)}</p>,
+			cell: (row) => <p>{notationToString(row.amount)}</p>,
 		},
 		{
 			key: 'quantity',
@@ -372,7 +372,7 @@ export function buildOrderHistoryColumns({
 			width: '180px',
 			cell: (row) => (
 				<TotalUsdCell
-					amount={row.left}
+					amount={row.amount}
 					price={row.price}
 					secondAssetUsdPrice={secondAssetUsdPrice}
 				/>
