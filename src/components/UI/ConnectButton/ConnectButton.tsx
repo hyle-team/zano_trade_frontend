@@ -6,6 +6,7 @@ import useUpdateUser from '@/hook/useUpdateUser';
 import AlertType from '@/interfaces/common/AlertType';
 import ConnectButtonProps from '@/interfaces/props/components/UI/ConnectButton/ConnectButtonProps';
 import ZanoWindow from '@/interfaces/common/ZanoWindow';
+import { requestCompanionPermissions } from '@/utils/wallet';
 import Button from '../Button/Button';
 
 function ConnectButton(props: ConnectButtonProps) {
@@ -22,6 +23,7 @@ function ConnectButton(props: ConnectButtonProps) {
 		try {
 			setAlertState('loading');
 			await new Promise((resolve) => setTimeout(resolve, 1000));
+			await requestCompanionPermissions([{ type: 'general' }, { type: 'balance' }]);
 			const walletData = (
 				await (window as unknown as ZanoWindow).zano.request('GET_WALLET_DATA')
 			).data;
