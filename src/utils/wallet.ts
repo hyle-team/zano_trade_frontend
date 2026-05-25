@@ -6,14 +6,14 @@ async function requestCompanionPermissions(permissions: { type: string }[]): Pro
 		permissions,
 	});
 
-	if (result?.error?.includes('Unknown method')) {
+	if (result?.error === 'Unknown method: REQUEST_ACCESS') {
 		// Old extension — no permissions system, continue with legacy flow
 		console.warn('Companion does not support permissions system, continuing with legacy flow');
 		return;
 	}
 
 	if (result?.error) {
-		throw new Error(result.error);
+		throw new Error(JSON.stringify(result));
 	}
 }
 
