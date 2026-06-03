@@ -1,3 +1,5 @@
+import { createSecureHeaders } from 'next-secure-headers';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	reactStrictMode: true,
@@ -20,43 +22,21 @@ const nextConfig = {
 			{
 				source: '/(.*)',
 				headers: [
-					{
-						key: 'Content-Security-Policy',
-						value: [
-							"default-src 'self'",
-							"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
-							"style-src 'self' 'unsafe-inline'",
-							"img-src 'self' data: blob:",
-							"font-src 'self'",
-							"connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com",
-							"media-src 'self'",
-							"object-src 'none'",
-							"frame-ancestors 'none'",
-							"base-uri 'self'",
-							"form-action 'self'",
-							'upgrade-insecure-requests',
-						].join('; '),
-					},
-					{
-						key: 'Strict-Transport-Security',
-						value: 'max-age=63072000; includeSubDomains; preload',
-					},
-					{ key: 'X-Content-Type-Options', value: 'nosniff' },
-					{ key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-					{ key: 'X-XSS-Protection', value: '1; mode=block' },
-					{ key: 'Referrer-Policy', value: 'same-origin' },
+					// Content-Security-Policy is set per-request in src/middleware.ts
+					// (requires a dynamic nonce for script-src).
+					...createSecureHeaders({
+						forceHTTPSRedirect: false, // HSTS is set in nginx
+						referrerPolicy: 'same-origin',
+					}),
 					{
 						key: 'Permissions-Policy',
 						value: [
-							'camera=()',
-							'microphone=()',
-							'display-capture=()',
-							'fullscreen=()',
-							'picture-in-picture=()',
-							'speaker-selection=()',
-							'geolocation=()',
-							'payment=()',
-							'usb=()',
+							'camera=(self)', // video calls
+							'microphone=(self)', // audio calls
+							'display-capture=(self)', // screen sharing
+							'fullscreen=(self)', // MediaPlayer and SlideViewer
+							'picture-in-picture=(self)', // VideoPlayer PiP mode
+							'speaker-selection=(self)', // call audio output device (setSinkId)
 						].join(', '),
 					},
 				],
