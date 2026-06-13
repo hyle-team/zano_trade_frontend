@@ -2,20 +2,31 @@ import ZanoWindow from '@/interfaces/common/ZanoWindow';
 import IonicSwap from '@/interfaces/wallet/IonicSwap';
 
 async function requestCompanionPermissions(permissions: { type: string }[]): Promise<void> {
-	const result = await (window as unknown as ZanoWindow).zano.request('REQUEST_ACCESS', {
-		permissions,
-	});
+	const NOT_SUPPORTED_LOG =
+		'Companion does not support permissions system, continuing with legacy flow';
 
-	const error = result?.error || '';
+	try {
+		const result = await (window as unknown as ZanoWindow).zano.request('REQUEST_ACCESS', {
+			permissions,
+		});
 
-	if (error.includes('Unknown method') || error.includes('not a function')) {
-		// Old/mobile extension — no permissions system, continue with legacy flow
-		console.warn('Companion does not support permissions system, continuing with legacy flow');
-		return;
-	}
+		const error = String(result?.error || '');
 
-	if (error) {
-		throw new Error(error);
+		if (error.includes('Unknown method')) {
+			console.warn(NOT_SUPPORTED_LOG);
+			return;
+		}
+
+		if (error) {
+			throw new Error(error);
+		}
+	} catch (error) {
+		if (error instanceof Error && error.message.includes('not a function')) {
+			console.warn(NOT_SUPPORTED_LOG);
+			return;
+		}
+
+		throw error;
 	}
 }
 
