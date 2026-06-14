@@ -21,7 +21,7 @@ async function requestCompanionPermissions(permissions: { type: string }[]): Pro
 			throw new Error(error);
 		}
 	} catch (error) {
-		if (error instanceof Error && error.message.includes('not a function')) {
+		if (String(error).includes('not a function')) {
 			console.warn(NOT_SUPPORTED_LOG);
 			return;
 		}
