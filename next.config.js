@@ -22,21 +22,18 @@ const nextConfig = {
 			{
 				source: '/(.*)',
 				headers: [
-					// Content-Security-Policy is set per-request in src/middleware.ts
-					// (requires a dynamic nonce for script-src).
 					...createSecureHeaders({
-						forceHTTPSRedirect: false, // HSTS is set in nginx
 						referrerPolicy: 'same-origin',
 					}),
 					{
 						key: 'Permissions-Policy',
 						value: [
-							'camera=(self)', // video calls
-							'microphone=(self)', // audio calls
-							'display-capture=(self)', // screen sharing
-							'fullscreen=(self)', // MediaPlayer and SlideViewer
-							'picture-in-picture=(self)', // VideoPlayer PiP mode
-							'speaker-selection=(self)', // call audio output device (setSinkId)
+							'fullscreen=(self)',
+							'camera=()',
+							'microphone=()',
+							'display-capture=()',
+							'picture-in-picture=()',
+							'speaker-selection=()',
 						].join(', '),
 					},
 				],
