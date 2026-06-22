@@ -43,6 +43,8 @@ function ConnectButton(props: ConnectButtonProps) {
 				throw new Error('Invalid wallet data');
 			}
 
+			const currentUrlPath = window.location.pathname;
+
 			const authRequestRes = await fetch('/api/auth/request-auth', {
 				method: 'POST',
 				headers: {
@@ -51,6 +53,7 @@ function ConnectButton(props: ConnectButtonProps) {
 				body: JSON.stringify({
 					address: walletAddress,
 					alias: walletAlias,
+					path: currentUrlPath,
 				}),
 			}).then((res) => res.json());
 
@@ -83,7 +86,7 @@ function ConnectButton(props: ConnectButtonProps) {
 						alias: walletAlias,
 						address: walletAddress,
 						signature,
-						publicKey,
+						pkey: publicKey,
 						message: authMessage,
 					},
 				}),
