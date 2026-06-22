@@ -37,6 +37,18 @@ export function buildOrderPoolColumns({
 			cell: (row) => <p>{notationToString(row.left, 8)}</p>,
 		},
 		{
+			key: 'min_per_apply_amount',
+			header: <>Min ({firstCurrencyName})</>,
+			width: '80px',
+			cell: (row) => (
+				<p>
+					{row.min_per_apply_amount
+						? notationToString(row.min_per_apply_amount, 8)
+						: 'No'}
+				</p>
+			),
+		},
+		{
 			key: 'total',
 			header: <>Total ({secondCurrencyName})</>,
 			width: '80px',

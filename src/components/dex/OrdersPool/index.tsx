@@ -226,7 +226,7 @@ const OrdersPool = (props: OrdersPoolProps) => {
 									}}
 									responsive={{
 										query: '(max-width: 640px)',
-										hiddenKeys: ['total'],
+										hiddenKeys: ['total', 'min_per_apply_amount'],
 										alignOverride: { quantity: 'right' },
 										tableLayout: 'auto',
 									}}
@@ -390,6 +390,13 @@ const OrdersPool = (props: OrdersPoolProps) => {
 
 								<h6>Amount ({firstCurrencyName})</h6>
 								<p>{notationToString(ordersInfoTooltip?.left)}</p>
+
+								<h6>Min Per Apply Amount ({firstCurrencyName})</h6>
+								<p>
+									{ordersInfoTooltip.min_per_apply_amount !== null
+										? notationToString(ordersInfoTooltip.min_per_apply_amount)
+										: 'No'}
+								</p>
 
 								<h6>Total ({secondCurrencyName})</h6>
 								<p>{notationToString(totalDecimal.toString())}</p>

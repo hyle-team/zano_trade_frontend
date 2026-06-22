@@ -69,6 +69,16 @@ export function buildUserColumns({
 			cell: (row) => <p>{notationToString(row.left)}</p>,
 		},
 		{
+			key: 'min_per_apply_amount',
+			header: <>Min Per Apply ({firstCurrencyName})</>,
+			width: '160px',
+			cell: (row) => (
+				<p>
+					{row.min_per_apply_amount ? notationToString(row.min_per_apply_amount) : 'No'}
+				</p>
+			),
+		},
+		{
 			key: 'total',
 			header: <>Total ({secondCurrencyName})</>,
 			width: '180px',
@@ -320,7 +330,7 @@ export function buildOrderHistoryColumns({
 		{
 			key: 'direction',
 			header: 'Direction',
-			width: '110px',
+			width: '70px',
 			cell: (row) => (
 				<p
 					style={{
@@ -342,7 +352,19 @@ export function buildOrderHistoryColumns({
 			key: 'quantity',
 			header: <>Quantity ({firstCurrencyName})</>,
 			width: '160px',
-			cell: (row) => <p>{notationToString(row.left)}</p>,
+			cell: (row) => <p>{notationToString(row.amount)}</p>,
+		},
+		{
+			key: 'quantity',
+			header: <>Min Per Apply ({firstCurrencyName})</>,
+			width: '160px',
+			cell: (row) => (
+				<p>
+					{row.min_per_apply_amount !== null
+						? notationToString(row.min_per_apply_amount)
+						: 'No'}
+				</p>
+			),
 		},
 		{
 			key: 'total',
@@ -350,7 +372,7 @@ export function buildOrderHistoryColumns({
 			width: '180px',
 			cell: (row) => (
 				<TotalUsdCell
-					amount={row.left}
+					amount={row.amount}
 					price={row.price}
 					secondAssetUsdPrice={secondAssetUsdPrice}
 				/>
@@ -359,7 +381,7 @@ export function buildOrderHistoryColumns({
 		{
 			key: 'time',
 			header: 'Time',
-			width: '100px',
+			width: '180px',
 			cell: (row) => <p>{formatTimestamp(row.timestamp)}</p>,
 		},
 	];

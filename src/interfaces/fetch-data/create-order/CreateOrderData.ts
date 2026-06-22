@@ -7,6 +7,7 @@ interface CreateOrderData {
 	price: string;
 	amount: string;
 	pairId: string;
+	minPerApplyAmount?: string;
 }
 
 export default CreateOrderData;

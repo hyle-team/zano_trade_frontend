@@ -68,6 +68,10 @@ function Trading({
 	const matrixAddresses = useMatrixAddresses(ordersHistory);
 	const [orderFormType, setOrderFormType] = useState(buySellValues[1]);
 
+	const userOrdersOfThisSideAmount = userOrders.filter(
+		(order) => order.type === (orderFormType.code === 'buy' ? 'buy' : 'sell'),
+	).length;
+
 	const {
 		orderForm,
 		currencyNames,
@@ -216,10 +220,12 @@ function Trading({
 							priceState={orderForm.price}
 							amountState={orderForm.amount}
 							totalState={orderForm.total}
+							minPerApplyAmountState={orderForm.minPerApplyAmount}
 							buySellState={orderFormType}
 							setBuySellState={setOrderFormType}
 							setPriceFunction={orderForm.onPriceChange}
 							setAmountFunction={orderForm.onAmountChange}
+							setMinPerApplyAmountFunction={orderForm.onMinPerApplyAmountChange}
 							setRangeInputValue={orderForm.setRangeInputValue}
 							rangeInputValue={orderForm.rangeInputValue}
 							balance={Number(balance)}
@@ -227,9 +233,12 @@ function Trading({
 							priceValid={orderForm.priceValid}
 							amountValid={orderForm.amountValid}
 							totalValid={orderForm.totalValid}
+							minPerApplyAmountValid={orderForm.minPerApplyAmountValid}
 							totalUsd={orderForm.totalUsd}
 							scrollToOrderList={scrollToOrdersList}
 							onAfter={onAfter}
+							resetForm={orderForm.resetForm}
+							userOrdersOfThisSideAmount={userOrdersOfThisSideAmount}
 						/>
 					</div>
 				</div>

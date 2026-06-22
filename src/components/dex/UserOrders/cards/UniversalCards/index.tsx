@@ -71,7 +71,8 @@ const AliasRow = ({ label = 'Alias', children }: { label?: string; children: Rea
 );
 
 export default function UniversalCards(props: UniversalCardsProps) {
-	const { firstCurrencyName, secondCurrencyName, secondAssetUsdPrice, data, onAfter } = props;
+	const { firstCurrencyName, secondCurrencyName, secondAssetUsdPrice, data, onAfter, type } =
+		props;
 
 	if (!data?.length)
 		return (
@@ -99,27 +100,52 @@ export default function UniversalCards(props: UniversalCardsProps) {
 							<p className={styles.card__label}>Direction</p>
 							<p className={classes(styles.card__value, styles.card__type)}>{side}</p>
 						</div>
-						<div className={styles.card__col}>
+						<div className={classes(styles.card__col, styles.card__col_timestamp)}>
 							<p className={styles.card__label}>Time</p>
 							<p className={styles.card__value}>
 								{formatTimestamp(Number(row.timestamp))}
 							</p>
 						</div>
-						<div className={classes(styles.card__col, styles.card__price)}>
+						<div
+							className={classes(
+								styles.card__col,
+								type !== 'history' ? styles.card__price : undefined,
+							)}
+						>
 							<p className={styles.card__label}>Price ({secondCurrencyName})</p>
 							<p className={styles.card__value}>{notationToString(row.price)}</p>
 						</div>
+						{type === 'orders' && (
+							<div className={styles.card__col}>
+								<p className={styles.card__label}>Quantity ({firstCurrencyName})</p>
+								<p className={styles.card__value}>
+									{notationToString(row.amount ?? row.left)}
+								</p>
+							</div>
+						)}
 					</div>
 				);
 
 				const Metrics = (
 					<>
-						<div className={styles.card__col}>
-							<p className={styles.card__label}>Quantity ({firstCurrencyName})</p>
-							<p className={styles.card__value}>
-								{notationToString(row.amount ?? row.left)}
-							</p>
-						</div>
+						{type !== 'orders' && (
+							<div className={styles.card__col}>
+								<p className={styles.card__label}>Quantity ({firstCurrencyName})</p>
+								<p className={styles.card__value}>
+									{notationToString(row.amount ?? row.left)}
+								</p>
+							</div>
+						)}
+						{(type === 'orders' || type === 'history') && (
+							<div className={styles.card__col}>
+								<p className={styles.card__label}>Min ({firstCurrencyName})</p>
+								<p className={styles.card__value}>
+									{row.min_per_apply_amount !== null
+										? notationToString(row.min_per_apply_amount)
+										: 'No'}
+								</p>
+							</div>
+						)}
 						<div className={styles.card__col}>
 							<p className={styles.card__label}>Total ({secondCurrencyName})</p>
 							<TotalUsdCell
@@ -129,12 +155,18 @@ export default function UniversalCards(props: UniversalCardsProps) {
 								secondAssetUsdPrice={secondAssetUsdPrice}
 							/>
 						</div>
-						<div
-							className={classes(styles.card__col, styles.card__price, styles.mobile)}
-						>
-							<p className={styles.card__label}>Price ({secondCurrencyName})</p>
-							<p className={styles.card__value}>{notationToString(row.price)}</p>
-						</div>
+						{type !== 'history' && (
+							<div
+								className={classes(
+									styles.card__col,
+									styles.card__price,
+									styles.mobile,
+								)}
+							>
+								<p className={styles.card__label}>Price ({secondCurrencyName})</p>
+								<p className={styles.card__value}>{notationToString(row.price)}</p>
+							</div>
+						)}
 					</>
 				);
 

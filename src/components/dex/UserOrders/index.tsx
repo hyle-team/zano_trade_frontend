@@ -264,36 +264,92 @@ const UserOrders = ({
 						onAfter={onAfter}
 					/>
 				);
-			case 'matches':
-				return !isSm ? (
-					<GenericTable
-						className={styles.userOrders__body}
-						columns={columnsSuitables}
-						data={matches.sort(sortMatches)}
-						getRowKey={(r) => r.id}
-						emptyMessage="No suitables"
-						groupBy={(r) => r.connected_order_id}
-						renderGroupHeader={({ groupKey }) => (
-							<OrderGroupHeader
-								order={userOrders.find((o) => String(o.id) === String(groupKey))}
-								firstCurrencyName={firstCurrencyName}
-								secondCurrencyName={secondCurrencyName}
-							/>
-						)}
-					/>
-				) : (
-					<UniversalCards
-						type="matches"
-						data={matches.sort(sortMatches)}
-						firstCurrencyName={firstCurrencyName}
-						secondCurrencyName={secondCurrencyName}
-						secondAssetUsdPrice={secondAssetUsdPrice}
-						onAfter={onAfter}
-						matrixAddresses={matrixAddresses}
-						pairData={pairData}
-						userOrders={userOrders}
-					/>
-				);
+			case 'matches': {
+				if (!isSm) {
+					return (
+						<GenericTable
+							className={styles.userOrders__body}
+							columns={columnsSuitables}
+							data={matches.sort(sortMatches)}
+							getRowKey={(r) => r.id}
+							emptyMessage="No suitables"
+							groupBy={(r) => r.connected_order_id}
+							renderGroupHeader={({ groupKey }) => (
+								<OrderGroupHeader
+									order={userOrders.find(
+										(o) => String(o.id) === String(groupKey),
+									)}
+									firstCurrencyName={firstCurrencyName}
+									secondCurrencyName={secondCurrencyName}
+								/>
+							)}
+						/>
+					);
+				}
+
+				const sortedMatches = matches.sort(sortMatches);
+
+				const separateMatchesOnGroupsByUserOrders = ({
+					sortedMatches,
+				}: {
+					sortedMatches: ApplyTip[];
+				}) => {
+					const getMatchGroupId = (match: ApplyTip) => match.connected_order_id;
+
+					const groupedMatchesMap = new Map<string, ApplyTip[]>();
+
+					for (const match of sortedMatches) {
+						const matchGroupId = getMatchGroupId(match);
+
+						const currentGroupMatches = groupedMatchesMap.get(matchGroupId) ?? [];
+						currentGroupMatches.push(match);
+
+						groupedMatchesMap.set(matchGroupId, currentGroupMatches);
+					}
+
+					const groupedMatchesMapEntries = Array.from(groupedMatchesMap.entries());
+
+					return groupedMatchesMapEntries
+						.map(([groupId, matches]) => {
+							const userOrder = userOrders.find((e) => e.id === groupId);
+
+							if (!userOrder) {
+								return undefined;
+							}
+
+							return {
+								userOrder,
+								matches,
+							};
+						})
+						.filter((e) => e !== undefined);
+				};
+
+				const matchesGroupsByUserOrders = separateMatchesOnGroupsByUserOrders({
+					sortedMatches,
+				});
+
+				return matchesGroupsByUserOrders.map((group) => (
+					<>
+						<OrderGroupHeader
+							order={group.userOrder}
+							firstCurrencyName={firstCurrencyName}
+							secondCurrencyName={secondCurrencyName}
+						/>
+						<UniversalCards
+							type="matches"
+							data={group.matches}
+							firstCurrencyName={firstCurrencyName}
+							secondCurrencyName={secondCurrencyName}
+							secondAssetUsdPrice={secondAssetUsdPrice}
+							onAfter={onAfter}
+							matrixAddresses={matrixAddresses}
+							pairData={pairData}
+							userOrders={userOrders}
+						/>
+					</>
+				));
+			}
 			case 'requests':
 				return !isSm ? (
 					<GenericTable

@@ -226,10 +226,16 @@ export async function createOrder(
 	orderData: CreateOrderData,
 ): Promise<ErrorRes | { success: true; data: { immediateMatch: boolean } }> {
 	return axios
-		.post('/api/orders/create', {
-			token: sessionStorage.getItem('token'),
-			orderData,
-		})
+		.post(
+			'/api/orders/create',
+			{
+				token: sessionStorage.getItem('token'),
+				orderData,
+			},
+			{
+				validateStatus: () => true,
+			},
+		)
 		.then((res) => res.data);
 }
 

@@ -36,6 +36,8 @@ export interface UserOrderData {
 	left: number;
 	first_currency: CurrencyRow;
 	second_currency: CurrencyRow;
+	min_per_apply_amount: string | null;
+	max_per_apply_amount: string | null;
 
 	pair: {
 		id: number;

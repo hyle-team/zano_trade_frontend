@@ -18,15 +18,19 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import styles from './styles.module.scss';
 import LabeledInput from './components/LabeledInput';
 
+const MAX_ORDERS_PER_SIDE = 10;
+
 function InputPanelItem(props: InputPanelItemProps) {
 	const {
 		priceState = '',
 		amountState = '',
 		totalState = '',
+		minPerApplyAmountState,
 		buySellState = buySellValues[0],
 		setBuySellState,
 		setPriceFunction,
 		setAmountFunction,
+		setMinPerApplyAmountFunction,
 		setRangeInputValue,
 		rangeInputValue = '50',
 		balance = 0,
@@ -34,10 +38,13 @@ function InputPanelItem(props: InputPanelItemProps) {
 		amountValid,
 		priceValid,
 		totalValid,
+		minPerApplyAmountValid,
 		totalUsd,
 		scrollToOrderList,
 		currencyNames,
 		onAfter,
+		resetForm,
+		userOrdersOfThisSideAmount,
 	} = props;
 
 	const { state } = useContext(Store);
@@ -65,75 +72,91 @@ function InputPanelItem(props: InputPanelItemProps) {
 		});
 	}
 
-	function resetForm() {
-		setPriceFunction('');
-		setAmountFunction('');
-		setRangeInputValue('50');
-	}
-
 	const numericBalance = Number(balance);
 	const numericZanoBalance = Number(zanoBalance);
 	const hasValidAssetBalance = Number.isFinite(numericBalance);
 	const hasValidZanoBalance = Number.isFinite(numericZanoBalance);
 
 	async function postOrder() {
-		const price = new Decimal(priceState);
-		const amount = new Decimal(amountState);
-		const total = new Decimal(totalState);
+		try {
+			const isMinPerApplyAmountSet = minPerApplyAmountState !== '';
+			const minPerApplyAmount = isMinPerApplyAmountSet
+				? new Decimal(minPerApplyAmountState)
+				: undefined;
 
-		const isFull =
-			price.greaterThan(0) &&
-			price.lessThan(1000000000) &&
-			amount.greaterThan(0) &&
-			amount.lessThan(1000000000) &&
-			total.greaterThan(0);
+			const price = new Decimal(priceState);
+			const amount = new Decimal(amountState);
+			const total = new Decimal(totalState);
 
-		if (!isFull) return;
+			const isFull =
+				price.greaterThan(0) &&
+				price.lessThan(1000000000) &&
+				amount.greaterThan(0) &&
+				amount.lessThan(1000000000) &&
+				total.greaterThan(0);
 
-		const assetAmount = new Decimal(hasValidAssetBalance ? String(numericBalance) : '0');
-		const zanoAmount = new Decimal(hasValidZanoBalance ? String(numericZanoBalance) : '0');
+			if (!isFull) return;
 
-		if (isBuy) {
-			if (zanoAmount.lessThan(total)) {
+			const assetAmount = new Decimal(hasValidAssetBalance ? String(numericBalance) : '0');
+			const zanoAmount = new Decimal(hasValidZanoBalance ? String(numericZanoBalance) : '0');
+
+			if (isBuy) {
+				if (zanoAmount.lessThan(total)) {
+					setAlertState('error');
+					setAlertSubtitle('Insufficient ZANO balance');
+					setTimeout(() => setAlertState(null), 3000);
+					return;
+				}
+			} else if (assetAmount.lessThan(amount)) {
 				setAlertState('error');
-				setAlertSubtitle('Insufficient ZANO balance');
+				setAlertSubtitle(`Insufficient ${firstCurrencyName} balance`);
 				setTimeout(() => setAlertState(null), 3000);
 				return;
 			}
-		} else if (assetAmount.lessThan(amount)) {
-			setAlertState('error');
-			setAlertSubtitle(`Insufficient ${firstCurrencyName} balance`);
-			setTimeout(() => setAlertState(null), 3000);
-			return;
-		}
 
-		const orderData: CreateOrderData = {
-			type: isBuy ? 'buy' : 'sell',
-			side: 'limit',
-			price: price.toString(),
-			amount: amount.toString(),
-			pairId: typeof router.query.id === 'string' ? router.query.id : '',
-		};
+			const orderData: CreateOrderData = {
+				type: isBuy ? 'buy' : 'sell',
+				side: 'limit',
+				price: price.toString(),
+				amount: amount.toString(),
+				pairId: typeof router.query.id === 'string' ? router.query.id : '',
+				minPerApplyAmount:
+					minPerApplyAmount !== undefined ? minPerApplyAmount.toFixed() : undefined,
+			};
 
-		setCreatingState(true);
-		const result = await createOrder(orderData);
-		setCreatingState(false);
+			setCreatingState(true);
+			const result = await createOrder(orderData);
+			setCreatingState(false);
 
-		if (result.success) {
-			if (result.data?.immediateMatch) {
-				setHasImmediateMatch(true);
-				goToTab();
-				scrollToOrderList();
-			}
-			onAfter();
-			resetForm();
-		} else {
-			setAlertState('error');
-			if (result.data === 'Same order') {
-				setAlertSubtitle('Order already exists');
+			if (result.success) {
+				if (result.data?.immediateMatch) {
+					setHasImmediateMatch(true);
+					goToTab();
+					scrollToOrderList();
+				}
+				onAfter();
+				resetForm();
 			} else {
-				setAlertSubtitle('Failed to create order');
+				setAlertState('error');
+				if (result.data === 'Same order') {
+					setAlertSubtitle('Order already exists');
+				} else if (result.data === 'Too many orders') {
+					setAlertSubtitle('Too many opened orders for this pair and side');
+				} else {
+					setAlertSubtitle('Failed to create order');
+				}
+
+				setTimeout(() => {
+					setAlertState(null);
+					setAlertSubtitle('');
+				}, 3000);
 			}
+		} catch (error) {
+			console.error('Error creating order:', error);
+
+			setCreatingState(false);
+			setAlertState('error');
+			setAlertSubtitle('Failed to create order');
 
 			setTimeout(() => {
 				setAlertState(null);
@@ -153,8 +176,27 @@ function InputPanelItem(props: InputPanelItemProps) {
 	}
 
 	const buttonText = creatingState ? 'Creating...' : 'Create Order';
-	const isButtonDisabled = !priceValid || !amountValid || !totalValid || creatingState;
+
+	const isMinPerApplyAmountValidForCreation =
+		minPerApplyAmountState === '' || minPerApplyAmountValid;
+
+	const tooManyOrders = userOrdersOfThisSideAmount >= MAX_ORDERS_PER_SIDE;
+
+	const isButtonDisabled =
+		!priceValid ||
+		!amountValid ||
+		!totalValid ||
+		!isMinPerApplyAmountValidForCreation ||
+		tooManyOrders ||
+		creatingState;
 	const showTotalError = priceState !== '' && amountState !== '' && !totalValid;
+
+	const createButtonErrorLabel = (() => {
+		if (tooManyOrders) {
+			return 'Too many orders for this side';
+		}
+		return undefined;
+	})();
 
 	return (
 		<div data-tour="input-panel" className={styles.inputPanel}>
@@ -226,6 +268,14 @@ function InputPanelItem(props: InputPanelItemProps) {
 					invalid={!!amountState && !amountValid}
 				/>
 
+				<LabeledInput
+					value={minPerApplyAmountState}
+					setValue={setMinPerApplyAmountFunction}
+					currency={firstCurrencyName}
+					label="Min Per Apply Amount (Optional)"
+					invalid={minPerApplyAmountState !== '' && !minPerApplyAmountValid}
+				/>
+
 				<div className={classes(isBuy && styles.disabled)}>
 					<RangeInput value={!isBuy ? rangeInputValue : '50'} onInput={onRangeInput} />
 					<div className={styles.inputPanel__body_labels}>
@@ -263,20 +313,26 @@ function InputPanelItem(props: InputPanelItemProps) {
 						</p>
 					</div>
 				</div>
-				{state.wallet?.connected ? (
-					<Button
-						disabled={isButtonDisabled}
-						onClick={postOrder}
-						className={classes(
-							styles.inputPanel__body_btn,
-							isBuy ? styles.buy : styles.sell,
-						)}
-					>
-						{buttonText}
-					</Button>
-				) : (
-					<ConnectButton className={styles.inputPanel__body_btn} />
-				)}
+				<div className={styles.inputPanel__body_btnWrapper}>
+					{state.wallet?.connected ? (
+						<Button
+							disabled={isButtonDisabled}
+							onClick={postOrder}
+							className={classes(
+								styles.inputPanel__body_btn,
+								isBuy ? styles.buy : styles.sell,
+							)}
+						>
+							{buttonText}
+						</Button>
+					) : (
+						<ConnectButton className={styles.inputPanel__body_btn} />
+					)}
+
+					{createButtonErrorLabel !== undefined && (
+						<p className={styles.inputPanel__body_btnLabel}>{createButtonErrorLabel}</p>
+					)}
+				</div>
 			</div>
 		</div>
 	);

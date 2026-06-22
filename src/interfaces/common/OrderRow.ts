@@ -12,6 +12,8 @@ interface OrderRow {
 	user_id: string;
 	status: string;
 	left: number;
+	min_per_apply_amount: number | null;
+	max_per_apply_amount: number | null;
 	isInstant: boolean;
 }
 
