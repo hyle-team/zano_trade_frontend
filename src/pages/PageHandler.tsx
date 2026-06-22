@@ -35,7 +35,7 @@ function PageHandler(props: { config: GetConfigResData }) {
 		console.log(state);
 		if (state.user?.id) {
 			socket.emit('in-account', {
-				id: state.user?.id,
+				token: sessionStorage.getItem('token'),
 			});
 
 			socket.on('refresh-request', () => {
