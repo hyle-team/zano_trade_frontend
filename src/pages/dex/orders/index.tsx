@@ -453,7 +453,9 @@ function Orders() {
 					/>
 
 					<div className={styles['orders__preloader-wrapper']} ref={inViewRef}>
-						{orderPageLoading && <Preloader />}
+						{orderPageLoading &&
+							orders.length > 0 &&
+							lastOrderOffset < (totalOrdersCount ?? 0) && <Preloader />}
 					</div>
 				</div>
 				{alertState && (

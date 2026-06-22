@@ -27,6 +27,7 @@ interface InputPanelItemProps {
 	scrollToOrderList: () => void;
 	onAfter: () => Promise<void>;
 	resetForm: () => void;
+	userOrdersOfThisSideAmount: number;
 }
 
 export default InputPanelItemProps;

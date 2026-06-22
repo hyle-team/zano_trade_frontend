@@ -1,6 +1,9 @@
+import { createSecureHeaders } from 'next-secure-headers';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	reactStrictMode: true,
+	poweredByHeader: false,
 	async redirects() {
 		return [
 			{
@@ -13,6 +16,29 @@ const nextConfig = {
 			//   destination: '/maintenance',
 			//   permanent: false,
 			// },
+		];
+	},
+	async headers() {
+		return [
+			{
+				source: '/(.*)',
+				headers: [
+					...createSecureHeaders({
+						referrerPolicy: 'same-origin',
+					}),
+					{
+						key: 'Permissions-Policy',
+						value: [
+							'fullscreen=(self)',
+							'camera=()',
+							'microphone=()',
+							'display-capture=()',
+							'picture-in-picture=()',
+							'speaker-selection=()',
+						].join(', '),
+					},
+				],
+			},
 		];
 	},
 	webpack: (config) => {

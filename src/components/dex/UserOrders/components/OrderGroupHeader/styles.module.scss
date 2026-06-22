@@ -1,8 +1,11 @@
 .header {
 	margin-block: 2px;
+	position: relative;
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	gap: 20px;
+	column-gap: 20px;
+	row-gap: 10px;
 	padding-inline: 12px;
 	padding-block: 6px;
 	background-color: var(--table-group-header-bg);
@@ -47,6 +50,7 @@
 	&__label,
 	&__value,
 	&__type {
+		white-space: nowrap;
 		font-size: 12px;
 		font-weight: 400;
 

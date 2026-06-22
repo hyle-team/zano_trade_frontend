@@ -68,6 +68,10 @@ function Trading({
 	const matrixAddresses = useMatrixAddresses(ordersHistory);
 	const [orderFormType, setOrderFormType] = useState(buySellValues[1]);
 
+	const userOrdersOfThisSideAmount = userOrders.filter(
+		(order) => order.type === (orderFormType.code === 'buy' ? 'buy' : 'sell'),
+	).length;
+
 	const {
 		orderForm,
 		currencyNames,
@@ -234,6 +238,7 @@ function Trading({
 							scrollToOrderList={scrollToOrdersList}
 							onAfter={onAfter}
 							resetForm={orderForm.resetForm}
+							userOrdersOfThisSideAmount={userOrdersOfThisSideAmount}
 						/>
 					</div>
 				</div>

@@ -86,9 +86,14 @@
 			gap: 5px;
 		}
 
-		&_btn {
+		&_btnWrapper {
 			margin-top: 10px;
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+		}
 
+		&_btn {
 			&.buy {
 				background-color: #16d1d6;
 
@@ -103,6 +108,15 @@
 				&:hover {
 					background-color: #ff8585;
 				}
+			}
+		}
+
+		&_btnLabel {
+			font-size: 12px;
+			color: #ff6767;
+
+			@media screen and (max-width: 640px) {
+				font-size: 10px;
 			}
 		}
 	}
