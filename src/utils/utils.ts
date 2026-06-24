@@ -1,4 +1,3 @@
-import WalletCredentials from '@/interfaces/common/WalletCredentials';
 import Decimal from 'decimal.js';
 import whitelistedTokens from '@/constants/tokens.json';
 
@@ -110,14 +109,6 @@ export const localeTimeLeft = (now: number | null, timestamp: number) => {
 
 	return `${intToStrFixedLen(hours)}:${intToStrFixedLen(minutes)}:${intToStrFixedLen(seconds)}`;
 };
-
-export function setWalletCredentials(credentials: WalletCredentials | undefined) {
-	if (credentials) {
-		localStorage.setItem('wallet', JSON.stringify(credentials));
-	} else {
-		localStorage.removeItem('wallet');
-	}
-}
 
 export function isPositiveFloatStr(input: string) {
 	const regExp = /^\d+(\.\d*)?$/;
