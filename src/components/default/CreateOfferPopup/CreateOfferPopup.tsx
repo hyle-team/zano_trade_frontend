@@ -19,6 +19,7 @@ import WindowedInputsProps, {
 import AlertType from '@/interfaces/common/AlertType';
 import CurrencyRow from '@/interfaces/common/CurrencyRow';
 import UpdateOfferData from '@/interfaces/fetch-data/update-offer/UpdateOfferData';
+import { Decimal } from 'decimal.js';
 import styles from './CreateOfferPopup.module.scss';
 
 function CreateOfferPopup(props: CreateOfferPopupProps) {
@@ -90,41 +91,36 @@ function CreateOfferPopup(props: CreateOfferPopupProps) {
 	}, [state.config?.currencies]);
 
 	async function sendUpdateRequest() {
-		const limitsMin = parseFloat(limits.min);
-		const limitsMax = parseFloat(limits.max);
+		let offerPrice: string;
+		let limitsMin: string;
+		let limitsMax: string;
+		let depositBuyer: string;
+		let depositSeller: string;
 
-		const depositBuyer = parseFloat(deposit.buyer);
-		const depositSeller = parseFloat(deposit.seller);
+		try {
+			limitsMin = new Decimal(limits.min).toFixed();
+			limitsMax = new Decimal(limits.max).toFixed();
 
-		const offerPrice = parseFloat(price);
+			depositBuyer = new Decimal(deposit.buyer).toFixed();
+			depositSeller = new Decimal(deposit.seller).toFixed();
 
-		const successedInput =
-			limits.min && limits.max && firstCurrency && secondCurrency && depositCurrency;
+			offerPrice = new Decimal(price).toFixed();
+		} catch (error) {
+			if (error instanceof Error && /DecimalError/.test(error.message)) {
+				setAlertState('error');
+				setAlertSubtitle('Please, set correct values');
+				setTimeout(() => setAlertState(null), 3000);
+				return;
+			}
 
-		const rangeCorrect =
-			limitsMin > 0 &&
-			limitsMin < 1000000000 &&
-			limitsMax > 0 &&
-			limitsMax < 1000000000 &&
-			depositBuyer > 0 &&
-			depositBuyer < 1000000000 &&
-			depositSeller > 0 &&
-			depositSeller < 1000000000 &&
-			parseFloat(price) > 0 &&
-			parseFloat(price) < 10000000000 &&
-			limitsMin < limitsMax &&
-			(firstCurrency?.type === 'fiat') === (secondCurrency?.type === 'crypto');
-
-		if (!successedInput) {
-			setAlertState('error');
-			setAlertSubtitle('Please, fill all fields');
-			setTimeout(() => setAlertState(null), 3000);
-			return;
+			throw error;
 		}
 
-		if (!rangeCorrect) {
+		const areCurrenciesSelected = firstCurrency && secondCurrency && depositCurrency;
+
+		if (!areCurrenciesSelected) {
 			setAlertState('error');
-			setAlertSubtitle('Please, set correct values');
+			setAlertSubtitle('Please, select all currencies');
 			setTimeout(() => setAlertState(null), 3000);
 			return;
 		}
