@@ -43,14 +43,14 @@ function ProcessContent() {
 
 	useEffect(() => {
 		socket.emit('join', {
-			token: sessionStorage.getItem('token') || null,
+			token: state.token,
 			chat_id: router.query.id,
 		});
 		console.log('Connected to socket');
 
 		socket.on('check-connection', () => {
 			socket.emit('submit-watched', {
-				token: sessionStorage.getItem('token') || null,
+				token: state.token,
 				chat_id: router.query.id,
 			});
 		});
@@ -61,11 +61,11 @@ function ProcessContent() {
 			socket.off('check-connection');
 
 			socket.emit('leave', {
-				token: sessionStorage.getItem('token') || null,
+				token: state.token,
 				chat_id: router.query.id,
 			});
 		};
-	}, []);
+	}, [state.token]);
 
 	const [sellerState, setSellerState] = useState<DepositState>(null); // default, deposit, confirmed, canceled
 	const [buyerState, setBuyerState] = useState<DepositState>(null); // default, deposit, confirmed, canceled
@@ -110,7 +110,7 @@ function ProcessContent() {
 	useEffect(() => {
 		async function getChatData() {
 			if (!(typeof router.query.id === 'string')) return;
-			const result = await getChat(router.query.id);
+			const result = await getChat(router.query.id, { token: state.token });
 
 			console.log(result);
 
@@ -122,7 +122,7 @@ function ProcessContent() {
 
 			setChatData(resultData);
 
-			const chunkResult = await getChatChunk(router.query.id, 1);
+			const chunkResult = await getChatChunk(router.query.id, 1, { token: state.token });
 
 			if (!chunkResult.success) router.push('/');
 
@@ -152,7 +152,7 @@ function ProcessContent() {
 
 	function changeDepositState(depositState: DepositState) {
 		socket.emit('change-deposit', {
-			token: sessionStorage.getItem('token'),
+			token: state.token,
 			chat_id: router.query.id,
 			deposit_state: depositState,
 		});

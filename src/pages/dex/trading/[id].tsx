@@ -1,7 +1,7 @@
 import styles from '@/styles/Trading.module.scss';
 import Header from '@/components/default/Header/Header';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
-import { useCallback, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import {
 	cancelOrder,
 	getCandles,
@@ -36,6 +36,7 @@ import useMatrixAddresses from '@/hook/useMatrixAddresses';
 import takeOrderClick from '@/utils/takeOrderClick';
 import useUpdateUser from '@/hook/useUpdateUser';
 import { GuideProvider } from '@/store/guide-provider';
+import { Store } from '@/store/store-reducer';
 import { GetServerSidePropsContext } from 'next';
 import { TradingProps } from '@/interfaces/props/pages/dex/trading/TradingProps';
 import { Footer } from '@/zano_ui/src';
@@ -47,6 +48,7 @@ function Trading({
 	initialTrades,
 	initialCandles,
 }: TradingProps) {
+	const { state } = useContext(Store);
 	const { alertState, alertSubtitle, setAlertState } = useAlert();
 	const { elementRef: orderListRef, scrollToElement: scrollToOrdersList } =
 		useScroll<HTMLDivElement>();
@@ -138,7 +140,7 @@ function Trading({
 
 		try {
 			for (const order of userOrders) {
-				await cancelOrder(order.id);
+				await cancelOrder(order.id, { token: state.token });
 			}
 
 			await updateUserOrders();
@@ -147,7 +149,7 @@ function Trading({
 		} finally {
 			setMyOrdersLoading(false);
 		}
-	}, [userOrders, updateUserOrders]);
+	}, [userOrders, updateUserOrders, state.token]);
 
 	const { filteredOrdersHistory } = useFilteredData({
 		ordersBuySell,

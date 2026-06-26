@@ -143,7 +143,7 @@ function CreateOfferPopup(props: CreateOfferPopupProps) {
 
 		setAlertState('loading');
 		setAlertSubtitle('Updating offer data');
-		const result = await updateOffer(offerNewData);
+		const result = await updateOffer(offerNewData, { token: state.token });
 		if (!result.success) {
 			setAlertState('error');
 			setAlertSubtitle('Server error occured.');

@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import { Store } from '@/store/store-reducer';
-import { updateWalletState } from '@/store/actions';
+import { updateToken, updateWalletState } from '@/store/actions';
 import Alert from '@/components/UI/Alert/Alert';
 import useUpdateUser from '@/hook/useUpdateUser';
 import AlertType from '@/interfaces/common/AlertType';
@@ -111,7 +111,7 @@ function ConnectButton(props: ConnectButtonProps) {
 				throw new Error(ConnectErrorMessage.SERVER_AUTH_ERROR);
 			}
 
-			sessionStorage.setItem('token', result?.data);
+			updateToken(dispatch, result?.data);
 
 			updateWalletState(dispatch, { ...walletData, connected: true });
 
