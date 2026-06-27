@@ -61,7 +61,7 @@ export default function RequestActionCell({
 					alertErr('Companion responded with an error');
 					return;
 				}
-				result = await confirmTransaction(row.id);
+				result = await confirmTransaction(row.id, { token: state.token });
 			} else {
 				const firstCurrencyId = pairData?.first_currency.asset_id;
 				const secondCurrencyId = pairData?.second_currency.asset_id;
@@ -102,7 +102,10 @@ export default function RequestActionCell({
 					return;
 				}
 
-				result = await applyOrder({ ...row, hex_raw_proposal: hex });
+				result = await applyOrder(
+					{ ...row, hex_raw_proposal: hex },
+					{ token: state.token },
+				);
 			}
 		} finally {
 			setLoading(false);

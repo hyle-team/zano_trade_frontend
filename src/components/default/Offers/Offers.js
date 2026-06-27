@@ -81,7 +81,9 @@ function Offers(props) {
 
 			setPopupAlertState('loading');
 			setPopupAlertSubtitle('Creating chat...');
-			const result = await createChat(offerData.number, payInputState, receiveInputState);
+			const result = await createChat(offerData.number, payInputState, receiveInputState, {
+				token: state.token,
+			});
 			if (!result.success) {
 				setPopupAlertState('error');
 				setPopupAlertSubtitle('Error creating chat.');
@@ -283,7 +285,7 @@ function Offers(props) {
 			if (props.extended && !props.withEditor && props.offerData.offer_number) {
 				setAlertState('loading');
 				setAlertSubtitle('Deleting chat...');
-				const result = await deleteChat(props.offerData.id);
+				const result = await deleteChat(props.offerData.id, { token: state.token });
 				if (!result.success) {
 					setAlertState('error');
 					setAlertSubtitle('Error deleting chat. Please try again later.');
@@ -299,7 +301,7 @@ function Offers(props) {
 
 			setAlertState('loading');
 			setAlertSubtitle('Deleting offer...');
-			const result = await deleteOffer(props.offerData.number);
+			const result = await deleteOffer(props.offerData.number, { token: state.token });
 			if (!result.success) {
 				setAlertState('error');
 				setAlertSubtitle('Error deleting offer. Please try again later.');

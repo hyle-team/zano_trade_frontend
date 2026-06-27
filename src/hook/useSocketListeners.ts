@@ -4,8 +4,9 @@ import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import { PairStats } from '@/interfaces/responses/orders/GetPairStatsRes';
 import { getUserOrdersPage } from '@/utils/methods';
 import socket from '@/utils/socket';
+import { Store } from '@/store/store-reducer';
 import { useRouter } from 'next/router';
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, SetStateAction, useContext, useEffect } from 'react';
 
 interface useSocketListenersParams {
 	setUserOrders: Dispatch<SetStateAction<OrderRow[]>>;
@@ -24,11 +25,12 @@ export const useSocketListeners = ({
 	ordersHistory,
 	updateOrders,
 }: useSocketListenersParams) => {
+	const { state } = useContext(Store);
 	const router = useRouter();
 	const pairId = typeof router.query.id === 'string' ? router.query.id : '';
 
 	async function socketUpdateOrders() {
-		const result = await getUserOrdersPage(pairId);
+		const result = await getUserOrdersPage(pairId, { token: state.token });
 
 		if (result.success) {
 			setUserOrders(result?.data?.orders || []);

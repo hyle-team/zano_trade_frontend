@@ -53,8 +53,8 @@ function ProfileTable(props: ProfileTableProps) {
 			setAlertState('loading');
 			setAlertSubtitle(`Deleting ${isChat ? 'chat' : 'offer'}...`);
 			const result = isChat
-				? await deleteChat(offerData.id)
-				: await deleteOffer(offerData.number);
+				? await deleteChat(offerData.id, { token: state.token })
+				: await deleteOffer(offerData.number, { token: state.token });
 			if (!result.success) {
 				setAlertState('error');
 				setAlertSubtitle(

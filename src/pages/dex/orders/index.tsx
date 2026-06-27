@@ -2,7 +2,7 @@ import styles from '@/styles/Orders.module.scss';
 import Header from '@/components/default/Header/Header';
 import PageTitle from '@/components/default/PageTitle/PageTitle';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Dropdown from '@/components/UI/Dropdown/Dropdown';
 import DateRangeSelector from '@/components/UI/DateRangeSelector/DateRangeSelector';
 import Button from '@/components/UI/Button/Button';
@@ -22,11 +22,13 @@ import Decimal from 'decimal.js';
 import { useInView } from 'react-intersection-observer';
 import Preloader from '@/components/UI/Preloader/Preloader';
 import { CancelAllBodyOrderType } from '@/interfaces/fetch-data/cancel-all-orders/CancelAllData';
+import { Store } from '@/store/store-reducer';
 import OrdersTable from './OrdersTable/OrdersTable';
 
 const ORDERS_PER_PAGE = 10;
 
 function Orders() {
+	const { state } = useContext(Store);
 	const fetchUser = useUpdateUser();
 
 	const ordersCategories = [
@@ -163,16 +165,19 @@ function Orders() {
 	async function addNewOrdersPage() {
 		const { status, type, pairId, date } = deriveGetUserOrdersFiltersFromState();
 
-		const getUserOrdersRes = await fetchMethods.getUserOrders({
-			limit: ORDERS_PER_PAGE,
-			offset: lastOrderOffset,
-			filterInfo: {
-				status,
-				type,
-				pairId,
-				date,
+		const getUserOrdersRes = await fetchMethods.getUserOrders(
+			{
+				limit: ORDERS_PER_PAGE,
+				offset: lastOrderOffset,
+				filterInfo: {
+					status,
+					type,
+					pairId,
+					date,
+				},
 			},
-		});
+			{ token: state.token },
+		);
 
 		if (!getUserOrdersRes.success) {
 			throw new Error('Error fetching user orders');
@@ -223,7 +228,9 @@ function Orders() {
 
 	async function initPairsDropdown() {
 		try {
-			const getUserOrdersAllPairsRes = await fetchMethods.getUserOrdersAllPairs();
+			const getUserOrdersAllPairsRes = await fetchMethods.getUserOrdersAllPairs({
+				token: state.token,
+			});
 
 			if (!getUserOrdersAllPairsRes.success) {
 				throw new Error('Error fetching pairs for orders');
@@ -245,16 +252,19 @@ function Orders() {
 	async function initOrders() {
 		const { status, type, pairId, date } = deriveGetUserOrdersFiltersFromState();
 
-		const getUserOrdersRes = await fetchMethods.getUserOrders({
-			limit: ORDERS_PER_PAGE,
-			offset: 0,
-			filterInfo: {
-				status,
-				type,
-				pairId,
-				date,
+		const getUserOrdersRes = await fetchMethods.getUserOrders(
+			{
+				limit: ORDERS_PER_PAGE,
+				offset: 0,
+				filterInfo: {
+					status,
+					type,
+					pairId,
+					date,
+				},
 			},
-		});
+			{ token: state.token },
+		);
 
 		if (!getUserOrdersRes.success) {
 			throw new Error('Error fetching user orders');
@@ -328,7 +338,7 @@ function Orders() {
 			// Simulate loading time
 			await new Promise((resolve) => setTimeout(resolve, 500));
 
-			const result = await fetchMethods.cancelOrder(orderId);
+			const result = await fetchMethods.cancelOrder(orderId, { token: state.token });
 
 			if (!result.success) {
 				throw new Error('ERROR_CANCELING_ORDER');
@@ -368,13 +378,16 @@ function Orders() {
 
 			const { type, pairId, date } = deriveCancelAllOrdersFiltersFromState();
 
-			const cancelAllRes = await fetchMethods.cancelAllOrders({
-				filterInfo: {
-					type,
-					pairId,
-					date,
+			const cancelAllRes = await fetchMethods.cancelAllOrders(
+				{
+					filterInfo: {
+						type,
+						pairId,
+						date,
+					},
 				},
-			});
+				{ token: state.token },
+			);
 
 			if (!cancelAllRes.success) {
 				throw new Error('Error canceling all orders');

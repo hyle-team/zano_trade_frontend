@@ -4,6 +4,7 @@ import ContextValue, { ContextAction, ContextState } from '@/interfaces/common/C
 const initialState: ContextState = {
 	wallet: null,
 	user: null,
+	token: null,
 	config: null,
 	assetsRates: new Map<string, number>(),
 	__triggers: {
@@ -21,6 +22,9 @@ const reducer = (state: ContextState, action: ContextAction): ContextState => {
 
 		case 'USER_UPDATED':
 			return { ...state, user: action.payload };
+
+		case 'TOKEN_UPDATED':
+			return { ...state, token: action.payload };
 
 		case 'CONFIG_UPDATED':
 			return { ...state, config: action.payload };

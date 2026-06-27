@@ -98,7 +98,7 @@ const UserOrders = ({
 		if (!loggedIn) return;
 
 		(async () => {
-			const requestsData = await getUserPendings();
+			const requestsData = await getUserPendings({ token: state.token });
 
 			if (requestsData.success) {
 				setUserRequests(requestsData.data);
@@ -106,13 +106,16 @@ const UserOrders = ({
 		})();
 
 		(async () => {
-			const result = await getUserOrders({
-				limit: 100,
-				offset: 0,
-				filterInfo: {
-					status: GetUserOrdersBodyStatus.FINISHED,
+			const result = await getUserOrders(
+				{
+					limit: 100,
+					offset: 0,
+					filterInfo: {
+						status: GetUserOrdersBodyStatus.FINISHED,
+					},
 				},
-			});
+				{ token: state.token },
+			);
 
 			if (!result.success) {
 				setAlertState('error');

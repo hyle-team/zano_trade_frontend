@@ -54,7 +54,7 @@ const AdminPanel: React.FC = () => {
 	const fetchFeaturedPairs = async () => {
 		try {
 			const response = await axios.post('/api/admin/get-featured', {
-				token: sessionStorage.getItem('token'),
+				token: state.token,
 			});
 			if (response.data.success) {
 				setFeaturedPairs(
@@ -77,7 +77,7 @@ const AdminPanel: React.FC = () => {
 	const fetchAdmins = async () => {
 		try {
 			const response = await axios.post('/api/admin/get-admins', {
-				token: sessionStorage.getItem('token'),
+				token: state.token,
 			});
 			if (response.data.success) {
 				const fetchedAdmins = response.data.data;
@@ -107,7 +107,7 @@ const AdminPanel: React.FC = () => {
 		try {
 			const response = await axios.post('/api/admin/add-featured', {
 				asset_id: values.asset_id,
-				token: sessionStorage.getItem('token'),
+				token: state.token,
 			});
 
 			if (response.data.success) {
@@ -137,7 +137,7 @@ const AdminPanel: React.FC = () => {
 			const pairToRemove = featuredPairs.find((pair) => pair.key === key);
 			if (pairToRemove) {
 				const response = await axios.post('/api/admin/delete-featured', {
-					token: sessionStorage.getItem('token'),
+					token: state.token,
 					id: pairToRemove.key,
 				});
 
@@ -180,7 +180,7 @@ const AdminPanel: React.FC = () => {
 
 			const { data } = await axios.post('/api/admin/add-admin', {
 				alias: values.alias,
-				token: sessionStorage.getItem('token'),
+				token: state.token,
 			});
 
 			message[data.success ? 'success' : 'error']({
@@ -215,7 +215,7 @@ const AdminPanel: React.FC = () => {
 
 		try {
 			const response = await axios.post('/api/admin/delete-admin', {
-				token: sessionStorage.getItem('token'),
+				token: state.token,
 				id: key,
 			});
 
@@ -285,7 +285,7 @@ const AdminPanel: React.FC = () => {
 
 		axios
 			.post('/api/admin/check-admin', {
-				token: sessionStorage.getItem('token'),
+				token: state.token,
 			})
 			.then(async (res) => {
 				await new Promise((resolve) => setTimeout(resolve, 500));
