@@ -4,7 +4,9 @@ import Marketplace from '@/pages/p2p/components/Marketplace/Marketplace';
 import OffersIcon from '@/assets/images/UI/offers.svg';
 import PlusIcon from '@/assets/images/UI/plus.svg';
 import { useContext, useEffect, useState } from 'react';
-import { getStats } from '@/utils/methods';
+import { getStats } from '@/utils/serverMethods';
+import { getForwardedFor } from '@/utils/serverFetch';
+import { GetServerSidePropsContext } from 'next';
 import Button from '@/components/UI/Button/Button';
 import NotificationIndicator from '@/components/UI/NotificationIndicator/NotificationIndicator';
 import { Store } from '@/store/store-reducer';
@@ -102,8 +104,8 @@ function Home(props: HomeProps) {
 	);
 }
 
-export async function getServerSideProps() {
-	const stats = await getStats();
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+	const stats = await getStats({ xForwardedFor: getForwardedFor(ctx.req) });
 
 	return {
 		props: {

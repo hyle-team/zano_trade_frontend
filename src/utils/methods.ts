@@ -5,7 +5,6 @@ import ApplyOrderData from '@/interfaces/fetch-data/apply-order/ApplyOrderData';
 import GetPageData from '@/interfaces/fetch-data/get-page/GetPageData';
 import UpdateOfferData from '@/interfaces/fetch-data/update-offer/UpdateOfferData';
 import ErrorRes from '@/interfaces/responses/ErrorRes';
-import GetStatsRes from '@/interfaces/responses/offers/GetStatsRes';
 import GetConfigRes from '@/interfaces/responses/config/GetConfigRes';
 import GetPairsPageRes from '@/interfaces/responses/dex/GetPairsPageRes';
 import GetPairRes from '@/interfaces/responses/dex/GetPairRes';
@@ -24,15 +23,13 @@ import GetChatChunkRes from '@/interfaces/responses/chats/GetChatChunkRes';
 import axios from 'axios';
 import GetPairsPagesAmountRes from '@/interfaces/responses/dex/GetPairsPagesAmountRes';
 import { PairSortOption } from '@/interfaces/enum/pair';
-import { API_URL } from '@/constants';
 import { GetUserOrdersData } from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
 import GetUserOrdersAllPairsRes from '@/interfaces/responses/orders/GetUserOrdersAllPairsRes';
 import { CancelAllData } from '@/interfaces/fetch-data/cancel-all-orders/CancelAllData';
 import CancelAllRes from '@/interfaces/responses/orders/CancelAllRes';
 import AuthParams from '@/interfaces/common/AuthParams';
 
-const isServer = typeof window === 'undefined';
-const baseUrl = isServer ? API_URL : '';
+const baseUrl = '';
 
 export async function getUser({ token }: AuthParams): Promise<ErrorRes | GetUserRes> {
 	return axios
@@ -81,35 +78,6 @@ export async function getPage(
 			data: params,
 		})
 		.then((res) => res.data);
-}
-
-export async function getStats(): Promise<GetStatsRes> {
-	return (await fetch(`${baseUrl}/api/offers/get-stats`).then((res) =>
-		res.json(),
-	)) as GetStatsRes;
-}
-
-export async function findPairID(
-	first: string,
-	second: string,
-	host: string | undefined = undefined,
-): Promise<number | undefined> {
-	const findPairURL = `${host ?? ''}/api/dex/find-pair`;
-
-	console.log('Find pair URL:', findPairURL);
-
-	return (await fetch(findPairURL, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			first,
-			second,
-		}),
-	})
-		.then((res) => res.json())
-		.then((res) => parseInt(res?.data, 10) || undefined)) as number | undefined;
 }
 
 export function getFormattedCurrencies(currencies: CurrencyRow[]): CurrencyContentRow[] {

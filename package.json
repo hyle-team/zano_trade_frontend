@@ -29,6 +29,7 @@
 		"decimal.js": "^10.4.3",
 		"echarts": "^5.5.1",
 		"echarts-for-react": "^3.0.2",
+		"jose": "^6.2.3",
 		"nanoid": "^5.1.6",
 		"next": "^16.1.1",
 		"next-secure-headers": "^2.2.0",
