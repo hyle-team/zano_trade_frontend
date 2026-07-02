@@ -2,14 +2,9 @@ import styles from '@/styles/Trading.module.scss';
 import Header from '@/components/default/Header/Header';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
 import { useCallback, useContext, useState } from 'react';
-import {
-	cancelOrder,
-	getCandles,
-	getOrdersPage,
-	getPair,
-	getPairStats,
-	getTrades,
-} from '@/utils/methods';
+import { cancelOrder } from '@/utils/methods';
+import { getCandles, getOrdersPage, getPair, getPairStats, getTrades } from '@/utils/serverMethods';
+import { getForwardedFor } from '@/utils/serverFetch';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import Alert from '@/components/UI/Alert/Alert';
 import PeriodState from '@/interfaces/states/pages/dex/trading/InputPanelItem/PeriodState';
@@ -272,13 +267,14 @@ function Trading({
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 	const pairId = ctx.params?.id as string;
+	const xForwardedFor = getForwardedFor(ctx.req);
 
 	const [pairRes, statsRes, ordersRes, tradesRes, candlesRes] = await Promise.all([
-		getPair(pairId),
-		getPairStats(pairId),
-		getOrdersPage(pairId),
-		getTrades(pairId),
-		getCandles(pairId, '1h'),
+		getPair(pairId, { xForwardedFor }),
+		getPairStats(pairId, { xForwardedFor }),
+		getOrdersPage(pairId, { xForwardedFor }),
+		getTrades(pairId, { xForwardedFor }),
+		getCandles(pairId, '1h', { xForwardedFor }),
 	]);
 
 	return {
