@@ -5,8 +5,10 @@ import Alert from '@/components/UI/Alert/Alert';
 import useUpdateUser from '@/hook/useUpdateUser';
 import AlertType from '@/interfaces/common/AlertType';
 import ConnectButtonProps from '@/interfaces/props/components/UI/ConnectButton/ConnectButtonProps';
-import ZanoWindow from '@/interfaces/common/ZanoWindow';
 import { requestCompanionPermissions } from '@/utils/wallet';
+import { zanoWallet } from '@/utils/zanoWallet';
+import { ZanoWebError, GetWalletDataResponse, RequestMessageSignResponse } from 'zano_web3/web';
+import { WalletState } from '@/interfaces/common/ContextValue';
 import Button from '../Button/Button';
 
 enum ConnectErrorMessage {
@@ -33,17 +35,36 @@ function ConnectButton(props: ConnectButtonProps) {
 			setAlertState('loading');
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 
-			if (!('zano' in window)) {
-				throw new Error(ConnectErrorMessage.NO_EXTENSION);
+			try {
+				await requestCompanionPermissions([{ type: 'general' }, { type: 'balance' }]);
+			} catch (error) {
+				if (error instanceof ZanoWebError && error.code === 'ZANO_WALLET_NOT_AVAILABLE') {
+					throw new Error(ConnectErrorMessage.NO_EXTENSION);
+				}
+
+				throw error;
 			}
 
-			await requestCompanionPermissions([{ type: 'general' }, { type: 'balance' }]);
-			const walletData = (
-				await (window as unknown as ZanoWindow).zano.request('GET_WALLET_DATA')
-			).data;
+			let getWalletDataResult: GetWalletDataResponse;
 
-			const walletAddress = walletData?.address;
-			const walletAlias = walletData?.alias;
+			try {
+				getWalletDataResult = await zanoWallet.getWallet();
+			} catch (error) {
+				if (error instanceof ZanoWebError && error.code === 'ZANO_WALLET_NOT_AVAILABLE') {
+					throw new Error(ConnectErrorMessage.NO_EXTENSION);
+				}
+
+				throw error;
+			}
+
+			if (!getWalletDataResult.success) {
+				throw new Error(getWalletDataResult.error);
+			}
+
+			const { data: walletData } = getWalletDataResult;
+
+			const walletAddress = walletData.address;
+			const walletAlias = walletData.alias;
 
 			if (!walletAddress) {
 				throw new Error(ConnectErrorMessage.COMPANION_OFFLINE);
@@ -78,18 +99,30 @@ function ConnectButton(props: ConnectButtonProps) {
 				throw new Error(ConnectErrorMessage.SERVER_AUTH_ERROR);
 			}
 
-			const signResult = await (window as unknown as ZanoWindow).zano.request(
-				'REQUEST_MESSAGE_SIGN',
-				{ message: authMessage },
-				null,
-			);
+			let signResult: RequestMessageSignResponse;
 
-			if (!signResult?.data?.result) {
-				throw new Error(ConnectErrorMessage.SIGN_DENIED);
+			try {
+				signResult = await zanoWallet.requestMessageSign(authMessage);
+			} catch (error) {
+				if (error instanceof ZanoWebError && error.code === 'ZANO_WALLET_NOT_AVAILABLE') {
+					throw new Error(ConnectErrorMessage.NO_EXTENSION);
+				}
+
+				throw error;
 			}
 
-			const signature = signResult.data.result.sig;
-			const publicKey = signResult.data.result.pkey;
+			if (!signResult.success) {
+				if (signResult.error === 'Sign request denied by user') {
+					throw new Error(ConnectErrorMessage.SIGN_DENIED);
+				}
+
+				throw new Error(signResult.error);
+			}
+
+			const { data: signResultData } = signResult;
+
+			const signature = signResultData.sig;
+			const publicKey = signResultData.pkey;
 
 			const result = await fetch('/api/auth', {
 				method: 'POST',
@@ -113,7 +146,7 @@ function ConnectButton(props: ConnectButtonProps) {
 
 			updateToken(dispatch, result?.data);
 
-			updateWalletState(dispatch, { ...walletData, connected: true });
+			updateWalletState(dispatch, { ...walletData, connected: true } as WalletState);
 
 			await fetchUser();
 
@@ -132,6 +165,10 @@ function ConnectButton(props: ConnectButtonProps) {
 			const knownError = isErrorKnown
 				? errorMessage
 				: 'Internal error occurred. Please try again.';
+
+			if (!isErrorKnown) {
+				console.error('Error connecting wallet:', error);
+			}
 
 			setAlertState('error');
 			setAlertErrMessage(knownError);
