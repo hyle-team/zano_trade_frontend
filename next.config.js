@@ -4,6 +4,9 @@ import { createSecureHeaders } from 'next-secure-headers';
 const nextConfig = {
 	reactStrictMode: true,
 	poweredByHeader: false,
+
+	transpilePackages: ['zano_web3'],
+
 	async redirects() {
 		return [
 			{
