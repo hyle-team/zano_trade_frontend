@@ -49,7 +49,7 @@
 		"tsx": "^4.15.7",
 		"url-loader": "^4.1.1",
 		"uuidv4": "^6.2.13",
-		"zano_web3": "file:zano_web3-9.8.0-canary.0.tgz"
+		"zano_web3": "^10.1.0"
 	},
 	"devDependencies": {
 		"@svgr/webpack": "^8.0.1",
