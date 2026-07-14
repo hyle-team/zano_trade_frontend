@@ -1,5 +1,3 @@
-import ZanoWindow from '@/interfaces/common/ZanoWindow';
-import IonicSwap from '@/interfaces/wallet/IonicSwap';
 import { zanoWallet } from './zanoWallet';
 
 async function requestCompanionPermissions(
@@ -24,18 +22,4 @@ async function requestCompanionPermissions(
 	throw new Error(error);
 }
 
-async function ionicSwap(params: IonicSwap) {
-	// TODO: Replace with `zanoWallet` object
-	return (window as unknown as ZanoWindow).zano.request('IONIC_SWAP', params, null);
-}
-
-async function confirmIonicSwap(hex_raw_proposal: string) {
-	// TODO: Replace with `zanoWallet` object
-	return (window as unknown as ZanoWindow).zano.request(
-		'IONIC_SWAP_ACCEPT',
-		{ hex_raw_proposal },
-		null,
-	);
-}
-
-export { requestCompanionPermissions, ionicSwap, confirmIonicSwap };
+export { requestCompanionPermissions };
