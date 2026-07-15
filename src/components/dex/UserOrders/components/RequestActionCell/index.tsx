@@ -1,13 +1,19 @@
-import Link from 'next/link';
 import Decimal from 'decimal.js';
 import { useState, useContext } from 'react';
+import {
+	ZanoWebError,
+	AcceptIonicSwapResponse,
+	InitializeIonicSwapParams,
+	InitializeIonicSwapResponse,
+} from 'zano_web3/web';
+
 import { Store } from '@/store/store-reducer';
 import { useAlert } from '@/hook/useAlert';
 import { applyOrder, confirmTransaction } from '@/utils/methods';
-import { confirmIonicSwap, ionicSwap } from '@/utils/wallet';
 import { updateAutoClosedNotification } from '@/store/actions';
 import { notationToString } from '@/utils/utils';
 import ActionBtn from '@/components/UI/ActionBtn';
+import { zanoWallet } from '@/utils/zanoWallet';
 import { RequestActionCellProps } from './types';
 
 export default function RequestActionCell({
@@ -52,15 +58,32 @@ export default function RequestActionCell({
 					alertErr('Invalid transaction data received');
 					return;
 				}
-				const confirmSwapResult = await confirmIonicSwap(row.hex_raw_proposal);
-				if (confirmSwapResult.data?.error?.code === -7) {
-					alertErr('Insufficient funds');
-					return;
+
+				let confirmSwapResult: AcceptIonicSwapResponse;
+
+				try {
+					confirmSwapResult = await zanoWallet.acceptIonicSwap(row.hex_raw_proposal);
+				} catch (error) {
+					if (error instanceof ZanoWebError) {
+						if (error.code === 'ZANO_WALLET_NOT_AVAILABLE') {
+							alertErr('Companion is offline');
+							return;
+						}
+					}
+
+					throw error;
 				}
-				if (!confirmSwapResult.data?.result) {
+
+				if (!confirmSwapResult.success) {
+					if (confirmSwapResult.error === 'WALLET_RPC_ERROR_-7') {
+						alertErr('Insufficient funds');
+						return;
+					}
+
 					alertErr('Companion responded with an error');
 					return;
 				}
+
 				result = await confirmTransaction(row.id, { token: state.token });
 			} else {
 				const firstCurrencyId = pairData?.first_currency.asset_id;
@@ -74,7 +97,7 @@ export default function RequestActionCell({
 				const leftDecimal = new Decimal(row.left);
 				const priceDecimal = new Decimal(row.price);
 
-				const params = {
+				const params: InitializeIonicSwapParams = {
 					destinationAssetID: row.type === 'buy' ? secondCurrencyId : firstCurrencyId,
 					destinationAssetAmount: notationToString(
 						row.type === 'buy'
@@ -90,20 +113,35 @@ export default function RequestActionCell({
 					destinationAddress: row.user.address,
 				};
 
-				const createSwapResult = await ionicSwap(params);
-				const hex = createSwapResult?.data?.result?.hex_raw_proposal;
+				let createSwapResult: InitializeIonicSwapResponse;
 
-				if (createSwapResult?.data?.error?.code === -7) {
-					alertErr('Insufficient funds');
-					return;
+				try {
+					createSwapResult = await zanoWallet.initializeIonicSwap(params);
+				} catch (error) {
+					if (error instanceof ZanoWebError) {
+						if (error.code === 'ZANO_WALLET_NOT_AVAILABLE') {
+							alertErr('Companion is offline');
+							return;
+						}
+					}
+
+					throw error;
 				}
-				if (!hex) {
+
+				if (!createSwapResult.success) {
+					if (createSwapResult.error === 'WALLET_RPC_ERROR_-7') {
+						alertErr('Insufficient funds');
+						return;
+					}
+
 					alertErr('Companion responded with an error');
 					return;
 				}
 
+				const hexRawProposal = createSwapResult.data;
+
 				result = await applyOrder(
-					{ ...row, hex_raw_proposal: hex },
+					{ ...row, hex_raw_proposal: hexRawProposal },
 					{ token: state.token },
 				);
 			}
