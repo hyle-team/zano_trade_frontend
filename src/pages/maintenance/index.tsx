@@ -33,7 +33,7 @@ const Maintenance = () => {
 				</p>
 
 				<div className={styles.main__content_social}>
-					<Link target="_blank" href="https://discord.gg/zano">
+					<Link target="_blank" href="https://discord.gg/wE3rmYY">
 						<DisconrdIcon />
 					</Link>
 					<Link target="_blank" href="https://twitter.com/zano_project">
