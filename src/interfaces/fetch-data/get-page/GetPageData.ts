@@ -5,7 +5,7 @@ interface GetPageData {
 	page: number;
 	input_currency_id?: string;
 	target_currency_id?: string;
-	price?: number;
+	price?: string;
 	priceDescending?: boolean;
 }
 

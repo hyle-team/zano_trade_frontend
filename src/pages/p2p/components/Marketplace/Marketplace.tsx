@@ -49,11 +49,25 @@ function Marketplace(props: MarketplaceProps) {
 
 		setOffers([]);
 
+		let price: string | undefined;
+
+		try {
+			price = currFiltersState.price
+				? parseFloat(currFiltersState.price).toString()
+				: undefined;
+		} catch (error) {
+			if (error instanceof Error && /DecimalError/.test(error.message)) {
+				price = undefined;
+			}
+
+			throw error;
+		}
+
 		const result = (
 			await Promise.all([
 				getPage({
 					type: currFiltersState.buyState ? 'buy' : 'sell',
-					price: parseFloat(currFiltersState.price) || undefined,
+					price,
 					priceDescending,
 					page: pageState,
 					input_currency_id:

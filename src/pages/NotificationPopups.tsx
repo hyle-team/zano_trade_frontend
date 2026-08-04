@@ -13,16 +13,14 @@ export default function NotificationPopups() {
 	const [notificationOrders, setNotificationOrders] = useState<OrderDataWithPair[]>([]);
 
 	useEffect(() => {
-		const token = sessionStorage.getItem('token');
-
-		if (token) {
-			socket.emit('in-dex-notifications', { token });
+		if (state.token) {
+			socket.emit('in-dex-notifications', { token: state.token });
 
 			return () => {
-				socket.emit('out-dex-notifications', { token });
+				socket.emit('out-dex-notifications', { token: state.token });
 			};
 		}
-	}, [state.user?.address]);
+	}, [state.user?.address, state.token]);
 
 	useEffect(() => {
 		function onNotify({ orderData }: { orderData: OrderDataWithPair }) {

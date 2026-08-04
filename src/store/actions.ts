@@ -14,6 +14,12 @@ export const updateUser = (dispatch: Dispatch<ContextAction>, state: UserState) 
 		payload: state,
 	});
 
+export const updateToken = (dispatch: Dispatch<ContextAction>, token: string | null) =>
+	dispatch({
+		type: 'TOKEN_UPDATED',
+		payload: token,
+	});
+
 export const updateConfig = (dispatch: Dispatch<ContextAction>, state: GetConfigResData | null) =>
 	dispatch({
 		type: 'CONFIG_UPDATED',

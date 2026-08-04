@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { nanoid } from 'nanoid';
 import MainPageTitle from '@/components/default/MainPageTitle/MainPageTitle';
 import { getPairsPage, getPairsPagesAmount, getZanoPrice } from '@/utils/methods';
+import { getPairsPage as getPairsPageServer } from '@/utils/serverMethods';
+import { getForwardedFor } from '@/utils/serverFetch';
+import { GetServerSidePropsContext } from 'next';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import PairData from '@/interfaces/common/PairData';
 import { useInView } from 'react-intersection-observer';
@@ -170,9 +173,11 @@ function Dex({
 	);
 }
 
-export async function getServerSideProps() {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+	const xForwardedFor = getForwardedFor(ctx.req);
+
 	const [pairsRes, priceRes] = await Promise.all([
-		getPairsPage(1, '', true, PairSortOption.VOLUME_HIGH_TO_LOW),
+		getPairsPageServer(1, '', true, PairSortOption.VOLUME_HIGH_TO_LOW, { xForwardedFor }),
 		getZanoPrice(),
 	]);
 

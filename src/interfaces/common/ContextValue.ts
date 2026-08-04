@@ -45,6 +45,7 @@ type UserState = GetUserResData | null;
 interface ContextState {
 	wallet: WalletState | null;
 	user: UserState;
+	token: string | null;
 	config: GetConfigResData | null;
 	assetsRates: Map<string, number>;
 	__triggers: {
@@ -63,6 +64,10 @@ type ContextAction =
 	| {
 			type: 'USER_UPDATED';
 			payload: UserState;
+	  }
+	| {
+			type: 'TOKEN_UPDATED';
+			payload: string | null;
 	  }
 	| {
 			type: 'CONFIG_UPDATED';

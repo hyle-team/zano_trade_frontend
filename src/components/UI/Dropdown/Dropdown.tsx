@@ -82,11 +82,14 @@ function Dropdown<T extends DropdownRow>(props: DropdownProps<T>) {
 			if (!e.code) return;
 			if (!favouriteCurrencies.includes(e.code)) {
 				setFavouriteCurrencies([...favouriteCurrencies, e.code]);
-				await sendFavouriteCurrencies([...favouriteCurrencies, e.code]);
+				await sendFavouriteCurrencies([...favouriteCurrencies, e.code], {
+					token: state.token,
+				});
 			} else {
 				setFavouriteCurrencies(favouriteCurrencies.filter((fav: string) => fav !== e.code));
 				await sendFavouriteCurrencies(
 					favouriteCurrencies.filter((fav: string) => fav !== e.code),
+					{ token: state.token },
 				);
 			}
 		}

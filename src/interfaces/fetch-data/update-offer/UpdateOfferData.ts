@@ -1,11 +1,11 @@
 import OfferType from '@/interfaces/common/OfferType';
 
 interface UpdateOfferData {
-	price: number;
-	min: number;
-	max: number;
-	deposit_seller: number;
-	deposit_buyer: number;
+	price: string;
+	min: string;
+	max: string;
+	deposit_seller: string;
+	deposit_buyer: string;
 	type: OfferType;
 	comment?: string;
 	input_currency_id: string;

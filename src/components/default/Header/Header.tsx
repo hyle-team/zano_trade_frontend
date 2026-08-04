@@ -22,7 +22,7 @@ import { classes, notationToString, shortenAddress } from '@/utils/utils';
 import useAdvancedTheme from '@/hook/useTheme';
 
 import { Store } from '@/store/store-reducer';
-import { updateAutoClosedNotification, updateWalletState } from '@/store/actions';
+import { updateAutoClosedNotification, updateToken, updateWalletState } from '@/store/actions';
 import CurrencyCheckRowProps from '@/interfaces/props/components/default/Header/CurrencyCheckRowProps';
 import Decimal from 'decimal.js';
 import socket from '@/utils/socket';
@@ -53,7 +53,7 @@ function Header({ isLg }: { isLg?: boolean }) {
 	}, [width]);
 
 	function logout() {
-		sessionStorage.removeItem('token');
+		updateToken(dispatch, null);
 		updateWalletState(dispatch, null);
 	}
 
@@ -247,16 +247,14 @@ function Header({ isLg }: { isLg?: boolean }) {
 	}
 
 	useEffect(() => {
-		const token = sessionStorage.getItem('token');
-
-		if (token) {
-			socket.emit('in-dex-notifications', { token });
+		if (state.token) {
+			socket.emit('in-dex-notifications', { token: state.token });
 
 			return () => {
-				socket.emit('out-dex-notifications', { token });
+				socket.emit('out-dex-notifications', { token: state.token });
 			};
 		}
-	}, [state.user?.address]);
+	}, [state.user?.address, state.token]);
 
 	const [activeNotifications, setActiveNotifications] = useState(
 		new Map<number, { Notification: Notification; orderData: OrderDataWithPair }>(),

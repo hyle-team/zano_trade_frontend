@@ -1,8 +1,8 @@
 import { GetServerSideProps } from 'next';
 
-import { findPairID } from '@/utils/methods';
+import { findPairID } from '@/utils/serverMethods';
+import { getForwardedFor } from '@/utils/serverFetch';
 import styles from '@/styles/404.module.scss';
-import { API_URL } from '@/constants';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const { first, second } = context.query;
@@ -14,7 +14,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	}
 
 	try {
-		const idFound = await findPairID(first as string, second as string, API_URL);
+		const idFound = await findPairID(first as string, second as string, {
+			xForwardedFor: getForwardedFor(context.req),
+		});
 
 		console.log('ID found:', idFound);
 

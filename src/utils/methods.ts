@@ -5,7 +5,6 @@ import ApplyOrderData from '@/interfaces/fetch-data/apply-order/ApplyOrderData';
 import GetPageData from '@/interfaces/fetch-data/get-page/GetPageData';
 import UpdateOfferData from '@/interfaces/fetch-data/update-offer/UpdateOfferData';
 import ErrorRes from '@/interfaces/responses/ErrorRes';
-import GetStatsRes from '@/interfaces/responses/offers/GetStatsRes';
 import GetConfigRes from '@/interfaces/responses/config/GetConfigRes';
 import GetPairsPageRes from '@/interfaces/responses/dex/GetPairsPageRes';
 import GetPairRes from '@/interfaces/responses/dex/GetPairRes';
@@ -24,19 +23,18 @@ import GetChatChunkRes from '@/interfaces/responses/chats/GetChatChunkRes';
 import axios from 'axios';
 import GetPairsPagesAmountRes from '@/interfaces/responses/dex/GetPairsPagesAmountRes';
 import { PairSortOption } from '@/interfaces/enum/pair';
-import { API_URL } from '@/constants';
 import { GetUserOrdersData } from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
 import GetUserOrdersAllPairsRes from '@/interfaces/responses/orders/GetUserOrdersAllPairsRes';
 import { CancelAllData } from '@/interfaces/fetch-data/cancel-all-orders/CancelAllData';
 import CancelAllRes from '@/interfaces/responses/orders/CancelAllRes';
+import AuthParams from '@/interfaces/common/AuthParams';
 
-const isServer = typeof window === 'undefined';
-const baseUrl = isServer ? API_URL : '';
+const baseUrl = '';
 
-export async function getUser(): Promise<ErrorRes | GetUserRes> {
+export async function getUser({ token }: AuthParams): Promise<ErrorRes | GetUserRes> {
 	return axios
 		.post('/api/user/get-user', {
-			token: sessionStorage.getItem('token'),
+			token,
 		})
 		.then((res) => res.data);
 }
@@ -47,19 +45,23 @@ export async function getConfig(): Promise<ErrorRes | GetConfigRes> {
 
 export async function updateOffer(
 	offerData: UpdateOfferData,
+	{ token }: AuthParams,
 ): Promise<ErrorRes | { success: true }> {
 	return axios
 		.post('/api/offers/update', {
-			token: sessionStorage.getItem('token'),
+			token,
 			offerData,
 		})
 		.then((res) => res.data);
 }
 
-export async function deleteOffer(number: string): Promise<ErrorRes | { success: true }> {
+export async function deleteOffer(
+	number: string,
+	{ token }: AuthParams,
+): Promise<ErrorRes | { success: true }> {
 	return axios
 		.post('/api/offers/delete', {
-			token: sessionStorage.getItem('token'),
+			token,
 			offerData: {
 				number: number ?? null,
 			},
@@ -76,35 +78,6 @@ export async function getPage(
 			data: params,
 		})
 		.then((res) => res.data);
-}
-
-export async function getStats(): Promise<GetStatsRes> {
-	return (await fetch(`${baseUrl}/api/offers/get-stats`).then((res) =>
-		res.json(),
-	)) as GetStatsRes;
-}
-
-export async function findPairID(
-	first: string,
-	second: string,
-	host: string | undefined = undefined,
-): Promise<number | undefined> {
-	const findPairURL = `${host ?? ''}/api/dex/find-pair`;
-
-	console.log('Find pair URL:', findPairURL);
-
-	return (await fetch(findPairURL, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			first,
-			second,
-		}),
-	})
-		.then((res) => res.json())
-		.then((res) => parseInt(res?.data, 10) || undefined)) as number | undefined;
 }
 
 export function getFormattedCurrencies(currencies: CurrencyRow[]): CurrencyContentRow[] {
@@ -132,10 +105,11 @@ export function getFormattedCurrencies(currencies: CurrencyRow[]): CurrencyConte
 
 export async function sendFavouriteCurrencies(
 	currs: string[],
+	{ token }: AuthParams,
 ): Promise<ErrorRes | { success: true }> {
 	return axios
 		.post('/api/user/set-favourite-currencies', {
-			token: sessionStorage.getItem('token'),
+			token,
 			data: currs,
 		})
 		.then((res) => res.data);
@@ -145,10 +119,11 @@ export async function createChat(
 	number: string,
 	pay: string,
 	receive: string,
+	{ token }: AuthParams,
 ): Promise<ErrorRes | { success: true; data: number }> {
 	return axios
 		.post('/api/chats/create', {
-			token: sessionStorage.getItem('token'),
+			token,
 			number,
 			chatData: {
 				pay,
@@ -158,29 +133,30 @@ export async function createChat(
 		.then((res) => res.data);
 }
 
-export async function getChat(id: string): Promise<ErrorRes | GetChatRes> {
+export async function getChat(id: string, { token }: AuthParams): Promise<ErrorRes | GetChatRes> {
 	return axios
 		.post('/api/chats/get-chat', {
-			token: sessionStorage.getItem('token'),
+			token,
 			id,
 		})
 		.then((res) => res.data);
 }
 
-export async function getAllChats(): Promise<ErrorRes | GetAllChatsRes> {
+export async function getAllChats({ token }: AuthParams): Promise<ErrorRes | GetAllChatsRes> {
 	return axios
 		.post('/api/chats/get-all-chats', {
-			token: sessionStorage.getItem('token'),
+			token,
 		})
 		.then((res) => res.data);
 }
 
 export async function deleteChat(
 	id: string,
+	{ token }: AuthParams,
 ): Promise<ErrorRes | { success: true; data?: undefined }> {
 	return axios
 		.post('/api/chats/delete-chat', {
-			token: sessionStorage.getItem('token'),
+			token,
 			id,
 		})
 		.then((res) => res.data);
@@ -224,12 +200,13 @@ export async function getPair(id: string): Promise<ErrorRes | GetPairRes> {
 
 export async function createOrder(
 	orderData: CreateOrderData,
+	{ token }: AuthParams,
 ): Promise<ErrorRes | { success: true; data: { immediateMatch: boolean } }> {
 	return axios
 		.post(
 			'/api/orders/create',
 			{
-				token: sessionStorage.getItem('token'),
+				token,
 				orderData,
 			},
 			{
@@ -247,23 +224,25 @@ export async function getOrdersPage(pairId: string): Promise<ErrorRes | GetOrder
 		.then((res) => res.data);
 }
 
-export async function getUserOrdersPage(pairId: string): Promise<ErrorRes | GetUserOrdersPageRes> {
+export async function getUserOrdersPage(
+	pairId: string,
+	{ token }: AuthParams,
+): Promise<ErrorRes | GetUserOrdersPageRes> {
 	return axios
 		.post('/api/orders/get-user-page', {
-			token: sessionStorage.getItem('token'),
+			token,
 			pairId,
 		})
 		.then((res) => res.data);
 }
 
-export async function getUserOrders({
-	limit,
-	offset,
-	filterInfo: { pairId, status, type, date },
-}: GetUserOrdersData): Promise<ErrorRes | GetUserOrdersRes> {
+export async function getUserOrders(
+	{ limit, offset, filterInfo: { pairId, status, type, date } }: GetUserOrdersData,
+	{ token }: AuthParams,
+): Promise<ErrorRes | GetUserOrdersRes> {
 	return axios
 		.patch('/api/orders/get', {
-			token: sessionStorage.getItem('token'),
+			token,
 
 			limit,
 			offset,
@@ -282,27 +261,35 @@ export async function getUserOrders({
 		.then((res) => res.data);
 }
 
-export async function getUserOrdersAllPairs(): Promise<ErrorRes | GetUserOrdersAllPairsRes> {
+export async function getUserOrdersAllPairs({
+	token,
+}: AuthParams): Promise<ErrorRes | GetUserOrdersAllPairsRes> {
 	return axios
 		.patch('/api/orders/get-user-orders-pairs', {
-			token: sessionStorage.getItem('token'),
+			token,
 		})
 		.then((res) => res.data);
 }
 
-export async function cancelOrder(id: string): Promise<ErrorRes | { success: true }> {
+export async function cancelOrder(
+	id: string,
+	{ token }: AuthParams,
+): Promise<ErrorRes | { success: true }> {
 	return axios
 		.post('/api/orders/cancel', {
-			token: sessionStorage.getItem('token'),
+			token,
 			orderId: id,
 		})
 		.then((res) => res.data);
 }
 
-export async function cancelTransaction(id: string): Promise<ErrorRes | { success: true }> {
+export async function cancelTransaction(
+	id: string,
+	{ token }: AuthParams,
+): Promise<ErrorRes | { success: true }> {
 	return axios
 		.post('/api/transactions/cancel', {
-			token: sessionStorage.getItem('token'),
+			token,
 			transactionId: id,
 		})
 		.then((res) => res.data);
@@ -336,21 +323,25 @@ export async function getPairStats(pairId: string): Promise<ErrorRes | GetPairSt
 		.then((res) => res.data);
 }
 
-export async function applyOrder(orderData: ApplyOrderData): Promise<ErrorRes | { success: true }> {
+export async function applyOrder(
+	orderData: ApplyOrderData,
+	{ token }: AuthParams,
+): Promise<ErrorRes | { success: true }> {
 	return axios
 		.post('/api/orders/apply-order', {
-			token: sessionStorage.getItem('token'),
+			token,
 			orderData,
 		})
 		.then((res) => res.data);
 }
 
-export async function cancelAllOrders({
-	filterInfo: { pairId, type, date },
-}: CancelAllData): Promise<ErrorRes | CancelAllRes> {
+export async function cancelAllOrders(
+	{ filterInfo: { pairId, type, date } }: CancelAllData,
+	{ token }: AuthParams,
+): Promise<ErrorRes | CancelAllRes> {
 	return axios
 		.patch('/api/orders/cancel-all', {
-			token: sessionStorage.getItem('token'),
+			token,
 			filterInfo: {
 				pairId,
 				type,
@@ -367,11 +358,12 @@ export async function cancelAllOrders({
 
 export async function confirmTransaction(
 	transactionId: string,
+	{ token }: AuthParams,
 ): Promise<ErrorRes | { success: true }> {
 	return axios
 		.post('/api/transactions/confirm', {
 			transactionId,
-			token: sessionStorage.getItem('token'),
+			token,
 		})
 		.then((res) => res.data);
 }
@@ -379,10 +371,11 @@ export async function confirmTransaction(
 export async function getChatChunk(
 	chatId: string,
 	chunkNumber: number,
+	{ token }: AuthParams,
 ): Promise<ErrorRes | GetChatChunkRes> {
 	return axios
 		.post('/api/chats/get-chat-chunk', {
-			token: sessionStorage.getItem('token'),
+			token,
 			id: chatId,
 			chunkNumber,
 		})
@@ -397,10 +390,10 @@ export async function getTrades(pairId: string) {
 		.then((res) => res.data);
 }
 
-export async function getUserPendings() {
+export async function getUserPendings({ token }: AuthParams) {
 	return axios
 		.post('/api/transactions/get-my-pending', {
-			token: sessionStorage.getItem('token'),
+			token,
 		})
 		.then((res) => res.data);
 }

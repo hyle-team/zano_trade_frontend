@@ -1,45 +1,25 @@
-import ZanoWindow from '@/interfaces/common/ZanoWindow';
-import IonicSwap from '@/interfaces/wallet/IonicSwap';
+import { zanoWallet } from './zanoWallet';
 
-async function requestCompanionPermissions(permissions: { type: string }[]): Promise<void> {
+async function requestCompanionPermissions(
+	permissions: { type: 'general' | 'balance' | 'history' }[],
+): Promise<void> {
 	const NOT_SUPPORTED_LOG =
 		'Companion does not support permissions system, continuing with legacy flow';
 
-	try {
-		const result = await (window as unknown as ZanoWindow).zano.request('REQUEST_ACCESS', {
-			permissions,
-		});
+	const requestPermissionsResult = await zanoWallet.requestPermissions(permissions);
 
-		const error = String(result?.error || '');
-
-		if (error.includes('Unknown method')) {
-			console.warn(NOT_SUPPORTED_LOG);
-			return;
-		}
-
-		if (error) {
-			throw new Error(error);
-		}
-	} catch (error) {
-		if (String(error).includes('not a function')) {
-			console.warn(NOT_SUPPORTED_LOG);
-			return;
-		}
-
-		throw error;
+	if (requestPermissionsResult.success) {
+		return;
 	}
+
+	const { error } = requestPermissionsResult;
+
+	if (error.includes('Unknown method')) {
+		console.warn(NOT_SUPPORTED_LOG);
+		return;
+	}
+
+	throw new Error(error);
 }
 
-async function ionicSwap(params: IonicSwap) {
-	return (window as unknown as ZanoWindow).zano.request('IONIC_SWAP', params, null);
-}
-
-async function confirmIonicSwap(hex_raw_proposal: string) {
-	return (window as unknown as ZanoWindow).zano.request(
-		'IONIC_SWAP_ACCEPT',
-		{ hex_raw_proposal },
-		null,
-	);
-}
-
-export { requestCompanionPermissions, ionicSwap, confirmIonicSwap };
+export { requestCompanionPermissions };

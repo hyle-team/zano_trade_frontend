@@ -53,7 +53,9 @@ function DetailedOfferPopup(props: DetailedOfferPopupProps) {
 
 		setPopupAlertState('loading');
 		setPopupAlertSubtitle('Creating chat...');
-		const result = await createChat(offerData.number, payInputState, receiveInputState);
+		const result = await createChat(offerData.number, payInputState, receiveInputState, {
+			token: state.token,
+		});
 		if (!result.success) {
 			setPopupAlertState('error');
 			setPopupAlertSubtitle('Error creating chat.');

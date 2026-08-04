@@ -6,13 +6,14 @@ import crossSmallIcon from '@/assets/images/UI/cross_icon_small.svg?url';
 import Input from '@/components/UI/Input/Input';
 import Button from '@/components/UI/Button/Button';
 import ProfileWidget from '@/components/UI/ProfileWidget/ProfileWidget';
-import { DragEvent, useEffect, useRef, useState } from 'react';
+import { DragEvent, useContext, useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid';
 import { intToStrFixedLen } from '@/utils/utils';
 import socket from '@/utils/socket';
 import MessengerProps from '@/interfaces/props/pages/p2p/process/components/Messenger/MessengerProps';
 import MessageProps from '@/interfaces/props/pages/p2p/process/components/Messenger/MessageProps';
 import { getChatChunk } from '@/utils/methods';
+import { Store } from '@/store/store-reducer';
 import Preloader from '@/components/UI/Preloader/Preloader';
 import styles from './Messenger.module.scss';
 
@@ -30,6 +31,8 @@ function Messenger(props: MessengerProps) {
 	const { maxChunks } = props;
 
 	const { finishState } = props;
+
+	const { state } = useContext(Store);
 
 	const messengerRef = useRef<HTMLDivElement>(null);
 
@@ -60,7 +63,7 @@ function Messenger(props: MessengerProps) {
 
 		if (msgInputState && msgInputState.length <= 10000) {
 			socket.emit('create-message', {
-				token: sessionStorage.getItem('token'),
+				token: state.token,
 				chat_id: props.chatId,
 				message: {
 					text: msgInputState,
@@ -71,7 +74,7 @@ function Messenger(props: MessengerProps) {
 		if (!!uploadedImages.length && uploadedImages.length <= 3) {
 			for (const image of uploadedImages) {
 				socket.emit('create-message', {
-					token: sessionStorage.getItem('token'),
+					token: state.token,
 					chat_id: props.chatId,
 					message: {
 						type: 'img',
@@ -168,7 +171,9 @@ function Messenger(props: MessengerProps) {
 		const scroll = messengerRef.current?.scrollTop;
 		if (!chunkLoading && chunkNumber < maxChunks && scroll && scroll < 10) {
 			setChunkLoading(true);
-			const result = await getChatChunk(props.chatId, chunkNumber + 1);
+			const result = await getChatChunk(props.chatId, chunkNumber + 1, {
+				token: state.token,
+			});
 			if (!result.success) return;
 			setMessages([
 				...result.data

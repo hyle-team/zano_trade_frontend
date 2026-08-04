@@ -1,15 +1,10 @@
 import styles from '@/styles/Trading.module.scss';
 import Header from '@/components/default/Header/Header';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
-import { useCallback, useState } from 'react';
-import {
-	cancelOrder,
-	getCandles,
-	getOrdersPage,
-	getPair,
-	getPairStats,
-	getTrades,
-} from '@/utils/methods';
+import { useCallback, useContext, useState } from 'react';
+import { cancelOrder } from '@/utils/methods';
+import { getCandles, getOrdersPage, getPair, getPairStats, getTrades } from '@/utils/serverMethods';
+import { getForwardedFor } from '@/utils/serverFetch';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import Alert from '@/components/UI/Alert/Alert';
 import PeriodState from '@/interfaces/states/pages/dex/trading/InputPanelItem/PeriodState';
@@ -36,6 +31,7 @@ import useMatrixAddresses from '@/hook/useMatrixAddresses';
 import takeOrderClick from '@/utils/takeOrderClick';
 import useUpdateUser from '@/hook/useUpdateUser';
 import { GuideProvider } from '@/store/guide-provider';
+import { Store } from '@/store/store-reducer';
 import { GetServerSidePropsContext } from 'next';
 import { TradingProps } from '@/interfaces/props/pages/dex/trading/TradingProps';
 import { Footer } from '@/zano_ui/src';
@@ -47,6 +43,7 @@ function Trading({
 	initialTrades,
 	initialCandles,
 }: TradingProps) {
+	const { state } = useContext(Store);
 	const { alertState, alertSubtitle, setAlertState } = useAlert();
 	const { elementRef: orderListRef, scrollToElement: scrollToOrdersList } =
 		useScroll<HTMLDivElement>();
@@ -138,7 +135,7 @@ function Trading({
 
 		try {
 			for (const order of userOrders) {
-				await cancelOrder(order.id);
+				await cancelOrder(order.id, { token: state.token });
 			}
 
 			await updateUserOrders();
@@ -147,7 +144,7 @@ function Trading({
 		} finally {
 			setMyOrdersLoading(false);
 		}
-	}, [userOrders, updateUserOrders]);
+	}, [userOrders, updateUserOrders, state.token]);
 
 	const { filteredOrdersHistory } = useFilteredData({
 		ordersBuySell,
@@ -270,13 +267,14 @@ function Trading({
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 	const pairId = ctx.params?.id as string;
+	const xForwardedFor = getForwardedFor(ctx.req);
 
 	const [pairRes, statsRes, ordersRes, tradesRes, candlesRes] = await Promise.all([
-		getPair(pairId),
-		getPairStats(pairId),
-		getOrdersPage(pairId),
-		getTrades(pairId),
-		getCandles(pairId, '1h'),
+		getPair(pairId, { xForwardedFor }),
+		getPairStats(pairId, { xForwardedFor }),
+		getOrdersPage(pairId, { xForwardedFor }),
+		getTrades(pairId, { xForwardedFor }),
+		getCandles(pairId, '1h', { xForwardedFor }),
 	]);
 
 	return {

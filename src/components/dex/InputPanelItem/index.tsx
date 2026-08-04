@@ -125,7 +125,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 			};
 
 			setCreatingState(true);
-			const result = await createOrder(orderData);
+			const result = await createOrder(orderData, { token: state.token });
 			setCreatingState(false);
 
 			if (result.success) {

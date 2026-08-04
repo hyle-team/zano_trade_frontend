@@ -75,7 +75,7 @@ export function useTradingData({
 
 	async function updateUserOrders() {
 		setMyOrdersLoading(true);
-		const result = await getUserOrdersPage(pairId);
+		const result = await getUserOrdersPage(pairId, { token: state.token });
 		await fetchUser();
 
 		if (!result.success) return;
