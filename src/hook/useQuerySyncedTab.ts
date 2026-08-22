@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 
 type TabType = string;
 
@@ -23,10 +23,9 @@ export function useQuerySyncedTab<T extends TabType>({
 	replace = true,
 }: Options<T>) {
 	const router = useRouter();
-	const pathname = usePathname();
-	const searchParams = useSearchParams();
 
-	const urlValue = searchParams.get(queryKey) as T | null;
+	const rawValue = router.query[queryKey];
+	const urlValue = (Array.isArray(rawValue) ? rawValue[0] : rawValue) as T | undefined;
 
 	const initialTab = useMemo(() => {
 		const fallback = (defaultType ?? tabs[0]?.type) as T;
@@ -50,20 +49,22 @@ export function useQuerySyncedTab<T extends TabType>({
 		const found = tabs.find((t) => t.type === nextType);
 		if (found) setActive(found);
 
-		const params = new URLSearchParams(searchParams.toString());
 		const def = (defaultType ?? tabs[0]?.type) as T;
+		const query = { ...router.query };
+
 		if (nextType === def) {
-			params.delete(queryKey);
+			delete query[queryKey];
 		} else {
-			params.set(queryKey, nextType);
+			query[queryKey] = nextType;
 		}
 
-		const url = params.toString() ? `${pathname}?${params}` : pathname;
+		const url = { pathname: router.pathname, query };
+		const options = { shallow: true, scroll: false };
 
 		if (replace) {
-			router.replace(url, { scroll: false });
+			router.replace(url, undefined, options);
 		} else {
-			router.push(url, { scroll: false });
+			router.push(url, undefined, options);
 		}
 	};
 
