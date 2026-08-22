@@ -38,6 +38,8 @@ const UserOrders = ({
 	secondAssetUsdPrice,
 	onAfter,
 	pairData,
+	requestedTab,
+	onRequestedTabHandled,
 }: UserOrdersProps) => {
 	const { state } = useContext(Store);
 	const loggedIn = !!state.wallet?.connected;
@@ -93,6 +95,13 @@ const UserOrders = ({
 		defaultType: 'opened',
 		queryKey: 'tab',
 	});
+
+	useEffect(() => {
+		if (!requestedTab) return;
+
+		setActiveTab(requestedTab);
+		onRequestedTabHandled?.();
+	}, [requestedTab]);
 
 	useEffect(() => {
 		if (!loggedIn) return;

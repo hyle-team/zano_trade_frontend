@@ -6,10 +6,15 @@ import RocketImg from '@/assets/images/UI/rocket.png';
 import styles from './styles.module.scss';
 import { BadgeStatusProps } from './types';
 
-function BadgeStatus({ type, icon }: BadgeStatusProps) {
+function BadgeStatus({ type, icon, className }: BadgeStatusProps) {
 	return (
 		<span
-			className={classes(styles.badge, type === 'high' && styles.high, icon && styles.icon)}
+			className={classes(
+				styles.badge,
+				type === 'high' && styles.high,
+				icon && styles.icon,
+				className,
+			)}
 		>
 			<Image
 				className={styles.badge__img}

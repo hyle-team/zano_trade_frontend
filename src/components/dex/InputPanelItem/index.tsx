@@ -14,7 +14,6 @@ import infoIcon from '@/assets/images/UI/info_alert_icon.svg?url';
 import Image from 'next/image';
 import { useAlert } from '@/hook/useAlert';
 import { buySellValues } from '@/constants';
-import { usePathname, useSearchParams } from 'next/navigation';
 import styles from './styles.module.scss';
 import LabeledInput from './components/LabeledInput';
 
@@ -41,6 +40,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 		minPerApplyAmountValid,
 		totalUsd,
 		scrollToOrderList,
+		openOrdersTab,
 		currencyNames,
 		onAfter,
 		resetForm,
@@ -49,28 +49,12 @@ function InputPanelItem(props: InputPanelItemProps) {
 
 	const { state } = useContext(Store);
 	const router = useRouter();
-	const pathname = usePathname();
-	const searchParams = useSearchParams();
 	const { setAlertState, setAlertSubtitle } = useAlert();
 	const [creatingState, setCreatingState] = useState(false);
 	const { firstCurrencyName, secondCurrencyName } = currencyNames;
 
 	const [hasImmediateMatch, setHasImmediateMatch] = useState(false);
 	const isBuy = buySellState?.code === 'buy';
-
-	function goToTab(name?: string) {
-		const params = new URLSearchParams(searchParams.toString());
-		if (name) {
-			params.set('tab', name);
-		} else {
-			params.delete('tab');
-		}
-
-		router.replace(`${pathname}?${params.toString()}`, undefined, {
-			shallow: true,
-			scroll: false,
-		});
-	}
 
 	const numericBalance = Number(balance);
 	const numericZanoBalance = Number(zanoBalance);
@@ -131,7 +115,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 			if (result.success) {
 				if (result.data?.immediateMatch) {
 					setHasImmediateMatch(true);
-					goToTab();
+					openOrdersTab('opened');
 					scrollToOrderList();
 				}
 				onAfter();
@@ -212,8 +196,8 @@ function InputPanelItem(props: InputPanelItemProps) {
 								<Button
 									className={styles.applyAlert__button}
 									onClick={() => {
+										openOrdersTab('matches');
 										scrollToOrderList();
-										goToTab('matches');
 										setHasImmediateMatch(false);
 									}}
 								>

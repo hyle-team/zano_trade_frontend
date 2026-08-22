@@ -85,22 +85,19 @@
 						}
 
 						&.buy {
-							background: linear-gradient(
-								to left,
-								var(--dex-buy-percentage) var(--precentage),
-								transparent var(--precentage)
-							);
+							background: linear-gradient(to left,
+									var(--dex-buy-percentage) var(--precentage),
+									transparent var(--precentage));
 						}
 
 						&.sell {
-							background: linear-gradient(
-								to left,
-								var(--dex-sell-percentage) var(--precentage),
-								transparent var(--precentage)
-							);
+							background: linear-gradient(to left,
+									var(--dex-sell-percentage) var(--precentage),
+									transparent var(--precentage));
 						}
 
 						td {
+
 							p,
 							span {
 								position: relative;
@@ -185,6 +182,10 @@
 	&__arrow {
 		border-top: 1px solid var(--dex-tooltip-border-color);
 		background-color: var(--dex-tooltip-bg) !important;
+	}
+
+	&__badge {
+		margin-top: 1px !important;
 	}
 
 	h6 {

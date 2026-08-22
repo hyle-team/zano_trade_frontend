@@ -48,5 +48,5 @@ export default function Popup<ContentProps extends object>(props: PopupProps<Con
 		};
 	}, []);
 
-	return popupContainer ? ReactDOM.createPortal(getPopupElement(), popupContainer) : <div></div>;
+	return popupContainer ? ReactDOM.createPortal(getPopupElement(), popupContainer) : null;
 }
