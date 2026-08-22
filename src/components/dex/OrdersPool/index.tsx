@@ -353,7 +353,11 @@ const OrdersPool = (props: OrdersPoolProps) => {
 								<p>
 									@{cutAddress(ordersInfoTooltip?.user?.alias || 'no alias', 12)}{' '}
 									{ordersInfoTooltip?.isInstant && (
-										<BadgeStatus type="instant" icon />
+										<BadgeStatus
+											className={styles.tooltip__badge}
+											type="instant"
+											icon
+										/>
 									)}
 								</p>
 

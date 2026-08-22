@@ -3,6 +3,7 @@ interface CurrencyCheckRowProps {
 	title: string;
 	amount: number;
 	balanceSeen?: boolean;
+	tooltipDisabled?: boolean;
 }
 
 export default CurrencyCheckRowProps;

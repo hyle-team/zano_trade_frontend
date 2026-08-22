@@ -5,6 +5,7 @@ import PairData from '@/interfaces/common/PairData';
 import { ForwardedRef } from 'react';
 
 export type OrderType = 'opened' | 'suitable' | 'requests' | 'offers' | 'history';
+export type UserOrdersTabType = 'opened' | 'matches' | 'requests' | 'offers' | 'history';
 export interface UserOrdersProps {
 	orderListRef: ForwardedRef<HTMLDivElement>;
 	userOrders: OrderRow[];
@@ -15,4 +16,6 @@ export interface UserOrdersProps {
 	matrixAddresses: MatrixAddress[];
 	pairData: PairData | null;
 	onAfter: () => Promise<void>;
+	requestedTab?: UserOrdersTabType | null;
+	onRequestedTabHandled?: () => void;
 }

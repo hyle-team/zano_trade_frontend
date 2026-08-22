@@ -21,6 +21,7 @@ import useScroll from '@/hook/useScroll';
 import InputPanelItem from '@/components/dex/InputPanelItem';
 import TradingHeader from '@/components/dex/TradingHeader';
 import UserOrders from '@/components/dex/UserOrders';
+import { UserOrdersTabType } from '@/components/dex/UserOrders/types';
 import OrdersPool from '@/components/dex/OrdersPool';
 import CandleChart from '@/components/dex/CandleChart';
 import { useSocketListeners } from '@/hook/useSocketListeners';
@@ -49,6 +50,8 @@ function Trading({
 		useScroll<HTMLDivElement>();
 	const { elementRef: orderFormRef, scrollToElement: scrollToOrderForm } =
 		useScroll<HTMLDivElement>();
+
+	const [requestedOrdersTab, setRequestedOrdersTab] = useState<UserOrdersTabType | null>(null);
 
 	const [pairData, setPairData] = useState<PairData | null>(initialPair);
 	const [pairStats, setPairStats] = useState<PairStats | null>(initialStats);
@@ -233,6 +236,7 @@ function Trading({
 							minPerApplyAmountValid={orderForm.minPerApplyAmountValid}
 							totalUsd={orderForm.totalUsd}
 							scrollToOrderList={scrollToOrdersList}
+							openOrdersTab={setRequestedOrdersTab}
 							onAfter={onAfter}
 							resetForm={orderForm.resetForm}
 							userOrdersOfThisSideAmount={userOrdersOfThisSideAmount}
@@ -250,6 +254,8 @@ function Trading({
 					secondAssetUsdPrice={secondAssetUsdPrice}
 					pairData={pairData}
 					onAfter={onAfter}
+					requestedTab={requestedOrdersTab}
+					onRequestedTabHandled={() => setRequestedOrdersTab(null)}
 				/>
 
 				{alertState && (

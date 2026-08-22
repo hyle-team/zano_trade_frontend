@@ -1,4 +1,5 @@
 import SelectValue from '@/interfaces/states/pages/dex/trading/InputPanelItem/SelectValue';
+import { UserOrdersTabType } from '@/components/dex/UserOrders/types';
 import { Dispatch, SetStateAction } from 'react';
 
 interface InputPanelItemProps {
@@ -25,6 +26,7 @@ interface InputPanelItemProps {
 	minPerApplyAmountValid: boolean;
 	totalUsd: string | undefined;
 	scrollToOrderList: () => void;
+	openOrdersTab: (_tab: UserOrdersTabType) => void;
 	onAfter: () => Promise<void>;
 	resetForm: () => void;
 	userOrdersOfThisSideAmount: number;

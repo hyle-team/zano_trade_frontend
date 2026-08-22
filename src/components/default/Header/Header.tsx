@@ -86,12 +86,18 @@ function Header({ isLg }: { isLg?: boolean }) {
 
 	function Menu(props: { isMobile?: boolean } = {}) {
 		function CurrencyCheck() {
-			function Row({ icon, title, amount, balanceSeen }: CurrencyCheckRowProps) {
+			function Row({
+				icon,
+				title,
+				amount,
+				balanceSeen,
+				tooltipDisabled,
+			}: CurrencyCheckRowProps) {
 				const [textHovered, setTextHovered] = useState(false);
 
 				const displayedAmount = balanceSeen ? new Decimal(amount).toFixed() : '****';
 
-				const showTooltip = displayedAmount.length >= 7;
+				const showTooltip = !tooltipDisabled && displayedAmount.length >= 7;
 
 				return (
 					<div
@@ -134,6 +140,7 @@ function Header({ isLg }: { isLg?: boolean }) {
 					>
 						<Row
 							balanceSeen={balanceSeen}
+							tooltipDisabled={currencyCheckOpended}
 							icon={zanoIcon}
 							title="ZANO"
 							amount={Number(assets.find((e) => e.ticker === 'ZANO')?.balance) || 0}
