@@ -5,6 +5,7 @@ interface LabeledInputProps {
 	currency: string;
 	readonly?: boolean;
 	invalid?: boolean;
+	errorText?: string;
 }
 
 export default LabeledInputProps;

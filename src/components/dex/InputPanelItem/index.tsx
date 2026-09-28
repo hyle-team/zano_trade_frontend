@@ -19,6 +19,12 @@ import LabeledInput from './components/LabeledInput';
 
 const MAX_ORDERS_PER_SIDE = 10;
 
+function getPrecisionError(value: string, decimalPoint: number) {
+	const decimals = value.split('.')[1]?.length ?? 0;
+	if (decimals <= decimalPoint) return undefined;
+	return `Maximum ${decimalPoint} decimal places allowed`;
+}
+
 function InputPanelItem(props: InputPanelItemProps) {
 	const {
 		priceState = '',
@@ -39,6 +45,8 @@ function InputPanelItem(props: InputPanelItemProps) {
 		totalValid,
 		minPerApplyAmountValid,
 		totalUsd,
+		priceDecimalPoint,
+		amountDecimalPoint,
 		scrollToOrderList,
 		openOrdersTab,
 		currencyNames,
@@ -173,7 +181,13 @@ function InputPanelItem(props: InputPanelItemProps) {
 		!isMinPerApplyAmountValidForCreation ||
 		tooManyOrders ||
 		creatingState;
-	const showTotalError = priceState !== '' && amountState !== '' && !totalValid;
+	const priceError = getPrecisionError(priceState, priceDecimalPoint);
+	const amountError = getPrecisionError(amountState, amountDecimalPoint);
+	const minPerApplyAmountError = getPrecisionError(minPerApplyAmountState, amountDecimalPoint);
+	const hasInputError = !!priceError || !!amountError;
+	const showTotalError = priceState !== '' && amountState !== '' && !hasInputError && !totalValid;
+	const totalError =
+		showTotalError && priceValid && amountValid ? 'Total is too small' : undefined;
 
 	const createButtonErrorLabel = (() => {
 		if (tooManyOrders) {
@@ -242,6 +256,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 					currency={secondCurrencyName}
 					label="Price"
 					invalid={!!priceState && !priceValid}
+					errorText={priceError}
 				/>
 
 				<LabeledInput
@@ -250,6 +265,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 					currency={firstCurrencyName}
 					label="Quantity"
 					invalid={!!amountState && !amountValid}
+					errorText={amountError}
 				/>
 
 				<LabeledInput
@@ -258,6 +274,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 					currency={firstCurrencyName}
 					label="Min Per Apply Amount (Optional)"
 					invalid={minPerApplyAmountState !== '' && !minPerApplyAmountValid}
+					errorText={minPerApplyAmountError}
 				/>
 
 				<div className={classes(isBuy && styles.disabled)}>
@@ -279,12 +296,17 @@ function InputPanelItem(props: InputPanelItemProps) {
 
 				<div className={styles.inputPanel__body_total}>
 					<LabeledInput
-						value={amountState && priceState && notationToString(totalState)}
+						value={
+							amountState && priceState && totalState !== '' && !hasInputError
+								? notationToString(totalState)
+								: ''
+						}
 						setValue={() => undefined}
 						currency={secondCurrencyName}
 						label="Total"
 						readonly={true}
 						invalid={showTotalError}
+						errorText={totalError}
 					/>
 
 					<div className={classes(styles.inputPanel__body_labels, styles.mobileWrap)}>

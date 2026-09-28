@@ -177,8 +177,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 	const xForwardedFor = getForwardedFor(ctx.req);
 
 	const [pairsRes, priceRes] = await Promise.all([
-		getPairsPageServer(1, '', true, PairSortOption.VOLUME_HIGH_TO_LOW, { xForwardedFor }),
-		getZanoPrice(),
+		getPairsPageServer(1, '', true, PairSortOption.VOLUME_HIGH_TO_LOW, { xForwardedFor }).catch(
+			() => null,
+		),
+		getZanoPrice().catch(() => null),
 	]);
 
 	let initialZanoUsd: number | null = null;
@@ -189,7 +191,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 	return {
 		props: {
-			initialPairs: pairsRes.success ? pairsRes.data : [],
+			initialPairs: pairsRes?.success ? pairsRes.data : [],
 			initialZanoUsd,
 		},
 	};
