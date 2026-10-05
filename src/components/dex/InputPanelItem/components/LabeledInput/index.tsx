@@ -6,7 +6,7 @@ import styles from './styles.module.scss';
 
 function LabeledInput(props: LabeledInputProps) {
 	const labelRef = useRef<HTMLParagraphElement>(null);
-	const { label = '', currency = '', value, readonly, setValue, invalid } = props;
+	const { label = '', currency = '', value, readonly, setValue, invalid, errorText } = props;
 
 	const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
 		if (!readonly && setValue) {
@@ -30,6 +30,7 @@ function LabeledInput(props: LabeledInputProps) {
 					<p>{currency}</p>
 				</div>
 			</div>
+			{errorText && <p className={styles.labeledInput__error}>{errorText}</p>}
 		</div>
 	);
 }
