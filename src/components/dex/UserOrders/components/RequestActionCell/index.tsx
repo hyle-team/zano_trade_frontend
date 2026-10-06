@@ -149,7 +149,7 @@ export default function RequestActionCell({
 				}
 
 				if (!getProposalInfoResult.success) {
-					if (getProposalInfoResult.error === 'WALLET_RPC_ERROR_-1') {
+					if (getProposalInfoResult.error === 'WALLET_RPC_ERROR_-6') {
 						await handleCancelTransaction({ txId: row.id });
 						return;
 					}
