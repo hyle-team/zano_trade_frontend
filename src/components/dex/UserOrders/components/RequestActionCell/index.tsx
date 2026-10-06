@@ -154,7 +154,7 @@ export default function RequestActionCell({
 						return;
 					}
 
-					if (getProposalInfoResult.error === 'WALLET_RPC_ERROR_-6') {
+					if (getProposalInfoResult.error === 'WALLET_RPC_ERROR_-4') {
 						alertErr(
 							'Proposal valid but not found for active wallet. Double-check it.',
 						);
