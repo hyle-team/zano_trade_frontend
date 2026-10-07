@@ -55,6 +55,8 @@ export default function RequestActionCell({
 		}
 
 		alertErr('The on-chain swap was malformed. Order canceled.');
+
+		await onAfter();
 	};
 
 	const handleValidateProposalAmounts = async ({
