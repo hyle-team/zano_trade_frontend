@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { notationToString, tradingKnownCurrencies } from '@/utils/utils';
 import Link from 'next/link';
 import { Dispatch, SetStateAction } from 'react';
+import { getDexOrderHref, useStoredDexMode } from '@/utils/dexMode';
 import styles from './OrderNotification.module.scss';
 
 interface OrderNotificationProps {
@@ -23,6 +24,7 @@ export default function OrderNotification({
 	const firstCurrencyTicker = first_currency.name;
 	const secondCurrencyTicker = second_currency.name;
 	const isBuy = order.type === 'buy';
+	const dexMode = useStoredDexMode();
 
 	function onCloseClick() {
 		setNotificationOrders((prev) => prev.filter((e, i) => i !== index));
@@ -32,7 +34,7 @@ export default function OrderNotification({
 		? pair.first_currency?.code
 		: 'tsds';
 
-	const pairLink = `/dex/trading/${order.pair.id}#my_orders`;
+	const pairLink = getDexOrderHref(dexMode, order.pair.id);
 
 	return (
 		<div className={styles['dex__order-notification']}>

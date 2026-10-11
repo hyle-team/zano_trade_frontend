@@ -13,6 +13,7 @@ import inter from '@/utils/font';
 import { API_URL } from '@/constants';
 import NProgress from 'nprogress';
 import { Router } from 'next/router';
+import HeroBlurs from '@/components/default/HeroBlurs';
 import PageHandler from './PageHandler';
 import NotificationPopups from './NotificationPopups';
 import 'nprogress/nprogress.css';
@@ -84,6 +85,7 @@ function App(data: AppProps & { config?: GetConfigResData }) {
 			</Head>
 			<StoreProvider>
 				<ThemeProvider themes={['dark', 'light']} defaultTheme="dark">
+					<HeroBlurs />
 					<Component {...pageProps} />
 					<PageHandler config={data.config as GetConfigResData} />
 					<NotificationPopups />

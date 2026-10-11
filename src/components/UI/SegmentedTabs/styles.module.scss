@@ -1,0 +1,83 @@
+@use '../../../styles/mixins' as *;
+
+.tabs {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	padding: 2px;
+	border-radius: 100px;
+	background: var(--tabs-bg);
+	transition: none;
+}
+
+.indicator {
+	position: absolute;
+	top: 2px;
+	left: 0;
+	height: calc(100% - 4px);
+	border-radius: 100px;
+	background: var(--primary-gradient);
+	pointer-events: none;
+	z-index: 0;
+	transition:
+		transform 0.4s cubic-bezier(0.65, 0, 0.35, 1),
+		width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+
+	&__hidden {
+		opacity: 0;
+	}
+
+	&__static {
+		transition: none;
+	}
+}
+
+.tab {
+	@include reset-button;
+	@include font;
+	position: relative;
+	z-index: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	border-radius: 100px;
+	font-weight: 700;
+	line-height: 100%;
+	color: var(--gray-color);
+	white-space: nowrap;
+	transition: color 0.3s ease;
+
+	* {
+		@include font;
+		color: inherit;
+		font-size: inherit;
+		font-weight: inherit;
+		transition: none;
+	}
+
+	&:hover {
+		color: var(--text-color);
+		background-color: transparent;
+	}
+
+	&.active {
+		color: #fff;
+	}
+
+	&.active__fallback {
+		background: var(--primary-gradient);
+	}
+}
+
+.md .tab {
+	padding: 9px 18px;
+	min-width: 120px;
+	font-size: 14px;
+}
+
+.sm .tab {
+	padding: 7px 12px;
+	min-width: 64px;
+	font-size: 13px;
+}

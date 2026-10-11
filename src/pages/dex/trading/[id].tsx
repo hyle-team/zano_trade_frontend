@@ -35,7 +35,7 @@ import { GuideProvider } from '@/store/guide-provider';
 import { Store } from '@/store/store-reducer';
 import { GetServerSidePropsContext } from 'next';
 import { TradingProps } from '@/interfaces/props/pages/dex/trading/TradingProps';
-import { Footer } from '@/zano_ui/src';
+import SiteFooter from '@/components/default/SiteFooter';
 
 function Trading({
 	initialOrders,
@@ -268,7 +268,7 @@ function Trading({
 					/>
 				)}
 			</main>
-			<Footer className="no-svg-style" />
+			<SiteFooter />
 		</GuideProvider>
 	);
 }

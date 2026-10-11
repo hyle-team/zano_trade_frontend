@@ -190,6 +190,7 @@ function ConnectButton(props: ConnectButtonProps) {
 					onClick={connect}
 					className={props.className}
 					transparent={props.transparent}
+					variant={props.transparent ? undefined : 'primary'}
 				>
 					Connect Wallet
 				</Button>

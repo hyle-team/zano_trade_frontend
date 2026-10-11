@@ -1,101 +1,340 @@
-.main {
+@use './mixins' as *;
+
+.ordersPage {
+	@include container;
+	@include page-padding;
 	display: flex;
 	flex-direction: column;
+	gap: 24px;
 
-	.orders__title {
+	* {
+		@include font;
+	}
+
+	&__head {
 		display: flex;
-		flex-direction: column;
-		gap: 10px;
+		align-items: flex-end;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 16px;
 
 		h1 {
-			font-size: 24px;
-			font-weight: 600;
+			font-size: 36px;
+			font-weight: 800;
+			color: var(--text-color);
+
+			@include mobile {
+				font-size: 28px;
+			}
 		}
 
 		p {
-			font-weight: 400;
-			font-size: 18px;
-			opacity: 80%;
+			margin-top: 6px;
+			font-size: 16px;
+			font-weight: 500;
+			color: var(--gray-color);
+		}
+	}
+}
+
+.toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+
+	&__filters {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 10px;
+
+		.cancelBtn {
+			min-height: 46px;
+		}
+
+		@include mobile {
+			width: 100%;
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 8px;
+
+			&.toolbar__filters > * {
+				min-width: 0;
+			}
+
+			.dateFilter,
+			.cancelBtn {
+				grid-column: 1 / -1;
+				width: 100%;
+			}
 		}
 	}
 
-	.orders__content {
+}
+
+.dateFilter {
+	width: 250px;
+}
+
+.content {
+	display: flex;
+	flex-direction: column;
+
+	&,
+	*:not(button) {
+		transition: none;
+	}
+}
+
+.counter {
+	min-width: 18px;
+	height: 18px;
+	padding: 0 5px;
+	display: inline-grid;
+	place-content: center;
+	border-radius: 100px;
+	font-size: 11px !important;
+	font-weight: 800;
+	color: #fff !important;
+	background: var(--red-color);
+}
+
+.list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.card {
+	@include card;
+	transition: none;
+	padding: 18px 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+
+	&__highlight {
+		border-color: var(--primary-color);
+		box-shadow: 0 0 0 1px rgba(39, 151, 255, 0.25);
+	}
+
+	&__top {
 		display: flex;
-		flex-direction: column;
-		gap: 40px;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
 
-		.orders__nav {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
+	&__title {
+		display: flex;
+		align-items: center;
+		gap: 10px;
 
-			@media screen and (max-width: 1180px) {
-				flex-direction: column;
-				gap: 20px;
-				align-items: start;
+		p {
+			font-size: 16px;
+			font-weight: 700;
+			color: var(--text-color);
+		}
+	}
+
+	&__meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 24px;
+
+		p {
+			font-size: 13px;
+			color: var(--gray-color);
+
+			span {
+				margin-left: 4px;
+				font-size: 13px;
+				font-weight: 600;
+				color: var(--text-color);
 			}
 		}
+	}
 
-		> :first-child {
-			padding-top: 20px;
+	&__bottom {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding-top: 14px;
+		border-top: 1px solid var(--divider-color);
+
+		@include mobile {
+			flex-direction: column;
+			align-items: stretch;
 		}
+	}
 
-		.orders__filters_wrapper {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			gap: 10px;
+	&__hint {
+		font-size: 13px;
+		line-height: 1.5;
+		color: var(--gray-color);
+	}
 
-			@media screen and (max-width: 600px) {
-				width: 100%;
-			}
+	&__actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-shrink: 0;
 
-			@media screen and (max-width: 1400px) {
-				button {
-					display: none;
-				}
+		@include mobile {
+			justify-content: flex-end;
+		}
+	}
+}
+
+.side {
+	padding: 4px 10px;
+	border-radius: 100px;
+	font-size: 12px;
+	font-weight: 700;
+
+	&__buy {
+		color: var(--green-color);
+		background: var(--success-bg-color);
+	}
+
+	&__sell {
+		color: var(--red-color);
+		background: var(--danger-bg-color);
+	}
+}
+
+.stage {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 5px 10px;
+	border-radius: 100px;
+	font-size: 12px;
+	font-weight: 700;
+
+	&__success {
+		color: var(--green-color);
+		background: var(--success-bg-color);
+	}
+
+	&__info {
+		color: var(--primary-color);
+		background: var(--info-bg-color);
+	}
+
+	&__warning {
+		color: var(--warning-color);
+		background: var(--warning-bg-color);
+	}
+
+	&__muted {
+		color: var(--gray-color);
+		background: var(--light-color);
+	}
+}
+
+.sides {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	flex-wrap: wrap;
+
+	&__item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+
+		p {
+			font-size: 18px;
+			font-weight: 700;
+			color: var(--text-color);
+
+			span {
+				font-size: 14px;
+				font-weight: 600;
+				color: var(--gray-color);
 			}
 		}
+	}
 
-		.orders__filters {
-			display: flex;
-			gap: 10px;
-			flex-wrap: wrap;
+	&__arrow {
+		color: var(--muted-color);
+	}
+}
 
-			> * {
-				height: 54px;
-			}
+.progress {
+	height: 6px;
+	border-radius: 100px;
+	background: var(--light-color);
+	overflow: hidden;
 
-			.orders__pair__filter {
-				width: 180px;
-			}
+	span {
+		display: block;
+		height: 100%;
+		border-radius: inherit;
+		background: var(--primary-gradient);
+	}
+}
 
-			.orders__buy_sell__filter {
-				width: 180px;
-			}
+.empty {
+	@include card;
+	padding: 48px 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	text-align: center;
 
-			> :last-child {
-				width: 330px;
-			}
+	h3 {
+		font-size: 20px;
+		font-weight: 700;
+		color: var(--text-color);
+	}
 
-			@media screen and (max-width: 600px) {
-				width: 100%;
-				flex-direction: column;
+	p {
+		font-size: 14px;
+		color: var(--gray-color);
+		margin-bottom: 8px;
+	}
 
-				> * {
-					width: 100% !important;
-					height: 48px;
+	&__icon {
+		width: 56px;
+		height: 56px;
+		display: grid;
+		place-content: center;
+		border-radius: 16px;
+		color: var(--primary-color);
+		background: var(--info-bg-color);
+		margin-bottom: 6px;
+	}
+}
 
-					> :first-child {
-						height: 48px;
-					}
-				}
-			}
-		}
+.ordersPage .connect {
+	padding: 14px 28px;
+	border-radius: 16px;
+	border: none;
+	background: var(--primary-gradient) !important;
+	font-size: 16px;
+	font-weight: 600;
+}
 
-		.orders__preloader-wrapper {
-			display: flex;
-			justify-content: center;
-		}
+.loader {
+	width: 28px;
+	height: 28px;
+	margin: 40px auto;
+	border-radius: 50%;
+	border: 2px solid var(--primary-color);
+	border-right-color: transparent;
+	animation: spin 0.8s linear infinite;
+	transition: none;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
 	}
 }

@@ -28,6 +28,7 @@ import GetUserOrdersAllPairsRes from '@/interfaces/responses/orders/GetUserOrder
 import { CancelAllData } from '@/interfaces/fetch-data/cancel-all-orders/CancelAllData';
 import CancelAllRes from '@/interfaces/responses/orders/CancelAllRes';
 import AuthParams from '@/interfaces/common/AuthParams';
+import OrderRow from '@/interfaces/common/OrderRow';
 
 const baseUrl = '';
 
@@ -201,7 +202,7 @@ export async function getPair(id: string): Promise<ErrorRes | GetPairRes> {
 export async function createOrder(
 	orderData: CreateOrderData,
 	{ token }: AuthParams,
-): Promise<ErrorRes | { success: true; data: { immediateMatch: boolean } }> {
+): Promise<ErrorRes | { success: true; data: OrderRow & { immediateMatch?: boolean } }> {
 	return axios
 		.post(
 			'/api/orders/create',

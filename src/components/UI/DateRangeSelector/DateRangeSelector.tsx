@@ -202,7 +202,7 @@ function DateRangeSelector(props: DateRangeSelectorProps) {
 	return (
 		<div
 			ref={selectorRef}
-			className={`${styles.selector__wrapper} ${props.disabled ? styles.disabled : ''}`}
+			className={`${styles.selector__wrapper} ${props.disabled ? styles.disabled : ''} ${props.className || ''}`}
 		>
 			<div
 				className={`${styles.selector__header} ${props.className || ''}`}

@@ -1,17 +1,11 @@
+@use './mixins' as *;
+
 .trading {
-	padding-inline: 60px;
+	@include site-padding;
 	padding-top: 16px;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-
-	@media screen and (max-width: 1600px) {
-		padding-inline: 40px;
-	}
-
-	@media screen and (max-width: 1200px) {
-		padding-inline: 20px;
-	}
 
 	&__top {
 		margin-top: 16px;
@@ -71,5 +65,11 @@
 		&_chart {
 			display: none;
 		}
+	}
+}
+@media screen and (max-width: 640px) {
+	.trading__top_trades {
+		position: relative;
+		min-height: 320px;
 	}
 }

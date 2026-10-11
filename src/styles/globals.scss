@@ -12,6 +12,8 @@
 }
 
 #__next {
+	position: relative;
+	isolation: isolate;
 	width: 100%;
 	max-width: 2200px;
 	min-height: 100vh;
@@ -28,12 +30,16 @@ body {
 	background-color: var(--main-bg-color);
 }
 
+body {
+	overflow-x: clip;
+}
+
 main {
 	width: 100%;
 	padding: 80px 100px;
 
 	&.with-separators {
-		>* {
+		> * {
 			padding: 40px 0;
 			border-bottom: 1px solid var(--delimiter-color);
 
@@ -115,7 +121,7 @@ h6 {
 }
 
 h1,
-h1>* {
+h1 > * {
 	color: var(--font-main-color);
 	font-size: 48px;
 }
@@ -147,12 +153,11 @@ h6 {
 	-webkit-text-fill-color: transparent;
 }
 
-svg:not(.stroked):not(.no-svg-style svg) {
+:where(#__next) svg:not(.stroked):not(.no-svg-style svg):not(:where(.ui-icon)) {
 	* {
 		fill: var(--font-main-color);
 	}
 }
-
 
 svg {
 	&.dimmed {
@@ -175,9 +180,8 @@ svg {
 }
 
 @media screen and (max-width: 700px) {
-
 	h1,
-	h1>* {
+	h1 > * {
 		font-size: 32px;
 	}
 }
@@ -291,4 +295,10 @@ svg {
 	left: 0;
 	width: 100%;
 	height: 3px;
+}
+:root {
+	--primary-hover-color: #4ca5ef;
+	--red-color: #ff5c5c;
+	--warning-color: #f5a623;
+	--primary-gradient: radial-gradient(100% 188.88% at 0% 0%, #16d1d6 0%, #274cff 100%);
 }

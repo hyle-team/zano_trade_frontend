@@ -1,256 +1,66 @@
 import logoImg from '@/assets/images/UI/logo_block.svg?url';
 import logoImgWhite from '@/assets/images/UI/logo_block_dark.svg?url';
-import LogOutIcon from '@/assets/images/UI/logout.svg';
-import BurgerIcon from '@/assets/images/UI/hamburger_icon.svg';
-import BurgerCrossIcon from '@/assets/images/UI/burger_cross.svg';
 import React, { useRef, useState, useEffect, useContext } from 'react';
-import EyeIcon from '@/assets/images/UI/eye.svg';
-import EyeCloseIcon from '@/assets/images/UI/eye_close.svg';
-import zanoIcon from '@/assets/images/UI/zano.svg?url';
-import bitcoinWhiteIcon from '@/assets/images/UI/wbtc.svg?url';
-import sunIcon from '@/assets/images/UI/sun_icon.svg?url';
-import moonIcon from '@/assets/images/UI/moon_icon.svg?url';
-import ethWhiteIcon from '@/assets/images/UI/weth.svg?url';
-import customWhiteIcon from '@/assets/images/UI/tsds.svg?url';
 import Link from 'next/link';
-import Tooltip from '@/components/UI/Tooltip/Tooltip';
-import Button from '@/components/UI/Button/Button';
+import { useRouter } from 'next/router';
+import Decimal from 'decimal.js';
 
-import { useWindowWidth } from '@react-hook/window-size';
 import ConnectButton from '@/components/UI/ConnectButton/ConnectButton';
-import { classes, notationToString, shortenAddress } from '@/utils/utils';
+import TokenIcon from '@/components/UI/TokenIcon';
+import {
+	ChevronDownIcon,
+	EyeIcon,
+	EyeOffIcon,
+	LogoutIcon,
+	MoonIcon,
+	SunIcon,
+} from '@/components/UI/Icons';
+import { classes, notationToString, shortenAddress, ZANO_ASSET_ID } from '@/utils/utils';
+import { formatTokenAmount } from '@/utils/swap';
+import { figtree } from '@/utils/font';
 import useAdvancedTheme from '@/hook/useTheme';
-
 import { Store } from '@/store/store-reducer';
 import { updateAutoClosedNotification, updateToken, updateWalletState } from '@/store/actions';
-import CurrencyCheckRowProps from '@/interfaces/props/components/default/Header/CurrencyCheckRowProps';
-import Decimal from 'decimal.js';
 import socket from '@/utils/socket';
 import { OrderDataWithPair } from '@/interfaces/responses/orders/GetOrdersPageRes';
-import { useRouter } from 'next/router';
 import zanoImg from '@/assets/images/UI/zano.svg?url';
 import useUpdateUser from '@/hook/useUpdateUser';
+import { getDexOrderHref, getStoredDexMode } from '@/utils/dexMode';
 import NavBar from './NavBar/NavBar';
 import styles from './Header.module.scss';
+
+function useOutsideClick(ref: React.RefObject<HTMLElement>, onOutside: () => void) {
+	useEffect(() => {
+		function onMouseDown(e: MouseEvent) {
+			if (ref.current && !ref.current.contains(e.target as Node)) onOutside();
+		}
+
+		document.addEventListener('mousedown', onMouseDown);
+		return () => document.removeEventListener('mousedown', onMouseDown);
+	}, [ref, onOutside]);
+}
 
 function Header({ isLg }: { isLg?: boolean }) {
 	const { theme, setTheme } = useAdvancedTheme();
 	const router = useRouter();
 
-	const eyeRef = useRef<HTMLDivElement>(null);
-
 	const { dispatch, state } = useContext(Store);
 	const loggedIn = !!state.wallet?.connected;
 
-	const [menuOpened, setMenuState] = useState(false);
-	const [currencyCheckOpended, setCurrencyState] = useState(false);
-	const [balanceSeen, setBalanceState] = useState(true);
+	const [menuOpened, setMenuOpened] = useState(false);
+	const [balancesOpened, setBalancesOpened] = useState(false);
+	const [balanceSeen, setBalanceSeen] = useState(true);
 
-	const width = useWindowWidth();
+	const balancesRef = useRef<HTMLDivElement>(null);
+	useOutsideClick(balancesRef, () => setBalancesOpened(false));
 
 	useEffect(() => {
-		setMenuState(false);
-	}, [width]);
+		setMenuOpened(false);
+	}, [router.asPath]);
 
 	function logout() {
 		updateToken(dispatch, null);
 		updateWalletState(dispatch, null);
-	}
-
-	const getIcon = (ticker: string) => {
-		switch (ticker) {
-			case 'WBTC':
-				return bitcoinWhiteIcon;
-			case 'WETH':
-				return ethWhiteIcon;
-			default:
-				return customWhiteIcon;
-		}
-	};
-
-	function BurgerButton(props: { className?: string }) {
-		return (
-			<Button
-				transparent
-				className={`${styles.header__account__btn} ${styles.burger__tablet__btn} ${props.className}`}
-				onClick={() => setMenuState(!menuOpened)}
-			>
-				{!menuOpened ? (
-					<BurgerIcon className="filled" />
-				) : (
-					<BurgerCrossIcon className="filled" />
-				)}
-			</Button>
-		);
-	}
-
-	function Menu(props: { isMobile?: boolean } = {}) {
-		function CurrencyCheck() {
-			function Row({
-				icon,
-				title,
-				amount,
-				balanceSeen,
-				tooltipDisabled,
-			}: CurrencyCheckRowProps) {
-				const [textHovered, setTextHovered] = useState(false);
-
-				const displayedAmount = balanceSeen ? new Decimal(amount).toFixed() : '****';
-
-				const showTooltip = !tooltipDisabled && displayedAmount.length >= 7;
-
-				return (
-					<div
-						className={styles.currency__check__row}
-						onMouseEnter={() => setTextHovered(true)}
-						onMouseLeave={() => setTextHovered(false)}
-					>
-						<div className={styles.currency__check__icon}>
-							<img src={icon} alt={title}></img>
-						</div>
-						<p className={styles.currency__title}>
-							<span>{displayedAmount}</span> {title}
-						</p>
-						{showTooltip && (
-							<Tooltip
-								className={styles.currency__check__tooltip}
-								shown={textHovered}
-							>
-								{displayedAmount}
-							</Tooltip>
-						)}
-					</div>
-				);
-			}
-
-			const assets = state.wallet?.connected ? state.wallet?.assets || [] : [];
-
-			const openable = assets.length > 1;
-
-			return (
-				<div className={styles.header__currency__wrapper}>
-					<div
-						onClick={(e) => {
-							if (e.target === eyeRef.current || !openable) return;
-							setCurrencyState(!currencyCheckOpended);
-						}}
-						className={`${styles.header__currency__check} ${
-							currencyCheckOpended ? styles.currency__check__opened : ''
-						} ${openable ? styles.currency__check__openable : ''}`}
-					>
-						<Row
-							balanceSeen={balanceSeen}
-							tooltipDisabled={currencyCheckOpended}
-							icon={zanoIcon}
-							title="ZANO"
-							amount={Number(assets.find((e) => e.ticker === 'ZANO')?.balance) || 0}
-						></Row>
-						{/* <img
-                            onClick={() => setBalanceState(!balanceSeen)}
-                            src={balanceSeen ? eyeCloseIcon : eyeIcon} alt="see"
-                            style={!balanceSeen ? {opacity: "0.6"} : {}}
-                        /> */}
-						<div
-							onClick={() => setBalanceState(!balanceSeen)}
-							style={!balanceSeen ? { opacity: '0.6' } : {}}
-							ref={eyeRef}
-						>
-							{balanceSeen ? (
-								<EyeCloseIcon className="filled" />
-							) : (
-								<EyeIcon className="filled" />
-							)}
-						</div>
-					</div>
-					{currencyCheckOpended && (
-						<div className={styles.currency__check__menu}>
-							{assets
-								?.filter((e) => e.ticker !== 'ZANO')
-								.map((e) => (
-									<Row
-										key={e.ticker}
-										balanceSeen={balanceSeen}
-										icon={getIcon(e.ticker)}
-										title={e.ticker}
-										amount={Number(e.balance)}
-									/>
-								))}
-						</div>
-					)}
-				</div>
-			);
-		}
-
-		function ThemeButton(props: { className?: string }) {
-			const [tooltipShown, setTooltipState] = useState(false);
-
-			return (
-				<div className={styles.theme__btn__wrapper}>
-					<Button
-						onMouseEnter={() => setTooltipState(true)}
-						onMouseLeave={() => setTooltipState(false)}
-						className={`${styles.theme__btn} ${props.className}`}
-						onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-						transparent
-					>
-						<img src={theme === 'dark' ? sunIcon : moonIcon} alt="theme" />
-					</Button>
-					<Tooltip className={styles.theme__tooltip} shown={tooltipShown}>
-						{theme === 'dark' ? 'Light' : 'Dark'} Theme
-					</Tooltip>
-				</div>
-			);
-		}
-
-		return (
-			<div
-				className={`${styles.header__menu} ${props.isMobile ? styles.header__menu__mobile : ''}`}
-			>
-				<>
-					{loggedIn ? (
-						<div className={styles.header__account}>
-							{CurrencyCheck()}
-							<div className={styles.header__account__wrapper}>
-								<div className={styles.header__account__info}>
-									<p>
-										{state.wallet?.connected && state.wallet.alias
-											? `@${state.wallet.alias}`
-											: '@no alias'}
-									</p>
-									<p>
-										{state.wallet?.connected
-											? shortenAddress(state.wallet.address || '')
-											: '...'}
-									</p>
-								</div>
-								<div className={styles.header__account__panel}>
-									<div>
-										<ThemeButton className={styles.header__account__btn} />
-									</div>
-
-									<Button
-										onClick={logout}
-										className={styles.header__account__btn}
-										transparent={true}
-									>
-										<LogOutIcon className="stroked" />
-									</Button>
-
-									<BurgerButton />
-								</div>
-							</div>
-						</div>
-					) : (
-						<div className={styles.header__login}>
-							<ThemeButton />
-							<ConnectButton autoAuth className={styles.header__connect_btn} />
-							{!props.isMobile && <BurgerButton />}
-						</div>
-					)}
-					{props.isMobile && <NavBar mobile />}
-				</>
-			</div>
-		);
 	}
 
 	useEffect(() => {
@@ -276,7 +86,7 @@ function Header({ isLg }: { isLg?: boolean }) {
 				if (!!('Notification' in window) && Notification.permission === 'granted') {
 					const { pair } = orderData;
 
-					const pairLink = `/dex/trading/${pair.id}#my_orders`;
+					const pairLink = getDexOrderHref(getStoredDexMode(), pair.id);
 
 					const notification = new Notification('Zano Trade - New offer', {
 						body: `You have new offer: ${orderData.type === 'buy' ? 'Buy' : 'Sell'} | ${
@@ -293,7 +103,6 @@ function Header({ isLg }: { isLg?: boolean }) {
 
 					setActiveNotifications((prevNotifications) => {
 						const newNotifications = new Map(prevNotifications);
-						console.log('Added notification with orderId:', orderData.id);
 
 						newNotifications.set(parseInt(orderData.id, 10), {
 							Notification: notification,
@@ -314,7 +123,6 @@ function Header({ isLg }: { isLg?: boolean }) {
 				if (notification) {
 					notification.Notification.close();
 					newNotifications.delete(orderId);
-					console.log('Deleted notification with orderId:', orderId);
 				}
 
 				return newNotifications;
@@ -325,8 +133,6 @@ function Header({ isLg }: { isLg?: boolean }) {
 			for (const notificationID of state.closed_notifications) {
 				onCancel({ orderId: notificationID });
 			}
-
-			console.log('Closed notifications:', state.closed_notifications);
 
 			updateAutoClosedNotification(dispatch, []);
 		}
@@ -340,39 +146,169 @@ function Header({ isLg }: { isLg?: boolean }) {
 		};
 	}, [state.user, activeNotifications, state.closed_notifications]);
 
-	const mobileHeaderStyle: React.CSSProperties = {};
+	const assets = loggedIn ? state.wallet?.assets || [] : [];
+	const zanoAsset = assets.find((e) => e.assetId === ZANO_ASSET_ID);
+	const otherAssets = assets.filter((e) => e.assetId !== ZANO_ASSET_ID);
 
-	if (!menuOpened) {
-		mobileHeaderStyle.maxHeight = '0';
-	} else if (currencyCheckOpended) {
-		mobileHeaderStyle.overflow = 'inherit';
-	}
+	const displayBalance = (amount: string | number | undefined) => {
+		if (!balanceSeen) return '****';
+		try {
+			return formatTokenAmount(new Decimal(amount || 0).toFixed(), 4);
+		} catch {
+			return '0';
+		}
+	};
+
+	const alias = state.wallet?.alias ? `@${state.wallet.alias}` : '@no alias';
+	const address = shortenAddress(state.wallet?.address || '');
+
+	const themeButton = (
+		<button
+			className={styles.iconBtn}
+			onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+			aria-label={theme === 'dark' ? 'Light theme' : 'Dark theme'}
+			title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
+		>
+			{theme === 'dark' ? (
+				<SunIcon width={20} height={20} />
+			) : (
+				<MoonIcon width={20} height={20} />
+			)}
+		</button>
+	);
+
+	const balances = (
+		<div className={styles.balances} ref={balancesRef}>
+			<button
+				className={classes(styles.chip, balancesOpened && styles.chip__active)}
+				onClick={() => setBalancesOpened((prev) => !prev)}
+			>
+				<TokenIcon assetId={ZANO_ASSET_ID} size={22} />
+				<span className={styles.chip__value}>
+					{displayBalance(zanoAsset?.balance)} <em>ZANO</em>
+				</span>
+				<ChevronDownIcon className={styles.chip__chevron} />
+			</button>
+
+			<div className={classes(styles.dropdown, balancesOpened && styles.dropdown__open)}>
+				<div className={styles.dropdown__head}>
+					<p>Wallet balances</p>
+					<button
+						className={styles.dropdown__eye}
+						onClick={() => setBalanceSeen((prev) => !prev)}
+						aria-label={balanceSeen ? 'Hide balances' : 'Show balances'}
+					>
+						{balanceSeen ? <EyeOffIcon /> : <EyeIcon />}
+					</button>
+				</div>
+				{[zanoAsset, ...otherAssets].filter(Boolean).map((asset) => (
+					<div key={asset?.assetId} className={styles.dropdown__item}>
+						<TokenIcon assetId={asset?.assetId} size={24} />
+						<p>{asset?.ticker}</p>
+						<span>{displayBalance(asset?.balance)}</span>
+					</div>
+				))}
+				{!assets.length && <p className={styles.dropdown__empty}>No assets</p>}
+			</div>
+		</div>
+	);
+
+	const account = (
+		<div className={styles.account}>
+			<span className={styles.account__avatar}>
+				{(state.wallet?.alias || state.wallet?.address || '?').slice(0, 1).toUpperCase()}
+			</span>
+			<div className={styles.account__info}>
+				<p>{alias}</p>
+				<span>{address}</span>
+			</div>
+		</div>
+	);
 
 	return (
-		<>
-			{menuOpened && <div className={styles.header__blur__block}></div>}
-			<header className={classes(styles.header, isLg && styles.lg)}>
-				<div className={styles.header__logo}>
-					<Link href="/dex">
-						<img src={theme === 'dark' ? logoImg : logoImgWhite} alt="Zano P2P" />
+		<header
+			className={classes(styles.header, isLg && styles.lg, figtree.variable, 'no-svg-style')}
+		>
+			<div className={styles.header__bar}>
+				<div className={styles.header__main}>
+					<Link href="/dex" className={styles.header__logo}>
+						<img src={theme === 'dark' ? logoImg : logoImgWhite} alt="Zano Trade" />
 					</Link>
-				</div>
 
-				<div className={styles.header__desktop__navigation}>
-					<NavBar isLg={isLg} />
-				</div>
-
-				{Menu()}
-
-				<BurgerButton className={styles.header__burger} />
-
-				<div className={styles.header__account__mobile} style={mobileHeaderStyle}>
-					<div>
-						<Menu isMobile={true} />
+					<div className={styles.header__nav}>
+						<NavBar />
 					</div>
 				</div>
-			</header>
-		</>
+
+				<div className={styles.header__actions}>
+					{loggedIn ? (
+						<>
+							<div className={styles.header__desktopOnly}>{balances}</div>
+							<div className={styles.header__desktopOnly}>{account}</div>
+							{themeButton}
+							<button
+								className={classes(styles.iconBtn, styles.header__desktopOnly)}
+								onClick={logout}
+								aria-label="Log out"
+								title="Log out"
+							>
+								<LogoutIcon width={20} height={20} />
+							</button>
+						</>
+					) : (
+						<>
+							{themeButton}
+							<ConnectButton
+								autoAuth
+								className={classes(styles.connect, styles.header__desktopOnly)}
+							/>
+						</>
+					)}
+
+					<button
+						className={styles.burger}
+						onClick={() => setMenuOpened((prev) => !prev)}
+						aria-label={menuOpened ? 'Close menu' : 'Open menu'}
+						aria-expanded={menuOpened}
+					>
+						<span
+							className={classes(styles.burger__lines, menuOpened && styles.active)}
+						>
+							<span />
+							<span />
+							<span />
+						</span>
+					</button>
+				</div>
+			</div>
+
+			<div className={classes(styles.mobile, menuOpened && styles.mobile__open)}>
+				<NavBar mobile onNavigate={() => setMenuOpened(false)} />
+
+				<div className={styles.mobile__account}>
+					{loggedIn ? (
+						<>
+							{account}
+							<div className={styles.mobile__balances}>
+								{[zanoAsset, ...otherAssets].filter(Boolean).map((asset) => (
+									<div key={asset?.assetId} className={styles.dropdown__item}>
+										<TokenIcon assetId={asset?.assetId} size={24} />
+										<p>{asset?.ticker}</p>
+										<span>{displayBalance(asset?.balance)}</span>
+									</div>
+								))}
+							</div>
+							<button className={styles.mobile__logout} onClick={logout}>
+								<LogoutIcon />
+								Log out
+							</button>
+						</>
+					) : (
+						<ConnectButton autoAuth className={styles.mobile__connect} />
+					)}
+				</div>
+			</div>
+		</header>
 	);
 }
 

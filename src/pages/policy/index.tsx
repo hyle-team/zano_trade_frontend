@@ -3,7 +3,7 @@ import Header from '@/components/default/Header/Header';
 import Link from 'next/link';
 import PageTitle from '@/components/default/PageTitle/PageTitle';
 import { nanoid } from 'nanoid';
-import { Footer } from '@/zano_ui/src';
+import SiteFooter from '@/components/default/SiteFooter';
 
 function Policy() {
 	const contentList: string[] = Array(5).fill('Donec tellus felis, egestas ac tortor in;');
@@ -78,7 +78,7 @@ function Policy() {
 					</ul>
 				</div>
 			</main>
-			<Footer className="no-svg-style" />
+			<SiteFooter />
 		</>
 	);
 }
