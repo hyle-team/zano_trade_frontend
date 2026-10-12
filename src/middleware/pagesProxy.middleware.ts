@@ -7,6 +7,13 @@ const isDev = process.env.NODE_ENV === 'development';
 // Allow next-themes inline initialization script
 const NEXT_THEMES_HASH = "'sha256-Kk3IGXdFX+72JM6rbRJ6+DoTOy47CdFNCnQpb2EUODg='";
 
+const connectSrcUrls = [
+	backendURL,
+	backendWSURL,
+	'https://explorer.zano.org',
+	'https://messenger.zano.org',
+];
+
 export async function handlePagesProxy(request: NextRequest) {
 	const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
 	const cspHeader = `
@@ -18,7 +25,7 @@ export async function handlePagesProxy(request: NextRequest) {
     style-src 'self' 'unsafe-inline';
     img-src 'self' data: blob: ${backendURL};
     media-src 'self' blob: ${backendURL};
-    connect-src 'self' ${backendURL} ${backendWSURL} https://explorer.zano.org;
+    connect-src 'self' ${connectSrcUrls.join(' ')};
     worker-src 'self' blob:;
     font-src 'self';
     object-src 'none';
