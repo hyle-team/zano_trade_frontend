@@ -21,6 +21,16 @@
 	flex-direction: column;
 }
 
+html {
+	scrollbar-color: rgba(128, 128, 160, 0.45) transparent;
+}
+
+html::-webkit-scrollbar,
+html::-webkit-scrollbar-track,
+html::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
 html,
 body {
 	scroll-behavior: smooth;
@@ -39,7 +49,7 @@ main {
 	padding: 80px 100px;
 
 	&.with-separators {
-		> * {
+		>* {
 			padding: 40px 0;
 			border-bottom: 1px solid var(--delimiter-color);
 
@@ -121,7 +131,7 @@ h6 {
 }
 
 h1,
-h1 > * {
+h1>* {
 	color: var(--font-main-color);
 	font-size: 48px;
 }
@@ -180,8 +190,9 @@ svg {
 }
 
 @media screen and (max-width: 700px) {
+
 	h1,
-	h1 > * {
+	h1>* {
 		font-size: 32px;
 	}
 }
@@ -296,9 +307,21 @@ svg {
 	width: 100%;
 	height: 3px;
 }
+
 :root {
 	--primary-hover-color: #4ca5ef;
 	--red-color: #ff5c5c;
 	--warning-color: #f5a623;
 	--primary-gradient: radial-gradient(100% 188.88% at 0% 0%, #16d1d6 0%, #274cff 100%);
+}
+
+[class*='styles_popup__addresses_item']>svg {
+	width: 14px;
+	height: 14px;
+	min-width: 14px;
+}
+
+[class*='styles_popup__close'],
+[class*='styles_popup__close']:hover {
+	background-color: transparent;
 }

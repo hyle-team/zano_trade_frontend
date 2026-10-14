@@ -500,37 +500,52 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 32px;
+	gap: 56px;
 	padding-inline: 0;
 	@include page-padding;
+	padding-top: 32px;
 
 	* {
 		@include font;
 	}
 
 	@include mobile {
-		gap: 24px;
+		gap: 40px;
+		padding-top: 24px;
+	}
+
+	&__top {
+		@include container;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 480px;
+		align-items: center;
+		gap: 56px;
+
+		@media screen and (max-width: 1024px) {
+			grid-template-columns: minmax(0, 1fr);
+			justify-items: center;
+			gap: 28px;
+		}
 	}
 
 	&__hero {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: 14px;
-		text-align: center;
-		@include container;
-		max-width: 680px;
-	}
+		align-items: flex-start;
+		gap: 16px;
+		max-width: 560px;
 
-	&__title,
-	&__subtitle {
-		animation: modeFade 0.4s ease;
+		@media screen and (max-width: 1024px) {
+			align-items: center;
+			text-align: center;
+			max-width: 640px;
+		}
 	}
 
 	&__title {
-		font-size: 48px;
+		font-size: 56px;
 		font-weight: 800;
-		line-height: 1.1;
+		line-height: 1.05;
 		color: var(--text-color);
 
 		span {
@@ -542,18 +557,22 @@
 			-webkit-text-fill-color: transparent;
 		}
 
-		@media screen and (max-width: 620px) {
+		@media screen and (max-width: 1024px) {
+			font-size: 44px;
+		}
+
+		@include mobile {
 			font-size: 34px;
 		}
 	}
 
 	&__subtitle {
-		font-size: 17px;
+		font-size: 18px;
 		font-weight: 500;
 		line-height: 1.6;
 		color: var(--gray-color);
 
-		@media screen and (max-width: 620px) {
+		@include mobile {
 			font-size: 15px;
 		}
 	}
@@ -562,9 +581,12 @@
 		margin-top: 8px;
 		display: flex;
 		align-items: center;
-		justify-content: center;
 		flex-wrap: wrap;
 		gap: 12px;
+
+		@media screen and (max-width: 1024px) {
+			justify-content: center;
+		}
 
 		@include mobile {
 			flex-wrap: nowrap;
@@ -594,10 +616,6 @@
 		}
 	}
 
-	&__markets {
-		width: 100%;
-	}
-
 	&__widget {
 		width: 100%;
 		max-width: 480px;
@@ -611,24 +629,5 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 32px;
-		animation: modeSwitch 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-
-		> section:last-child {
-			margin-top: 24px;
-		}
-	}
-}
-
-@keyframes modeSwitch {
-	from {
-		opacity: 0;
-		transform: translateY(12px);
-	}
-}
-
-@keyframes modeFade {
-	from {
-		opacity: 0;
 	}
 }

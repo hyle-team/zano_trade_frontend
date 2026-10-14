@@ -198,6 +198,7 @@ function ConnectButton(props: ConnectButtonProps) {
 			{alertState && (
 				<Alert
 					type={alertState}
+					title={alertState === 'loading' ? 'Connecting wallet' : undefined}
 					subtitle={alertSubtitle}
 					close={() => setAlertState(null)}
 				/>

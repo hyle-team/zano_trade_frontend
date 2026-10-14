@@ -6,23 +6,16 @@ import SiteFooter from '@/components/default/SiteFooter';
 import ModeSwitch from '@/components/dex/swap/ModeSwitch';
 import SwapWidget from '@/components/dex/swap/SwapWidget';
 import HowItWorks from '@/components/dex/swap/HowItWorks';
-import MarketsList from '@/components/dex/MarketsList';
+import AssetSelectModal from '@/components/dex/swap/AssetSelectModal';
+import AssetFlight from '@/components/dex/AssetFlight';
 import { ListIcon } from '@/components/UI/Icons';
 import Button from '@/components/UI/Button/Button';
-import {
-	findPairID,
-	getOrdersPage,
-	getPair,
-	getPairStats,
-	getPairsPage,
-} from '@/utils/serverMethods';
+import { findPairID, getOrdersPage, getPair, getPairStats } from '@/utils/serverMethods';
 import { getForwardedFor } from '@/utils/serverFetch';
-import { getZanoPrice } from '@/utils/methods';
 import { classes, ZANO_ASSET_ID } from '@/utils/utils';
 import { figtree } from '@/utils/font';
 import { SwapMode } from '@/utils/swap';
-import { DEX_MODE_COOKIE, parseDexMode } from '@/utils/dexMode';
-import { PairSortOption } from '@/interfaces/enum/pair';
+import { setStoredDexMode } from '@/utils/dexMode';
 import PairData from '@/interfaces/common/PairData';
 import { PairStats } from '@/interfaces/responses/orders/GetPairStatsRes';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
@@ -32,95 +25,118 @@ interface DexProps {
 	initialPair: PairData | null;
 	initialStats: PairStats | null;
 	initialOrderBook: PageOrderData[];
-	initialPairs: PairData[];
-	initialZanoUsd: number | null;
-	initialMode: SwapMode;
 }
 
-const HERO: Record<SwapMode, { title: string; accent: string; subtitle: string }> = {
-	standard: {
-		title: 'Swap',
-		accent: 'Zano assets',
-		subtitle:
-			'Peer-to-peer ionic swaps with ZANO. Non-custodial, settled directly between wallets.',
-	},
-	advanced: {
-		title: 'Decentralized',
-		accent: 'Exchange',
-		subtitle:
-			'Order books and charts for every Zano asset. Peer-to-peer trading with ionic swaps.',
-	},
-};
+const queryValue = (value: string | string[] | undefined) =>
+	Array.isArray(value) ? value[0] : value;
 
-function Dex({
-	initialPair,
-	initialStats,
-	initialOrderBook,
-	initialPairs,
-	initialZanoUsd,
-	initialMode,
-}: DexProps) {
+function Dex({ initialPair, initialStats, initialOrderBook }: DexProps) {
 	const router = useRouter();
-	const [mode, setMode] = useState<SwapMode>(initialMode);
-	const queryMode = parseDexMode(router.query.mode);
+	const [assetPickerOpen, setAssetPickerOpen] = useState(false);
+	const [flight, setFlight] = useState<{ pair: PairData; rect: DOMRect } | null>(null);
+
+	const currentPairId =
+		queryValue(router.query.pair) ?? (initialPair ? String(initialPair.id) : null);
+
+	const openAdvanced = (pairId: string | number) => {
+		setStoredDexMode('advanced');
+		router.push(`/dex/trading/${pairId}`);
+	};
+
+	const onModeChange = (next: SwapMode) => {
+		if (next !== 'advanced') return;
+
+		if (currentPairId) {
+			openAdvanced(currentPairId);
+			return;
+		}
+
+		setAssetPickerOpen(true);
+	};
 
 	useEffect(() => {
-		if (queryMode) setMode(queryMode);
-	}, [queryMode]);
-	const hero = HERO[mode];
+		if (!router.isReady || queryValue(router.query.mode) !== 'advanced') return;
+
+		const query = { ...router.query };
+		delete query.mode;
+		router.replace({ pathname: router.pathname, query }, undefined, {
+			shallow: true,
+			scroll: false,
+		});
+
+		if (currentPairId) {
+			openAdvanced(currentPairId);
+		} else {
+			setAssetPickerOpen(true);
+		}
+	}, [router.isReady, router.query.mode]);
 
 	return (
 		<>
 			<Header />
 			<main className={classes(styles.swapPage, figtree.variable)}>
-				<section className={styles.swapPage__hero}>
-					<h1 key={`title-${mode}`} className={styles.swapPage__title}>
-						{hero.title} <span>{hero.accent}</span>
-					</h1>
-					<p key={`subtitle-${mode}`} className={styles.swapPage__subtitle}>
-						{hero.subtitle}
-					</p>
+				<div className={styles.swapPage__top}>
+					<section className={styles.swapPage__hero}>
+						<h1 className={styles.swapPage__title}>
+							Swap <span>Zano assets</span>
+						</h1>
+						<p className={styles.swapPage__subtitle}>
+							Peer-to-peer ionic swaps with ZANO. Non-custodial, settled directly
+							between wallets.
+						</p>
 
-					<div className={styles.swapPage__actions}>
-						<ModeSwitch mode={mode} onChange={setMode} />
-						<Button
-							variant="secondary"
-							size="sm"
-							className={styles.swapPage__ordersLink}
-							onClick={() => router.push('/dex/orders')}
-							aria-label="My orders"
-						>
-							<ListIcon />
-							<span className={styles.swapPage__ordersText}>My orders</span>
-						</Button>
-					</div>
-				</section>
-
-				<div key={mode} className={styles.swapPage__content}>
-					{mode === 'standard' ? (
-						<>
-							<div className={styles.swapPage__widget}>
-								<SwapWidget
-									initialPair={initialPair}
-									initialStats={initialStats}
-									initialOrderBook={initialOrderBook}
-								/>
-							</div>
-
-							<HowItWorks />
-						</>
-					) : (
-						<div className={styles.swapPage__markets}>
-							<MarketsList
-								initialPairs={initialPairs}
-								initialZanoUsd={initialZanoUsd}
-							/>
+						<div className={styles.swapPage__actions}>
+							<ModeSwitch mode="standard" onChange={onModeChange} />
+							<Button
+								variant="secondary"
+								size="sm"
+								className={styles.swapPage__ordersLink}
+								onClick={() => router.push('/dex/orders')}
+								aria-label="My orders"
+							>
+								<ListIcon />
+								<span className={styles.swapPage__ordersText}>My orders</span>
+							</Button>
 						</div>
-					)}
+					</section>
+
+					<div className={styles.swapPage__widget}>
+						<SwapWidget
+							initialPair={initialPair}
+							initialStats={initialStats}
+							initialOrderBook={initialOrderBook}
+						/>
+					</div>
+				</div>
+
+				<div className={styles.swapPage__content}>
+					<HowItWorks />
 				</div>
 			</main>
 
 			<SiteFooter />
+
+			<AssetSelectModal
+				open={assetPickerOpen}
+				onClose={() => setAssetPickerOpen(false)}
+				onSelect={(pair, rect) => {
+					router.prefetch(`/dex/trading/${pair.id}`);
+
+					if (rect) {
+						setFlight({ pair, rect });
+					} else {
+						openAdvanced(pair.id);
+					}
+				}}
+			/>
+
+			{flight && (
+				<AssetFlight
+					pair={flight.pair}
+					from={flight.rect}
+					onDone={() => openAdvanced(flight.pair.id)}
+				/>
+			)}
 		</>
 	);
 }
@@ -128,21 +144,6 @@ function Dex({
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 	const xForwardedFor = getForwardedFor(ctx.req);
 	const { pair, asset } = ctx.query;
-	const initialMode =
-		parseDexMode(ctx.query.mode) ??
-		parseDexMode(ctx.req.cookies?.[DEX_MODE_COOKIE]) ??
-		'standard';
-
-	const [pairsRes, priceRes] = await Promise.all([
-		getPairsPage(1, '', true, PairSortOption.VOLUME_HIGH_TO_LOW, { xForwardedFor }).catch(
-			() => null,
-		),
-		getZanoPrice().catch(() => null),
-	]);
-
-	const initialPairs = pairsRes?.success ? pairsRes.data : [];
-	const initialZanoUsd =
-		priceRes?.success && typeof priceRes.data?.usd === 'number' ? priceRes.data.usd : null;
 
 	let pairId: string | null = typeof pair === 'string' && pair ? pair : null;
 
@@ -151,11 +152,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			() => undefined,
 		);
 		if (found) pairId = String(found);
-	}
-
-	if (!pairId) {
-		const defaultPair = initialPairs.find((p) => p.second_currency?.asset_id === ZANO_ASSET_ID);
-		pairId = defaultPair ? String(defaultPair.id) : null;
 	}
 
 	const [pairRes, statsRes, ordersRes] = pairId
@@ -171,9 +167,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			initialPair: pairRes?.success ? pairRes.data : null,
 			initialStats: statsRes?.success ? statsRes.data : null,
 			initialOrderBook: ordersRes?.success ? ordersRes.data : [],
-			initialPairs,
-			initialZanoUsd,
-			initialMode,
 		},
 	};
 }

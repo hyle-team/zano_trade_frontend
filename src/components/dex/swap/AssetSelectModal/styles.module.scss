@@ -96,7 +96,8 @@
 	&__ticker {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		flex-wrap: wrap;
+		gap: 4px 8px;
 		font-size: 16px;
 		font-weight: 700;
 		color: var(--text-color);
@@ -109,6 +110,16 @@
 		font-weight: 600;
 		color: var(--warning-color);
 		background: var(--warning-bg-color);
+
+		&_whitelisted {
+			color: var(--green-color);
+			background: var(--success-bg-color);
+		}
+
+		&_featured {
+			color: #a77cff;
+			background: rgba(152, 91, 255, 0.16);
+		}
 	}
 
 	&__name {
@@ -157,10 +168,36 @@
 }
 
 .empty {
-	padding: 40px 0;
+	flex: 1;
+	padding: 40px 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
 	text-align: center;
-	font-size: 14px;
-	color: var(--gray-color);
+
+	&__icon {
+		width: 48px;
+		height: 48px;
+		margin-bottom: 6px;
+		display: grid;
+		place-content: center;
+		border-radius: 14px;
+		color: var(--gray-color);
+		background: var(--light-color);
+	}
+
+	&__title {
+		font-size: 16px;
+		font-weight: 700;
+		color: var(--text-color);
+	}
+
+	&__text {
+		font-size: 13px;
+		color: var(--gray-color);
+	}
 }
 
 .loader {

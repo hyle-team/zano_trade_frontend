@@ -407,6 +407,14 @@ export async function getZanoPrice() {
 		.then((res) => res.data);
 }
 
+export async function getAssetExplorerPrice(
+	assetId: string,
+): Promise<{ success: boolean; data?: { zano_price?: number | null; usd?: number | null } }> {
+	return axios
+		.get('https://explorer.zano.org/api/price', { params: { asset_id: assetId } })
+		.then((res) => res.data);
+}
+
 export async function getMatrixAddresses(addresses: string[]) {
 	try {
 		const { data } = await axios.post('https://messenger.zano.org/api/get-addresses', {

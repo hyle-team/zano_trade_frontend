@@ -1,73 +1,107 @@
 .ui__alert {
-	width: 420px;
-	background: var(--alert-bg);
-	border-radius: 10px;
-	padding: 20px;
 	position: fixed;
-	top: 40px;
+	top: 20px;
 	left: 50%;
-	transform: translate(-50%);
-	pointer-events: all;
+	transform: translateX(-50%);
+	z-index: 99999;
+	width: max-content;
+	min-width: 180px;
+	max-width: min(420px, calc(100vw - 32px));
+	padding: 12px 16px;
 	display: flex;
-	justify-content: flex-start;
-	gap: 20px;
+	align-items: center;
+	gap: 10px;
+	border-radius: 12px;
+	background-color: #222539;
+	color: #fff;
+	box-shadow: 0px 5px 30px 0px #200e2e66;
+	pointer-events: all;
+	animation: alertIn 0.3s ease;
 
-	.ui__alert__close {
-		cursor: pointer;
-		position: absolute;
-		right: 22px;
-		top: 22px;
+	* {
+		font-family: var(--font-figtree), 'Inter', sans-serif;
+		transition: none;
+	}
+
+	.ui__alert__icon {
+		flex-shrink: 0;
 		display: flex;
+		align-items: center;
+		justify-content: center;
 
-		img {
-			width: 14px;
-			height: 14px;
-			opacity: 0.5;
+		svg {
+			width: 20px;
+			height: 20px;
 		}
+	}
+
+	.ui__alert__loading {
+		animation: alertSpin 1s linear infinite;
 	}
 
 	.ui__alert__data {
-		p {
-			color: var(--font-dimmed-color);
-			line-height: 150%;
-		}
-	}
-
-	.ui__alert__success,
-	.ui__alert__error {
-		width: 64px;
-		min-width: 64px;
-		height: 64px;
-		background: #16d1d6;
-		border-radius: 10px;
+		min-width: 0;
+		margin-right: 6px;
 		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
+		flex-direction: column;
+		gap: 2px;
 
-	.ui__alert__error {
-		background: #ff6767;
-	}
+		h3 {
+			font-size: 15px;
+			font-weight: 600;
+			line-height: 140%;
+			color: #fff;
+		}
 
-	.ui__alert__loader {
-		img {
-			height: 64px;
-			width: 64px;
+		p {
+			font-size: 13px;
+			font-weight: 400;
+			line-height: 135%;
+			color: rgba(255, 255, 255, 0.65);
 		}
 	}
 
-	@media screen and (max-width: 500px) {
-		width: calc(100% - 40px);
-		gap: 15px;
+	.ui__alert__close {
+		cursor: pointer;
+		flex-shrink: 0;
+		margin-left: auto;
+		padding: 0;
+		display: block;
+		background: transparent;
+		color: #fff;
+		opacity: 0.5;
+		transition: opacity 0.2s ease;
 
-		.ui__alert__data {
-			h3 {
-				font-size: 24px;
-			}
-
-			p {
-				font-size: 18px;
-			}
+		svg {
+			display: block;
+			width: 13px;
+			height: 13px;
 		}
+
+		svg * {
+			color: #fff;
+		}
+
+		&:hover {
+			opacity: 1;
+			background: transparent;
+		}
+	}
+}
+
+@keyframes alertSpin {
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes alertIn {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -8px);
 	}
 }

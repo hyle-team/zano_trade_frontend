@@ -2,6 +2,7 @@ import styles from '@/styles/Trading.module.scss';
 import Header from '@/components/default/Header/Header';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
 import { useCallback, useContext, useState } from 'react';
+import { useRouter } from 'next/router';
 import { cancelOrder } from '@/utils/methods';
 import { getCandles, getOrdersPage, getPair, getPairStats, getTrades } from '@/utils/serverMethods';
 import { getForwardedFor } from '@/utils/serverFetch';
@@ -296,4 +297,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 	};
 }
 
-export default Trading;
+function TradingPage(props: TradingProps) {
+	const router = useRouter();
+	return <Trading key={String(router.query.id)} {...props} />;
+}
+
+export default TradingPage;

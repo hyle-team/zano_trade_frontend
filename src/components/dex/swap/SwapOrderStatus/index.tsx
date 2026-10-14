@@ -5,6 +5,7 @@ import { ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'rea
 import ConnectButton from '@/components/UI/ConnectButton/ConnectButton';
 import Button from '@/components/UI/Button/Button';
 import TokenIcon from '@/components/UI/TokenIcon';
+import ConfirmModal from '@/components/UI/ConfirmModal';
 import {
 	ArrowLeftIcon,
 	ArrowRightIcon,
@@ -81,6 +82,7 @@ const SwapOrderStatus = ({
 
 	const [snapshot, setSnapshot] = useState<OrderRow | null>(null);
 	const [finishedState, setFinishedState] = useState<'completed' | 'closed' | null>(null);
+	const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
 	const [busyAction, setBusyAction] = useState<string | null>(null);
 	const [notificationPermission, setNotificationPermission] = useState<
 		NotificationPermission | 'unsupported'
@@ -621,16 +623,7 @@ const SwapOrderStatus = ({
 						variant="danger"
 						size="sm"
 						loading={busyAction === 'cancel-order'}
-						onClick={() =>
-							runAction('cancel-order', async () => {
-								const success = await cancelOrder(orderId);
-								if (success) {
-									cancelledByUserRef.current = true;
-									setFinishedState('closed');
-								}
-								return success;
-							})
-						}
+						onClick={() => setConfirmCancelOpen(true)}
 					>
 						Cancel order
 					</Button>
@@ -644,6 +637,27 @@ const SwapOrderStatus = ({
 					)}
 				</div>
 			)}
+
+			<ConfirmModal
+				open={confirmCancelOpen}
+				title="Cancel order?"
+				description="Your order will be removed. Pending swap proposals for it will be rejected."
+				confirmLabel="Cancel order"
+				cancelLabel="Keep"
+				loading={busyAction === 'cancel-order'}
+				onClose={() => setConfirmCancelOpen(false)}
+				onConfirm={async () => {
+					await runAction('cancel-order', async () => {
+						const success = await cancelOrder(orderId);
+						if (success) {
+							cancelledByUserRef.current = true;
+							setFinishedState('closed');
+						}
+						return success;
+					});
+					setConfirmCancelOpen(false);
+				}}
+			/>
 		</div>
 	);
 };

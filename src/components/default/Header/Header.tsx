@@ -12,8 +12,8 @@ import {
 	EyeIcon,
 	EyeOffIcon,
 	LogoutIcon,
-	MoonIcon,
-	SunIcon,
+	ThemeIcon,
+	UserIcon,
 } from '@/components/UI/Icons';
 import { classes, notationToString, shortenAddress, ZANO_ASSET_ID } from '@/utils/utils';
 import { formatTokenAmount } from '@/utils/swap';
@@ -169,11 +169,7 @@ function Header({ isLg }: { isLg?: boolean }) {
 			aria-label={theme === 'dark' ? 'Light theme' : 'Dark theme'}
 			title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
 		>
-			{theme === 'dark' ? (
-				<SunIcon width={20} height={20} />
-			) : (
-				<MoonIcon width={20} height={20} />
-			)}
+			<ThemeIcon />
 		</button>
 	);
 
@@ -216,7 +212,7 @@ function Header({ isLg }: { isLg?: boolean }) {
 	const account = (
 		<div className={styles.account}>
 			<span className={styles.account__avatar}>
-				{(state.wallet?.alias || state.wallet?.address || '?').slice(0, 1).toUpperCase()}
+				<UserIcon />
 			</span>
 			<div className={styles.account__info}>
 				<p>{alias}</p>

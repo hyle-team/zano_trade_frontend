@@ -24,6 +24,10 @@
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
+
+	.price {
+		margin-block: 2px;
+	}
 }
 
 .field {
@@ -33,6 +37,10 @@
 
 	&:focus-within {
 		border-color: var(--primary-color);
+	}
+
+	&__disabled {
+		opacity: 0.55;
 	}
 
 	&__top {
@@ -154,11 +162,12 @@
 }
 
 .fields .flip {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+	position: relative;
 	z-index: 2;
+	height: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 
 	.flip__btn {
 		@include reset-button;
@@ -249,6 +258,29 @@
 	}
 }
 
+.details__loading {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--gray-color) !important;
+}
+
+.details__spinner {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	border: 2px solid var(--primary-color);
+	border-right-color: transparent;
+	animation: detailsSpin 0.8s linear infinite;
+	transition: none;
+}
+
+@keyframes detailsSpin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 .notice {
 	display: flex;
 	gap: 10px;
@@ -256,6 +288,11 @@
 	border-radius: 12px;
 	background: var(--info-bg-color);
 	color: var(--primary-color);
+
+	&__warning {
+		background: var(--warning-bg-color);
+		color: var(--warning-color);
+	}
 
 	svg {
 		flex-shrink: 0;

@@ -10,6 +10,9 @@ import Select, { SelectOption } from '@/components/UI/Select';
 import DateRangeSelector from '@/components/UI/DateRangeSelector/DateRangeSelector';
 import DateState from '@/interfaces/common/DateState';
 import TokenIcon from '@/components/UI/TokenIcon';
+import ConfirmModal from '@/components/UI/ConfirmModal';
+import TooltipWrapper from '@/components/UI/TooltipWrapper';
+import { Switch } from '@/components/UI/Switch/Switch';
 import { ArrowRightIcon, ClockIcon, SwapArrowsIcon } from '@/components/UI/Icons';
 import { Store } from '@/store/store-reducer';
 import { useOrderActions } from '@/hook/useOrderActions';
@@ -45,6 +48,11 @@ const SIDE_OPTIONS: SelectOption<SideFilter>[] = [
 	{ value: 'buy', label: 'Buy' },
 	{ value: 'sell', label: 'Sell' },
 ];
+
+const INACTIVE_META = {
+	label: 'Inactive',
+	hint: 'Paused after 24 hours without visiting Zano Trade. Turn it on to make it visible to other traders again.',
+};
 
 const HISTORY_PAGE_SIZE = 20;
 const ACTIVE_LIMIT = 200;
@@ -153,6 +161,9 @@ function Orders() {
 	const [userPairs, setUserPairs] = useState<GetUserOrdersAllPairsResPair[]>([]);
 	const [cancellingId, setCancellingId] = useState<string | null>(null);
 	const [cancellingAll, setCancellingAll] = useState(false);
+	const [confirmCancel, setConfirmCancel] = useState<
+		{ type: 'one'; order: UserOrderData } | { type: 'all' } | null
+	>(null);
 
 	const tokenRef = useRef(state.token);
 	tokenRef.current = state.token;
@@ -360,6 +371,18 @@ function Orders() {
 		setCancellingId(null);
 	}
 
+	async function onConfirmCancel() {
+		if (!confirmCancel) return;
+
+		if (confirmCancel.type === 'all') {
+			await onCancelAll();
+		} else {
+			await onCancel(confirmCancel.order.id);
+		}
+
+		setConfirmCancel(null);
+	}
+
 	async function onCancelAll() {
 		setCancellingAll(true);
 
@@ -398,9 +421,9 @@ function Orders() {
 						<SwapArrowsIcon width={26} height={26} />
 					</span>
 					<h3>No active orders</h3>
-					<p>Create a swap and it will appear here until it is completed.</p>
+					<p>You don&apos;t have any active swap orders yet.</p>
 					<Button variant="primary" onClick={() => router.push('/dex')}>
-						Start a swap
+						New swap
 					</Button>
 				</div>
 			);
@@ -409,13 +432,17 @@ function Orders() {
 		return (
 			<div className={styles.list}>
 				{visibleActive.map(({ order, stage, matchesCount }) => {
-					const meta = STAGE_META[stage];
+					const isInactive = order.status === 'inactive';
+					const meta = isInactive
+						? { ...INACTIVE_META, tone: 'warning' }
+						: STAGE_META[stage];
 					const ticker = order.first_currency?.name || order.pair?.first_currency?.name;
 					const amount = safeDecimal(order.amount);
 					const filled = amount.isZero()
 						? 0
 						: amount.minus(safeDecimal(order.left)).div(amount).mul(100).toNumber();
-					const actionRequired = stage === 'proposal' || stage === 'match';
+					const actionRequired =
+						!isInactive && (stage === 'proposal' || stage === 'match');
 
 					return (
 						<div
@@ -442,9 +469,14 @@ function Orders() {
 								<span
 									className={classes(styles.stage, styles[`stage__${meta.tone}`])}
 								>
-									{stage === 'requested' && <ClockIcon width={13} height={13} />}
+									{!isInactive && stage === 'requested' && (
+										<ClockIcon width={13} height={13} />
+									)}
 									{meta.label}
-									{stage === 'match' && matchesCount > 1 && ` (${matchesCount})`}
+									{!isInactive &&
+										stage === 'match' &&
+										matchesCount > 1 &&
+										` (${matchesCount})`}
 								</span>
 							</div>
 
@@ -471,11 +503,22 @@ function Orders() {
 							<div className={styles.card__bottom}>
 								<p className={styles.card__hint}>{meta.hint}</p>
 								<div className={styles.card__actions}>
+									<label
+										className={classes(styles.toggle, styles.toggle__disabled)}
+									>
+										<Switch
+											checked={!isInactive}
+											disabled={true}
+											onChange={() => undefined}
+										/>
+										<span>{isInactive ? 'Off' : 'On'}</span>
+									</label>
+
 									<Button
 										size="sm"
 										variant="ghost"
 										loading={cancellingId === order.id}
-										onClick={() => onCancel(order.id)}
+										onClick={() => setConfirmCancel({ type: 'one', order })}
 									>
 										Cancel
 									</Button>
@@ -505,7 +548,7 @@ function Orders() {
 		if (!history.length) {
 			return (
 				<div className={styles.empty}>
-					<h3>No finished orders yet</h3>
+					<h3>No finished orders</h3>
 					<p>Completed and cancelled orders will be shown here.</p>
 				</div>
 			);
@@ -638,7 +681,7 @@ function Orders() {
 										size="sm"
 										variant="danger"
 										loading={cancellingAll}
-										onClick={onCancelAll}
+										onClick={() => setConfirmCancel({ type: 'all' })}
 									>
 										Cancel all
 									</Button>
@@ -653,6 +696,32 @@ function Orders() {
 				)}
 			</main>
 			<SiteFooter />
+
+			<ConfirmModal
+				open={!!confirmCancel}
+				title={confirmCancel?.type === 'all' ? 'Cancel all orders?' : 'Cancel order?'}
+				description={
+					confirmCancel?.type === 'one'
+						? `Your ${confirmCancel.order.type} order for ${formatTokenAmount(
+								confirmCancel.order.left,
+								6,
+							)} ${
+								confirmCancel.order.first_currency?.name ||
+								confirmCancel.order.pair?.first_currency?.name ||
+								''
+							} will be removed. Pending swap proposals for it will be rejected.`
+						: 'All active orders that match the current filters will be removed. Pending swap proposals for them will be rejected.'
+				}
+				confirmLabel={confirmCancel?.type === 'all' ? 'Cancel all' : 'Cancel order'}
+				cancelLabel="Keep"
+				loading={
+					confirmCancel?.type === 'all'
+						? cancellingAll
+						: !!confirmCancel && cancellingId === confirmCancel.order.id
+				}
+				onConfirm={onConfirmCancel}
+				onClose={() => setConfirmCancel(null)}
+			/>
 		</>
 	);
 }

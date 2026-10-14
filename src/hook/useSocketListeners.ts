@@ -39,15 +39,19 @@ export const useSocketListeners = ({
 	}
 
 	useEffect(() => {
-		socket.emit('in-trading', { id: router.query.id });
+		const tradingPairId = router.query.id;
+		socket.emit('in-trading', { id: tradingPairId });
 
 		return () => {
-			socket.emit('out-trading', { id: router.query.id });
+			socket.emit('out-trading', { id: tradingPairId });
 		};
 	}, []);
 
 	useEffect(() => {
 		socket.on('new-order', async (data) => {
+			const orderPairId = data?.orderData?.pair_id;
+			if (orderPairId !== undefined && String(orderPairId) !== pairId) return;
+
 			setOrdersHistory([data.orderData, ...ordersHistory]);
 			await socketUpdateOrders();
 		});

@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import SegmentedTabs from '@/components/UI/SegmentedTabs';
 import { ChartIcon, SwapArrowsIcon } from '@/components/UI/Icons';
 import { SwapMode } from '@/utils/swap';
@@ -15,26 +14,11 @@ export function getAdvancedModeHref(pairId?: string | number | null) {
 }
 
 const ModeSwitch = ({ mode, onChange, className }: ModeSwitchProps) => {
-	const router = useRouter();
-
 	const onSelect = (next: SwapMode) => {
 		if (next === mode) return;
 
 		setStoredDexMode(next);
 		onChange(next);
-
-		const query = { ...router.query };
-
-		if (next === 'advanced') {
-			query.mode = 'advanced';
-		} else {
-			delete query.mode;
-		}
-
-		router.replace({ pathname: router.pathname, query }, undefined, {
-			shallow: true,
-			scroll: false,
-		});
 	};
 
 	return (

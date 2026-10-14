@@ -35,12 +35,10 @@ const SwapWidget = ({ initialPair, initialStats, initialOrderBook }: SwapWidgetP
 
 	const queryPair = queryValue(router.query.pair);
 	const queryOrder = queryValue(router.query.order);
-	const querySide = queryValue(router.query.side);
 
 	const pairId = queryPair ?? (initialPair ? String(initialPair.id) : null);
 	const orderId = queryOrder ?? null;
-	const side: OfferType = querySide === 'sell' ? 'sell' : 'buy';
-
+	const [side, setSide] = useState<OfferType>('buy');
 	const [assetModalOpen, setAssetModalOpen] = useState(false);
 
 	const market = useSwapMarket({
@@ -56,6 +54,7 @@ const SwapWidget = ({ initialPair, initialStats, initialOrderBook }: SwapWidgetP
 		const query: Record<string, string> = {};
 
 		Object.entries({ ...router.query, ...patch }).forEach(([key, value]) => {
+			if (key === 'side') return;
 			const v = queryValue(value as string | string[] | undefined);
 			if (v !== null && v !== undefined && v !== '') query[key] = v;
 		});
@@ -96,7 +95,7 @@ const SwapWidget = ({ initialPair, initialStats, initialOrderBook }: SwapWidgetP
 						userOrders={market.userOrders}
 						side={side}
 						loading={market.pairLoading}
-						onSideChange={(next) => updateQuery({ side: next === 'buy' ? null : next })}
+						onSideChange={setSide}
 						onOpenAssetSelect={() => setAssetModalOpen(true)}
 						onOrderCreated={(order) => {
 							updateQuery({ order: String(order.id) });

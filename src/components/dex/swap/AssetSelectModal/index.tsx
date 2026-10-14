@@ -15,7 +15,7 @@ interface AssetSelectModalProps {
 	open: boolean;
 	onClose: () => void;
 	selectedPairId?: string | null;
-	onSelect: (_pair: PairData) => void;
+	onSelect: (_pair: PairData, _rect?: DOMRect) => void;
 }
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -151,8 +151,8 @@ const AssetSelectModal = ({ open, onClose, selectedPairId, onSelect }: AssetSele
 						<button
 							key={pair.id}
 							className={classes(styles.row, selected && styles.selected)}
-							onClick={() => {
-								onSelect(pair);
+							onClick={(e) => {
+								onSelect(pair, e.currentTarget.getBoundingClientRect());
 								onClose();
 							}}
 						>
@@ -161,7 +161,26 @@ const AssetSelectModal = ({ open, onClose, selectedPairId, onSelect }: AssetSele
 							<div className={styles.row__info}>
 								<p className={styles.row__ticker}>
 									{pair.first_currency?.name}
-									{!pair.whitelisted && (
+									{pair.featured && (
+										<span
+											className={classes(
+												styles.row__badge,
+												styles.row__badge_featured,
+											)}
+										>
+											Featured
+										</span>
+									)}
+									{pair.whitelisted ? (
+										<span
+											className={classes(
+												styles.row__badge,
+												styles.row__badge_whitelisted,
+											)}
+										>
+											Whitelisted
+										</span>
+									) : (
 										<span className={styles.row__badge}>Unverified</span>
 									)}
 								</p>
@@ -191,7 +210,15 @@ const AssetSelectModal = ({ open, onClose, selectedPairId, onSelect }: AssetSele
 					);
 				})}
 
-				{!loading && pairs.length === 0 && <p className={styles.empty}>No assets found</p>}
+				{!loading && pairs.length === 0 && (
+					<div className={styles.empty}>
+						<span className={styles.empty__icon}>
+							<SearchIcon width={22} height={22} />
+						</span>
+						<p className={styles.empty__title}>No assets found</p>
+						<p className={styles.empty__text}>Try another ticker or asset ID.</p>
+					</div>
+				)}
 
 				{loading && (
 					<div className={styles.loader}>

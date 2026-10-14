@@ -246,26 +246,23 @@ export const ListIcon = (props: IconProps) => (
 	</svg>
 );
 
-export const SunIcon = (props: IconProps) => (
+export const ThemeIcon = (props: IconProps) => (
 	<svg
-		width="18"
-		height="18"
-		viewBox="0 0 24 24"
+		width="16"
+		height="16"
+		viewBox="0 0 16 16"
 		fill="none"
 		{...props}
 		className={classes('ui-icon', props.className)}
 	>
-		<circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.8" />
 		<path
-			d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"
-			stroke="currentColor"
-			strokeWidth="1.8"
-			strokeLinecap="round"
+			d="M8 3.28C8 2.17543 7.08497 1.25018 6.02885 1.57373C3.27934 2.41607 1.28 4.97455 1.28 8C1.28 11.0255 3.27934 13.5839 6.02885 14.4263C7.08497 14.7498 8 13.8246 8 12.72V3.28ZM8 16C3.58172 16 0 12.4183 0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8C16 12.4183 12.4183 16 8 16Z"
+			fill="currentColor"
 		/>
 	</svg>
 );
 
-export const MoonIcon = (props: IconProps) => (
+export const UserIcon = (props: IconProps) => (
 	<svg
 		width="18"
 		height="18"
@@ -274,12 +271,8 @@ export const MoonIcon = (props: IconProps) => (
 		{...props}
 		className={classes('ui-icon', props.className)}
 	>
-		<path
-			d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"
-			stroke="currentColor"
-			strokeWidth="1.8"
-			strokeLinejoin="round"
-		/>
+		<circle cx="12" cy="8" r="4" fill="currentColor" />
+		<path d="M4 20c0-3.9 3.6-7 8-7s8 3.1 8 7v1H4v-1Z" fill="currentColor" />
 	</svg>
 );
 
