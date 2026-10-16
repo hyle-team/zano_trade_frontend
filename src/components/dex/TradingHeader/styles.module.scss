@@ -4,7 +4,10 @@
 	justify-content: space-between;
 	gap: 25px;
 	position: relative;
-	border: none;
+	padding: 10px 16px 10px 10px;
+	border-radius: 16px;
+	background: var(--window-bg-color);
+	border: 1px solid var(--delimiter-color);
 
 	&__stats {
 		display: flex;
@@ -57,7 +60,8 @@
 	}
 }
 
-@media screen and (min-width: 1081px) and (max-width: 1280px), screen and (max-width: 880px) {
+@media screen and (min-width: 1081px) and (max-width: 1280px),
+screen and (max-width: 880px) {
 	.header__stats_item {
 		&:last-child {
 			display: none !important;
@@ -92,7 +96,7 @@
 			display: none !important;
 		}
 
-		&__stats > *:first-child {
+		&__stats>*:first-child {
 			flex: 1;
 			width: auto;
 		}

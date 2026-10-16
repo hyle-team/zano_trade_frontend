@@ -115,6 +115,7 @@
 
 .token {
 	@include reset-button;
+	min-height: 42px;
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;

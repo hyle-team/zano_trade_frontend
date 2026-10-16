@@ -518,17 +518,39 @@
 		@include container;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) 480px;
-		align-items: center;
-		gap: 56px;
+		grid-template-areas:
+			'hero widget'
+			'featured widget';
+		grid-template-rows: auto 1fr;
+		align-items: start;
+		column-gap: 56px;
+		row-gap: 40px;
 
 		@media screen and (max-width: 1024px) {
 			grid-template-columns: minmax(0, 1fr);
+			grid-template-areas:
+				'hero'
+				'widget'
+				'featured';
+			grid-template-rows: auto;
 			justify-items: center;
-			gap: 28px;
+			row-gap: 28px;
+		}
+	}
+
+	&__featured {
+		grid-area: featured;
+		width: 100%;
+		max-width: 640px;
+
+		@media screen and (max-width: 1024px) {
+			max-width: 480px;
 		}
 	}
 
 	&__hero {
+		grid-area: hero;
+		padding-top: 24px;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
@@ -536,6 +558,7 @@
 		max-width: 560px;
 
 		@media screen and (max-width: 1024px) {
+			padding-top: 0;
 			align-items: center;
 			text-align: center;
 			max-width: 640px;
@@ -617,6 +640,7 @@
 	}
 
 	&__widget {
+		grid-area: widget;
 		width: 100%;
 		max-width: 480px;
 		display: flex;

@@ -7,6 +7,7 @@ import Button from '@/components/UI/Button/Button';
 import TooltipWrapper from '@/components/UI/TooltipWrapper';
 import SegmentedTabs from '@/components/UI/SegmentedTabs';
 import TokenIcon from '@/components/UI/TokenIcon';
+import QuoteSelect from '@/components/dex/swap/QuoteSelect';
 import { ChevronDownIcon, InfoIcon, SwapArrowsIcon } from '@/components/UI/Icons';
 import { Store } from '@/store/store-reducer';
 import { useAlert } from '@/hook/useAlert';
@@ -388,10 +389,7 @@ const SwapForm = ({
 				<ChevronDownIcon />
 			</button>
 		) : (
-			<div className={classes(styles.token, styles.token__static)}>
-				<TokenIcon assetId={ZANO_ASSET_ID} size={26} />
-				<span>ZANO</span>
-			</div>
+			<QuoteSelect />
 		);
 
 	const liquidityNotice = (() => {

@@ -6,11 +6,18 @@ import SiteFooter from '@/components/default/SiteFooter';
 import ModeSwitch from '@/components/dex/swap/ModeSwitch';
 import SwapWidget from '@/components/dex/swap/SwapWidget';
 import HowItWorks from '@/components/dex/swap/HowItWorks';
+import FeaturedPairs from '@/components/dex/swap/FeaturedPairs';
 import AssetSelectModal from '@/components/dex/swap/AssetSelectModal';
 import AssetFlight from '@/components/dex/AssetFlight';
 import { ListIcon } from '@/components/UI/Icons';
 import Button from '@/components/UI/Button/Button';
-import { findPairID, getOrdersPage, getPair, getPairStats } from '@/utils/serverMethods';
+import {
+	findPairID,
+	getFeaturedPairs,
+	getOrdersPage,
+	getPair,
+	getPairStats,
+} from '@/utils/serverMethods';
 import { getForwardedFor } from '@/utils/serverFetch';
 import { classes, ZANO_ASSET_ID } from '@/utils/utils';
 import { figtree } from '@/utils/font';
@@ -25,12 +32,15 @@ interface DexProps {
 	initialPair: PairData | null;
 	initialStats: PairStats | null;
 	initialOrderBook: PageOrderData[];
+	featuredPairs: PairData[];
 }
+
+const FEATURED_PAIRS_COUNT = 3;
 
 const queryValue = (value: string | string[] | undefined) =>
 	Array.isArray(value) ? value[0] : value;
 
-function Dex({ initialPair, initialStats, initialOrderBook }: DexProps) {
+function Dex({ initialPair, initialStats, initialOrderBook, featuredPairs }: DexProps) {
 	const router = useRouter();
 	const [assetPickerOpen, setAssetPickerOpen] = useState(false);
 	const [flight, setFlight] = useState<{ pair: PairData; rect: DOMRect } | null>(null);
@@ -52,6 +62,13 @@ function Dex({ initialPair, initialStats, initialOrderBook }: DexProps) {
 		}
 
 		setAssetPickerOpen(true);
+	};
+
+	const selectFeaturedPair = (pair: PairData) => {
+		router.replace({ pathname: router.pathname, query: { pair: String(pair.id) } }, undefined, {
+			shallow: true,
+			scroll: false,
+		});
 	};
 
 	useEffect(() => {
@@ -107,6 +124,16 @@ function Dex({ initialPair, initialStats, initialOrderBook }: DexProps) {
 							initialOrderBook={initialOrderBook}
 						/>
 					</div>
+
+					{featuredPairs.length > 0 && (
+						<div className={styles.swapPage__featured}>
+							<FeaturedPairs
+								pairs={featuredPairs}
+								selectedPairId={currentPairId}
+								onSelect={selectFeaturedPair}
+							/>
+						</div>
+					)}
 				</div>
 
 				<div className={styles.swapPage__content}>
@@ -154,6 +181,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 		if (found) pairId = String(found);
 	}
 
+	const featuredRes = await getFeaturedPairs(FEATURED_PAIRS_COUNT, { xForwardedFor }).catch(
+		() => null,
+	);
+	const featuredPairs = (featuredRes?.success ? featuredRes.data : []).filter(
+		(p) => p.second_currency?.asset_id === ZANO_ASSET_ID,
+	);
+
 	const [pairRes, statsRes, ordersRes] = pairId
 		? await Promise.all([
 				getPair(pairId, { xForwardedFor }).catch(() => null),
@@ -167,6 +201,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 			initialPair: pairRes?.success ? pairRes.data : null,
 			initialStats: statsRes?.success ? statsRes.data : null,
 			initialOrderBook: ordersRes?.success ? ordersRes.data : [],
+			featuredPairs,
 		},
 	};
 }

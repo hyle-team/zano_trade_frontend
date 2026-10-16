@@ -1,0 +1,156 @@
+@use '../../../../styles/mixins' as *;
+
+.featured {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+
+	* {
+		@include font;
+	}
+
+	&__title {
+		font-size: 22px;
+		font-weight: 700;
+		color: var(--text-color);
+	}
+}
+
+.table {
+	display: flex;
+	flex-direction: column;
+
+	&__head,
+	.row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 130px 110px 76px;
+		align-items: center;
+		gap: 16px;
+	}
+
+	&__head {
+		padding: 0 14px 10px;
+
+		span {
+			font-size: 13px;
+			font-weight: 600;
+			color: var(--gray-color);
+		}
+	}
+
+	&__right {
+		text-align: right;
+		justify-self: end;
+	}
+
+	@include mobile {
+		&__head,
+		.row {
+			grid-template-columns: minmax(0, 1fr) auto auto;
+		}
+
+		&__head span:nth-child(2),
+		.row__volume {
+			display: none;
+		}
+	}
+}
+
+.row {
+	@include reset-button;
+	width: 100%;
+	padding: 12px 14px;
+	text-align: left;
+	border-radius: 14px;
+	border-bottom: 1px solid var(--divider-color);
+	transition: background-color 0.3s ease;
+
+	* {
+		transition: none;
+	}
+
+	&:last-child {
+		border-bottom-color: transparent;
+	}
+
+	&:hover,
+	&__selected {
+		background-color: var(--light-color);
+		border-bottom-color: transparent;
+	}
+
+	&__pair {
+		min-width: 0;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	&__info {
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	&__ticker {
+		font-size: 17px;
+		font-weight: 700;
+		line-height: 100%;
+		color: var(--text-color);
+		white-space: nowrap;
+
+		em {
+			font-style: normal;
+			font-size: 15px;
+			font-weight: 600;
+			color: var(--gray-color);
+		}
+	}
+
+	&__name {
+		font-size: 13px;
+		font-weight: 500;
+		color: var(--gray-color);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	&__volume {
+		font-size: 15px;
+		font-weight: 600;
+		color: var(--text-color);
+		white-space: nowrap;
+
+		em {
+			font-style: normal;
+			font-size: 13px;
+			font-weight: 500;
+			color: var(--gray-color);
+		}
+	}
+
+	&__price {
+		font-size: 16px;
+		font-weight: 700;
+		color: var(--text-color);
+		white-space: nowrap;
+	}
+
+	&__change {
+		font-size: 15px;
+		font-weight: 600;
+		color: var(--gray-color);
+		white-space: nowrap;
+
+		&.up {
+			color: var(--green-color);
+		}
+
+		&.down {
+			color: var(--red-color);
+		}
+	}
+}

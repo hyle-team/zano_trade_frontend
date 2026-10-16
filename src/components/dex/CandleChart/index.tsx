@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useMemo, useLayoutEffect } from 'react';
 import useAdvancedTheme from '@/hook/useTheme';
 import ReactECharts from 'echarts-for-react';
 import type CandleChartProps from '@/interfaces/props/pages/dex/trading/CandleChartProps/CandleChartProps';
+import { figtree } from '@/utils/font';
 import styles from './styles.module.scss';
 import { ResultCandle } from './types';
 import {
@@ -45,6 +46,7 @@ function CandleChart(props: CandleChartProps) {
 		const { startIdx, endIdx } = pickWindowIndices(timestamps, zoomStartByPeriod(props.period));
 
 		return {
+			textStyle: { fontFamily: figtree.style.fontFamily, fontSize: 11 },
 			grid: { top: '5%', left: '0%', right: '10%', bottom: '8%' },
 
 			xAxis: {

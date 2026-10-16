@@ -37,6 +37,8 @@ import { Store } from '@/store/store-reducer';
 import { GetServerSidePropsContext } from 'next';
 import { TradingProps } from '@/interfaces/props/pages/dex/trading/TradingProps';
 import SiteFooter from '@/components/default/SiteFooter';
+import { classes } from '@/utils/utils';
+import { figtree } from '@/utils/font';
 
 function Trading({
 	initialOrders,
@@ -166,7 +168,7 @@ function Trading({
 		<GuideProvider>
 			<Header isLg={true} />
 
-			<main className={styles.trading}>
+			<main className={classes(styles.trading, figtree.variable)}>
 				<TradingHeader
 					pairStats={pairStats}
 					pairRateUsd={pairRateUsd}
