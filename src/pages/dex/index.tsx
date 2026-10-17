@@ -47,6 +47,7 @@ function Dex({ initialPair, initialStats, initialOrderBook, featuredPairs }: Dex
 
 	const currentPairId =
 		queryValue(router.query.pair) ?? (initialPair ? String(initialPair.id) : null);
+	const [expanded, setExpanded] = useState(false);
 
 	const openAdvanced = (pairId: string | number) => {
 		setStoredDexMode('advanced');
@@ -92,7 +93,12 @@ function Dex({ initialPair, initialStats, initialOrderBook, featuredPairs }: Dex
 		<>
 			<Header />
 			<main className={classes(styles.swapPage, figtree.variable)}>
-				<div className={styles.swapPage__top}>
+				<div
+					className={classes(
+						styles.swapPage__top,
+						expanded && styles.swapPage__top_expanded,
+					)}
+				>
 					<section className={styles.swapPage__hero}>
 						<h1 className={styles.swapPage__title}>
 							Swap <span>Zano assets</span>
@@ -122,10 +128,11 @@ function Dex({ initialPair, initialStats, initialOrderBook, featuredPairs }: Dex
 							initialPair={initialPair}
 							initialStats={initialStats}
 							initialOrderBook={initialOrderBook}
+							onExpandedChange={setExpanded}
 						/>
 					</div>
 
-					{featuredPairs.length > 0 && (
+					{featuredPairs.length > 0 && !expanded && (
 						<div className={styles.swapPage__featured}>
 							<FeaturedPairs
 								pairs={featuredPairs}

@@ -536,6 +536,43 @@
 			justify-items: center;
 			row-gap: 28px;
 		}
+
+		&_expanded {
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-areas:
+				'hero'
+				'widget';
+			grid-template-rows: auto;
+			justify-items: center;
+			row-gap: 28px;
+
+			.swapPage__hero {
+				padding-top: 0;
+				align-items: center;
+				text-align: center;
+				max-width: 640px;
+			}
+
+			.swapPage__title {
+				font-size: 44px;
+
+				@include mobile {
+					font-size: 34px;
+				}
+			}
+
+			.swapPage__actions {
+				justify-content: center;
+
+				@media screen and (min-width: 848px) {
+					display: none;
+				}
+			}
+
+			.swapPage__widget {
+				max-width: none;
+			}
+		}
 	}
 
 	&__featured {
