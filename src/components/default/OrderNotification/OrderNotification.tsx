@@ -1,10 +1,11 @@
 import { OrderDataWithPair } from '@/interfaces/responses/orders/GetOrdersPageRes';
-import Button from '@/components/UI/Button/Button';
-import CrossIcon from '@/assets/images/UI/dex_cross_icon.svg';
-import Image from 'next/image';
-import { notationToString, tradingKnownCurrencies } from '@/utils/utils';
 import Link from 'next/link';
 import { Dispatch, SetStateAction } from 'react';
+import TokenIcon from '@/components/UI/TokenIcon';
+import { BellIcon, CloseIcon } from '@/components/UI/Icons';
+import { classes } from '@/utils/utils';
+import { figtree } from '@/utils/font';
+import { formatTokenAmount } from '@/utils/swap';
 import { getDexOrderHref, useStoredDexMode } from '@/utils/dexMode';
 import styles from './OrderNotification.module.scss';
 
@@ -19,7 +20,6 @@ export default function OrderNotification({
 	setNotificationOrders,
 	index,
 }: OrderNotificationProps) {
-	const { pair } = order;
 	const { first_currency, second_currency } = order.pair;
 	const firstCurrencyTicker = first_currency.name;
 	const secondCurrencyTicker = second_currency.name;
@@ -30,54 +30,64 @@ export default function OrderNotification({
 		setNotificationOrders((prev) => prev.filter((e, i) => i !== index));
 	}
 
-	const imgCode = tradingKnownCurrencies.includes(pair.first_currency?.code)
-		? pair.first_currency?.code
-		: 'tsds';
-
 	const pairLink = getDexOrderHref(dexMode, order.pair.id);
 
 	return (
-		<div className={styles['dex__order-notification']}>
-			<div className={styles['dex__order-notification_title']}>
-				<h6>New Offer!</h6>
-				<Button onClick={onCloseClick} transparent noBorder>
-					<CrossIcon />
-				</Button>
-			</div>
-			<div className={styles['dex__order-notification_pair']}>
-				<Image
-					width={20}
-					height={20}
-					src={`/currencies/trade_${imgCode}.svg`}
-					alt="currency"
-				/>
-				<p>
-					{firstCurrencyTicker}
-					<span>/{secondCurrencyTicker}</span>
-				</p>
-				<div className={!isBuy ? styles['order-sell'] : undefined}>
-					<p>{isBuy ? 'Buy' : 'Sell'}</p>
+		<div className={classes(styles.notification, figtree.variable)} role="status">
+			<div className={styles.notification__head}>
+				<span className={styles.notification__icon}>
+					<BellIcon width={18} height={18} />
+				</span>
+				<div className={styles.notification__title}>
+					<h3>New offer</h3>
+					<p>A new order matches one of yours</p>
 				</div>
-			</div>
-			<div className={styles['dex__order-notification_delimiter']} />
-			<div className={styles['dex__order-notification_info']}>
-				<div
-					className={`${styles['dex__order-notification_info-item']} ${
-						isBuy
-							? styles['dex__order-notification_price-buy']
-							: styles['dex__order-notification_price-sell']
-					}`}
+				<button
+					type="button"
+					className={styles.notification__close}
+					onClick={onCloseClick}
+					aria-label="Close"
 				>
-					<p>Price</p>
-					<p>{notationToString(order.price)}</p>
+					<CloseIcon width={14} height={14} />
+				</button>
+			</div>
+
+			<div className={styles.notification__body}>
+				<div className={styles.notification__pair}>
+					<TokenIcon assetId={first_currency.asset_id} size={28} />
+					<p>
+						{firstCurrencyTicker}
+						<span>/{secondCurrencyTicker}</span>
+					</p>
+					<span
+						className={classes(
+							styles.side,
+							isBuy ? styles.side__buy : styles.side__sell,
+						)}
+					>
+						{isBuy ? 'Buy' : 'Sell'}
+					</span>
+				</div>
+
+				<div className={styles.notification__meta}>
+					<p>
+						Price
+						<span>
+							{formatTokenAmount(order.price, 8)} {secondCurrencyTicker}
+						</span>
+					</p>
+					<p>
+						Amount
+						<span>
+							{formatTokenAmount(order.left, 6)} {firstCurrencyTicker}
+						</span>
+					</p>
 				</div>
 			</div>
-			<div className={styles['dex__order-notification_delimiter']} />
-			<div className={styles['dex__order-notification_details']}>
-				<Link href={pairLink} onClick={onCloseClick}>
-					Details
-				</Link>
-			</div>
+
+			<Link href={pairLink} onClick={onCloseClick} className={styles.notification__action}>
+				View offer
+			</Link>
 		</div>
 	);
 }

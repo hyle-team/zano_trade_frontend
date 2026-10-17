@@ -163,6 +163,11 @@ h6 {
 	-webkit-text-fill-color: transparent;
 }
 
+:where(.ui-icon),
+:where(.ui-icon) * {
+	color: inherit;
+}
+
 :where(#__next) svg:not(.stroked):not(.no-svg-style svg):not(:where(.ui-icon)) {
 	* {
 		fill: var(--font-main-color);

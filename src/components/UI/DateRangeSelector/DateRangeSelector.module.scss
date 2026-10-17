@@ -54,6 +54,12 @@
 			justify-content: space-between;
 			align-items: center;
 
+			h5 {
+				font-size: 16px;
+				font-weight: 700;
+				color: var(--text-color);
+			}
+
 			> div {
 				display: flex;
 				gap: 12px;
@@ -101,8 +107,9 @@
 				p {
 					width: 44px;
 					text-align: center;
-					font-weight: 700;
-					color: var(--font-dimmed-color);
+					font-size: 12px;
+					font-weight: 600;
+					color: var(--gray-color);
 				}
 			}
 
@@ -221,7 +228,6 @@
 			.selector__calendar__body {
 				> div:first-child {
 					p {
-						font-size: 14px;
 						width: 32px;
 					}
 				}

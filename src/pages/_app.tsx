@@ -9,7 +9,7 @@ import NextApp, { AppContext, AppProps } from 'next/app';
 import { ThemeProvider } from 'next-themes';
 import axios, { AxiosError } from 'axios';
 import { GetConfigResData } from '@/interfaces/responses/config/GetConfigRes';
-import inter from '@/utils/font';
+import inter, { figtree } from '@/utils/font';
 import { API_URL } from '@/constants';
 import NProgress from 'nprogress';
 import { Router } from 'next/router';
@@ -51,6 +51,10 @@ function App(data: AppProps & { config?: GetConfigResData }) {
 		<>
 			<style jsx global>
 				{`
+					:root {
+						--font-figtree: ${figtree.style.fontFamily};
+					}
+
 					* {
 						font-family: ${inter.style.fontFamily};
 					}

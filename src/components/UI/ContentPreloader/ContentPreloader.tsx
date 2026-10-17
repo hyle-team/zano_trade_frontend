@@ -9,7 +9,7 @@ function ContentPreloader({ className, style }: ContentPreloaderProps) {
 			<div className={styles.loader__content}>
 				<Preloader />
 
-				<p className={styles.loder__text}>Loading...</p>
+				<p className={styles.loader__text}>Loading...</p>
 			</div>
 		</div>
 	);

@@ -4,7 +4,6 @@ import socket from '@/utils/socket';
 import { useContext, useEffect, useState } from 'react';
 import styles from '@/styles/NotificationPopups.module.scss';
 import OrderNotification from '@/components/default/OrderNotification/OrderNotification';
-import { nanoid } from 'nanoid';
 import { updateAutoClosedNotification } from '@/store/actions';
 
 export default function NotificationPopups() {
@@ -24,7 +23,9 @@ export default function NotificationPopups() {
 
 	useEffect(() => {
 		function onNotify({ orderData }: { orderData: OrderDataWithPair }) {
-			setNotificationOrders((prev) => [orderData, ...prev].slice(0, 2));
+			setNotificationOrders((prev) =>
+				[orderData, ...prev.filter((e) => e.id !== orderData.id)].slice(0, 2),
+			);
 		}
 
 		function onCancel(data: { orderId: number }) {
@@ -62,7 +63,7 @@ export default function NotificationPopups() {
 				{notificationOrders.map((e, i) => (
 					<OrderNotification
 						setNotificationOrders={setNotificationOrders}
-						key={nanoid()}
+						key={e.id}
 						order={e}
 						index={i}
 					/>
