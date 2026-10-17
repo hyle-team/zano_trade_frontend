@@ -1,11 +1,8 @@
 import Popup from '@/components/UI/Popup/Popup';
 import AlertProps from '@/interfaces/props/components/UI/Alert/AlertProps';
+import { CheckIcon, CloseIcon } from '@/components/UI/Icons';
 import { classes } from '@/utils/utils';
 import { figtree } from '@/utils/font';
-import LoadingIcon from '@/assets/images/UI/alert/loading.svg';
-import SuccessIcon from '@/assets/images/UI/alert/success.svg';
-import ErrorIcon from '@/assets/images/UI/alert/error.svg';
-import CloseIcon from '@/assets/images/UI/alert/close.svg';
 import styles from './Alert.module.scss';
 
 function Alert(props: AlertProps) {
@@ -14,8 +11,8 @@ function Alert(props: AlertProps) {
 			title: props.title || 'Success!',
 			subtitle: props.subtitle || 'Lorem ipsum dolor sit amet',
 			icon: (
-				<div className={styles.ui__alert__icon}>
-					<SuccessIcon />
+				<div className={classes(styles.ui__alert__icon, styles.ui__alert__icon_success)}>
+					<CheckIcon width={18} height={18} />
 				</div>
 			),
 		},
@@ -23,8 +20,8 @@ function Alert(props: AlertProps) {
 			title: props.title || 'Fail!',
 			subtitle: props.subtitle || 'Lorem ipsum dolor sit amet',
 			icon: (
-				<div className={styles.ui__alert__icon}>
-					<ErrorIcon />
+				<div className={classes(styles.ui__alert__icon, styles.ui__alert__icon_error)}>
+					<CloseIcon width={16} height={16} />
 				</div>
 			),
 		},
@@ -32,8 +29,8 @@ function Alert(props: AlertProps) {
 			title: props.title || 'Loading...',
 			subtitle: props.subtitle || 'Lorem ipsum dolor sit amet',
 			icon: (
-				<div className={classes(styles.ui__alert__icon, styles.ui__alert__loading)}>
-					<LoadingIcon />
+				<div className={classes(styles.ui__alert__icon, styles.ui__alert__icon_loading)}>
+					<span className={styles.ui__alert__spinner} />
 				</div>
 			),
 		},
@@ -50,21 +47,23 @@ function Alert(props: AlertProps) {
 
 	if (!currentType) return null;
 
+	const closeButton = props.close && (
+		<button
+			type="button"
+			className={styles.ui__alert__close}
+			onClick={props.close}
+			aria-label="Close"
+		>
+			<CloseIcon width={14} height={14} />
+		</button>
+	);
+
 	function PopupContent() {
 		if (props.type === 'custom' && props.customContent) {
 			return (
 				<div className={classes(styles.ui__alert, figtree.variable)} role="status">
 					{props.customContent}
-					{props.close && (
-						<button
-							type="button"
-							className={styles.ui__alert__close}
-							onClick={props.close}
-							aria-label="Close"
-						>
-							<CloseIcon />
-						</button>
-					)}
+					{closeButton}
 				</div>
 			);
 		}
@@ -78,16 +77,7 @@ function Alert(props: AlertProps) {
 						{currentType.subtitle && <p>{currentType.subtitle}</p>}
 						{props.type === 'custom' && props.children}
 					</div>
-					{props.close && (
-						<button
-							type="button"
-							className={styles.ui__alert__close}
-							onClick={props.close}
-							aria-label="Close"
-						>
-							<CloseIcon />
-						</button>
-					)}
+					{closeButton}
 				</div>
 			);
 		}

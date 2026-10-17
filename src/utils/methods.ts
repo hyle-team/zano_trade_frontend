@@ -40,6 +40,13 @@ export async function getUser({ token }: AuthParams): Promise<ErrorRes | GetUser
 		.then((res) => res.data);
 }
 
+export async function checkAdmin({ token }: AuthParams): Promise<boolean> {
+	return axios
+		.post('/api/admin/check-admin', { token })
+		.then((res) => !!res.data?.success)
+		.catch(() => false);
+}
+
 export async function getConfig(): Promise<ErrorRes | GetConfigRes> {
 	return axios.get('/api/config').then((res) => res.data);
 }

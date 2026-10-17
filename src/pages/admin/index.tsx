@@ -1,13 +1,14 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
+import Head from 'next/head';
 import Header from '@/components/default/Header/Header';
 import SiteFooter from '@/components/default/SiteFooter';
-import ConnectButton from '@/components/UI/ConnectButton/ConnectButton';
 import ConfirmModal from '@/components/UI/ConfirmModal';
 import Alert from '@/components/UI/Alert/Alert';
 import { Store } from '@/store/store-reducer';
 import { classes } from '@/utils/utils';
 import { figtree } from '@/utils/font';
+import NotFound from '@/pages/404';
 import styles from './styles.module.scss';
 import PairStats from './PairStats';
 import FeaturedPairs from './FeaturedPairs';
@@ -52,8 +53,8 @@ type PendingRemoval = { type: 'pair'; pair: FeaturedPair } | { type: 'admin'; ad
 const NOTICE_TIMEOUT = 3000;
 
 const AdminPanel: React.FC = () => {
-	const [accessAllowed, setAccessAllowed] = useState<boolean | null>(null);
 	const { state } = useContext(Store);
+	const accessAllowed = !!state.token && state.isAdmin === true;
 
 	const [featuredPairs, setFeaturedPairs] = useState<FeaturedPair[]>([]);
 	const [featuredLoading, setFeaturedLoading] = useState(true);
@@ -296,99 +297,20 @@ const AdminPanel: React.FC = () => {
 
 		fetchAdmins();
 		fetchFeaturedPairs();
-	}, [accessAllowed]);
-
-	useEffect(() => {
-		if (!state?.wallet?.alias) {
-			return;
-		}
-
-		axios
-			.post('/api/admin/check-admin', {
-				token: state.token,
-			})
-			.then((res) => {
-				setAccessAllowed(!!res?.data?.success);
-			})
-			.catch((err) => {
-				console.error(err);
-				setAccessAllowed(false);
-			});
-	}, [state?.wallet?.alias]);
+	}, [accessAllowed, state.token]);
 
 	const currentAlias = state?.wallet?.alias;
 	const isOwner = admins.some((admin) => admin.alias === currentAlias && admin.isOwner);
 
-	const renderContent = () => {
-		if (!currentAlias) {
-			return (
-				<div className={styles.empty}>
-					<h3>Connect your wallet</h3>
-					<p>Connect Zano Companion with an admin alias to manage Zano Trade.</p>
-					<ConnectButton className={styles.connect} />
-				</div>
-			);
-		}
-
-		if (accessAllowed === null) {
-			return <div className={styles.loader} />;
-		}
-
-		if (!accessAllowed) {
-			return (
-				<div className={styles.empty}>
-					<h3>Access denied</h3>
-					<p>
-						<span>@{currentAlias}</span> doesn&apos;t have admin rights.
-					</p>
-				</div>
-			);
-		}
-
-		return (
-			<div className={styles.grid}>
-				<div className={styles.grid__wide}>
-					<PairStats
-						loading={loading}
-						volumeStats={volumeStats}
-						selectedAddress={selectedAddress}
-						setSelectedAddress={setSelectedAddress}
-						selectedPairID={selectedPairID}
-						setSelectedPairID={setSelectedPairID}
-						allDates={allDates}
-						setAllDates={setAllDates}
-						dateRange={dateRange}
-						setDateRange={setDateRange}
-						fetchVolumeStats={fetchVolumeStats}
-					/>
-				</div>
-
-				<FeaturedPairs
-					featuredPairs={featuredPairs}
-					loading={featuredLoading}
-					assetId={assetIdInput}
-					setAssetId={setAssetIdInput}
-					adding={addingPair}
-					addFeaturedPair={addFeaturedPair}
-					removeFeaturedPair={(pair) => setPendingRemoval({ type: 'pair', pair })}
-				/>
-
-				<Admins
-					admins={admins}
-					loading={adminsLoading}
-					currentAlias={currentAlias}
-					alias={aliasInput}
-					setAlias={setAliasInput}
-					adding={addingAdmin}
-					addAdmin={addAdmin}
-					removeAdmin={(admin) => setPendingRemoval({ type: 'admin', admin })}
-				/>
-			</div>
-		);
-	};
+	if (!state.token || state.isAdmin === false) {
+		return <NotFound />;
+	}
 
 	return (
 		<>
+			<Head>
+				<meta name="robots" content="noindex, nofollow" />
+			</Head>
 			<Header />
 			<main className={classes(styles.adminPage, figtree.variable)}>
 				<div className={styles.adminPage__head}>
@@ -415,7 +337,48 @@ const AdminPanel: React.FC = () => {
 					)}
 				</div>
 
-				{renderContent()}
+				{accessAllowed ? (
+					<div className={styles.grid}>
+						<div className={styles.grid__wide}>
+							<PairStats
+								loading={loading}
+								volumeStats={volumeStats}
+								selectedAddress={selectedAddress}
+								setSelectedAddress={setSelectedAddress}
+								selectedPairID={selectedPairID}
+								setSelectedPairID={setSelectedPairID}
+								allDates={allDates}
+								setAllDates={setAllDates}
+								dateRange={dateRange}
+								setDateRange={setDateRange}
+								fetchVolumeStats={fetchVolumeStats}
+							/>
+						</div>
+
+						<FeaturedPairs
+							featuredPairs={featuredPairs}
+							loading={featuredLoading}
+							assetId={assetIdInput}
+							setAssetId={setAssetIdInput}
+							adding={addingPair}
+							addFeaturedPair={addFeaturedPair}
+							removeFeaturedPair={(pair) => setPendingRemoval({ type: 'pair', pair })}
+						/>
+
+						<Admins
+							admins={admins}
+							loading={adminsLoading}
+							currentAlias={currentAlias}
+							alias={aliasInput}
+							setAlias={setAliasInput}
+							adding={addingAdmin}
+							addAdmin={addAdmin}
+							removeAdmin={(admin) => setPendingRemoval({ type: 'admin', admin })}
+						/>
+					</div>
+				) : (
+					<div className={styles.loader} />
+				)}
 			</main>
 			<SiteFooter />
 

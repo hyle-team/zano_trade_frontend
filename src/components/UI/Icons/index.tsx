@@ -111,6 +111,31 @@ export const CloseIcon = (props: IconProps) => (
 	</svg>
 );
 
+export const ShieldIcon = (props: IconProps) => (
+	<svg
+		width="20"
+		height="20"
+		viewBox="0 0 24 24"
+		fill="none"
+		{...props}
+		className={classes('ui-icon', props.className)}
+	>
+		<path
+			d="M12 3 5 5.8v5.4c0 4.3 2.9 8.2 7 9.8 4.1-1.6 7-5.5 7-9.8V5.8L12 3Z"
+			stroke="currentColor"
+			strokeWidth="1.8"
+			strokeLinejoin="round"
+		/>
+		<path
+			d="m9 12 2 2 4-4"
+			stroke="currentColor"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		/>
+	</svg>
+);
+
 export const PlusIcon = (props: IconProps) => (
 	<svg
 		width="16"

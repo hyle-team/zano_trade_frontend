@@ -12,6 +12,7 @@ import {
 	EyeIcon,
 	EyeOffIcon,
 	LogoutIcon,
+	ShieldIcon,
 	ThemeIcon,
 	UserIcon,
 } from '@/components/UI/Icons';
@@ -46,6 +47,8 @@ function Header({ isLg }: { isLg?: boolean }) {
 
 	const { dispatch, state } = useContext(Store);
 	const loggedIn = !!state.wallet?.connected;
+	const isAdmin = loggedIn && state.isAdmin === true;
+	const onAdminPage = router.pathname.startsWith('/admin');
 
 	const [menuOpened, setMenuOpened] = useState(false);
 	const [balancesOpened, setBalancesOpened] = useState(false);
@@ -173,6 +176,21 @@ function Header({ isLg }: { isLg?: boolean }) {
 		</button>
 	);
 
+	const adminButton = isAdmin && (
+		<Link
+			href="/admin"
+			className={classes(
+				styles.iconBtn,
+				styles.header__desktopOnly,
+				onAdminPage && styles.iconBtn__active,
+			)}
+			aria-label="Admin panel"
+			title="Admin panel"
+		>
+			<ShieldIcon />
+		</Link>
+	);
+
 	const balances = (
 		<div className={styles.balances} ref={balancesRef}>
 			<button
@@ -241,6 +259,7 @@ function Header({ isLg }: { isLg?: boolean }) {
 						<>
 							<div className={styles.header__desktopOnly}>{balances}</div>
 							<div className={styles.header__desktopOnly}>{account}</div>
+							{adminButton}
 							{themeButton}
 							<button
 								className={classes(styles.iconBtn, styles.header__desktopOnly)}
@@ -294,6 +313,12 @@ function Header({ isLg }: { isLg?: boolean }) {
 									</div>
 								))}
 							</div>
+							{isAdmin && (
+								<Link href="/admin" className={styles.mobile__admin}>
+									<ShieldIcon width={18} height={18} />
+									Admin panel
+								</Link>
+							)}
 							<button className={styles.mobile__logout} onClick={logout}>
 								<LogoutIcon />
 								Log out
