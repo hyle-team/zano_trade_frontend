@@ -13,7 +13,7 @@
 		}
 
 		&_title {
-			color: var(--footer-selected-link);
+			color: var(--gray-color);
 			white-space: nowrap;
 			font-size: 12px;
 			font-weight: 400;
@@ -37,11 +37,15 @@
 			font-weight: 500;
 
 			&.green {
-				color: #16d1d6;
+				color: var(--green-color);
 			}
 
 			&.red {
-				color: #ff6767;
+				color: var(--red-color);
+			}
+
+			&.neutral {
+				color: var(--gray-color);
 			}
 		}
 	}

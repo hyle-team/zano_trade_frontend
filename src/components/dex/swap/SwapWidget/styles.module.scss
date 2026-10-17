@@ -1,0 +1,117 @@
+@use '../../../../styles/mixins' as *;
+
+.card {
+	@include card;
+	width: 100%;
+	padding: 24px;
+	container-type: inline-size;
+
+	@include mobile {
+		padding: 16px;
+	}
+}
+
+.openOrders {
+	@include card;
+	width: 100%;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+
+	&__title {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 6px;
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--text-color);
+
+		span {
+			padding: 1px 8px;
+			border-radius: 100px;
+			font-size: 12px;
+			color: var(--primary-color);
+			background: var(--info-bg-color);
+		}
+	}
+
+	&__row {
+		@include reset-button;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		width: 100%;
+		padding: 10px 12px;
+		border-radius: 12px;
+		text-align: left;
+		background: var(--surface-color);
+
+		&:hover {
+			background: var(--surface-hover-color);
+
+			.openOrders__arrow {
+				color: var(--primary-color);
+				transform: translateX(2px);
+			}
+		}
+
+		p {
+			flex: 1;
+			min-width: 0;
+			font-size: 14px;
+			font-weight: 600;
+			color: var(--text-color);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+
+			span {
+				font-size: 13px;
+				font-weight: 500;
+				color: var(--gray-color);
+			}
+		}
+	}
+
+	&__side {
+		padding: 3px 8px;
+		border-radius: 100px;
+		font-size: 11px;
+		font-weight: 700;
+
+		&.buy {
+			color: var(--green-color);
+			background: var(--success-bg-color);
+		}
+
+		&.sell {
+			color: var(--red-color);
+			background: var(--danger-bg-color);
+		}
+	}
+
+	&__badge,
+	&__partial {
+		padding: 3px 8px;
+		border-radius: 100px;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	&__badge {
+		color: #fff;
+		background: var(--primary-gradient);
+	}
+
+	&__partial {
+		color: var(--warning-color);
+		background: var(--warning-bg-color);
+	}
+
+	&__arrow {
+		color: var(--muted-color);
+		flex-shrink: 0;
+	}
+}

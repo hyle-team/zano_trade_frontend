@@ -1,6 +1,13 @@
+@use '../../../styles/mixins' as *;
+
 .tooltip {
 	transition: none !important;
 	width: 300px;
+
+	&,
+	* {
+		@include font;
+	}
 
 	&__body {
 		width: 100%;

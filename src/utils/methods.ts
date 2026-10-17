@@ -28,6 +28,7 @@ import GetUserOrdersAllPairsRes from '@/interfaces/responses/orders/GetUserOrder
 import { CancelAllData } from '@/interfaces/fetch-data/cancel-all-orders/CancelAllData';
 import CancelAllRes from '@/interfaces/responses/orders/CancelAllRes';
 import AuthParams from '@/interfaces/common/AuthParams';
+import OrderRow from '@/interfaces/common/OrderRow';
 
 const baseUrl = '';
 
@@ -37,6 +38,13 @@ export async function getUser({ token }: AuthParams): Promise<ErrorRes | GetUser
 			token,
 		})
 		.then((res) => res.data);
+}
+
+export async function checkAdmin({ token }: AuthParams): Promise<boolean> {
+	return axios
+		.post('/api/admin/check-admin', { token })
+		.then((res) => !!res.data?.success)
+		.catch(() => false);
 }
 
 export async function getConfig(): Promise<ErrorRes | GetConfigRes> {
@@ -201,7 +209,7 @@ export async function getPair(id: string): Promise<ErrorRes | GetPairRes> {
 export async function createOrder(
 	orderData: CreateOrderData,
 	{ token }: AuthParams,
-): Promise<ErrorRes | { success: true; data: { immediateMatch: boolean } }> {
+): Promise<ErrorRes | { success: true; data: OrderRow & { immediateMatch?: boolean } }> {
 	return axios
 		.post(
 			'/api/orders/create',
@@ -403,6 +411,14 @@ export async function getZanoPrice() {
 		.get(
 			'https://explorer.zano.org/api/price?asset_id=d6329b5b1f7c0805b5c345f4957554002a2f557845f64d7645dae0e051a6498a',
 		)
+		.then((res) => res.data);
+}
+
+export async function getAssetExplorerPrice(
+	assetId: string,
+): Promise<{ success: boolean; data?: { zano_price?: number | null; usd?: number | null } }> {
+	return axios
+		.get('https://explorer.zano.org/api/price', { params: { asset_id: assetId } })
 		.then((res) => res.data);
 }
 

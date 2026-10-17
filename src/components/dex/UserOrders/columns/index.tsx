@@ -33,7 +33,8 @@ export function buildUserColumns({
 				<p
 					style={
 						{
-							'--direction-color': row.type === 'buy' ? '#16D1D6' : '#FF6767',
+							'--direction-color':
+								row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
 						} as React.CSSProperties
 					}
 				>
@@ -48,7 +49,7 @@ export function buildUserColumns({
 			cell: (row) => (
 				<p
 					style={{
-						color: row.type === 'buy' ? '#16D1D6' : '#FF6767',
+						color: row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
 						textTransform: 'capitalize',
 					}}
 				>
@@ -101,7 +102,7 @@ export function buildUserColumns({
 					<p
 						style={{
 							fontWeight: 500,
-							color: count > 0 ? '#1F8FEB' : '#B6B6C4',
+							color: count > 0 ? 'var(--primary-color)' : 'var(--font-dimmed-color)',
 						}}
 					>
 						{count}
@@ -120,7 +121,7 @@ export function buildUserColumns({
 					<p
 						style={{
 							fontWeight: 500,
-							color: count > 0 ? '#1F8FEB' : '#B6B6C4',
+							color: count > 0 ? 'var(--primary-color)' : 'var(--font-dimmed-color)',
 						}}
 					>
 						{count}
@@ -139,7 +140,7 @@ export function buildUserColumns({
 					<p
 						style={{
 							fontWeight: 500,
-							color: count > 0 ? '#1F8FEB' : '#B6B6C4',
+							color: count > 0 ? 'var(--primary-color)' : 'var(--font-dimmed-color)',
 						}}
 					>
 						{count}
@@ -319,7 +320,8 @@ export function buildOrderHistoryColumns({
 				<p
 					style={
 						{
-							'--direction-color': row.type === 'buy' ? '#16D1D6' : '#FF6767',
+							'--direction-color':
+								row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
 						} as React.CSSProperties
 					}
 				>
@@ -334,7 +336,7 @@ export function buildOrderHistoryColumns({
 			cell: (row) => (
 				<p
 					style={{
-						color: row.type === 'buy' ? '#16D1D6' : '#FF6767',
+						color: row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
 						textTransform: 'capitalize',
 					}}
 				>

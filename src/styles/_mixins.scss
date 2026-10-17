@@ -1,0 +1,70 @@
+@mixin font {
+	font-family: var(--font-figtree), 'Inter', sans-serif;
+}
+
+@mixin card {
+	background: var(--card-bg-color);
+	border: 1px solid var(--divider-color);
+	border-radius: 20px;
+	box-shadow: var(--card-shadow);
+}
+
+@mixin surface {
+	background: var(--surface-color);
+	border: 1px solid var(--border-color);
+	border-radius: 16px;
+}
+
+@mixin label {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--gray-color);
+}
+
+@mixin reset-button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+}
+
+@mixin mobile {
+	@media screen and (max-width: 620px) {
+		@content;
+	}
+}
+
+$container-max-width: 1180px;
+
+@mixin container {
+	width: 100%;
+	max-width: $container-max-width;
+	margin-inline: auto;
+	padding-inline: 20px;
+
+	@include mobile {
+		padding-inline: 16px;
+	}
+}
+
+@mixin page-padding {
+	padding-top: 48px;
+	padding-bottom: 100px;
+
+	@include mobile {
+		padding-top: 28px;
+		padding-bottom: 64px;
+	}
+}
+
+@mixin site-padding {
+	padding-inline: 60px;
+
+	@media screen and (max-width: 1600px) {
+		padding-inline: 40px;
+	}
+
+	@media screen and (max-width: 1200px) {
+		padding-inline: 20px;
+	}
+}
