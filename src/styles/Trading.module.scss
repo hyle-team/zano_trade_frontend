@@ -23,9 +23,10 @@
 
 	&__top {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) 360px 360px;
+		grid-template-columns: minmax(0, 1fr) min(var(--orders-width, 360px), 45%) 360px;
 		align-items: stretch;
 		gap: 8px;
+		transition: none;
 
 		&_chart {
 			order: 1;
@@ -56,6 +57,7 @@
 		}
 
 		&_trades {
+			position: relative;
 			order: 2;
 			min-width: 0;
 			height: 100%;
@@ -71,13 +73,13 @@
 
 @media screen and (max-width: 1440px) {
 	.trading__top {
-		grid-template-columns: minmax(0, 1fr) 320px 330px;
+		grid-template-columns: minmax(0, 1fr) min(var(--orders-width, 320px), 45%) 330px;
 	}
 }
 
 @media screen and (max-width: 1180px) {
 	.trading__top {
-		grid-template-columns: minmax(0, 1fr) 290px 310px;
+		grid-template-columns: minmax(0, 1fr) min(var(--orders-width, 290px), 45%) 310px;
 	}
 }
 
@@ -88,6 +90,10 @@
 		&_chart {
 			display: none;
 		}
+	}
+
+	.trading__top .trading__resizer {
+		display: none;
 	}
 }
 

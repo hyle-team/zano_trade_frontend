@@ -19,6 +19,8 @@ import { useRouter } from 'next/router';
 import PeriodState from '@/interfaces/states/pages/dex/trading/InputPanelItem/PeriodState';
 import { Store } from '@/store/store-reducer';
 
+const MIN_CANDLES_LOADING_MS = 700;
+
 interface UseTradingDataParams {
 	periodsState: PeriodState;
 	setCandles: Dispatch<SetStateAction<CandleRow[]>>;
@@ -49,20 +51,27 @@ export function useTradingData({
 	const prevPeriod = useRef<string | null>(null);
 
 	const [candlesLoaded, setCandlesLoaded] = useState(true);
+	const candlesRequestId = useRef(0);
 	const [ordersLoading, setOrdersLoading] = useState(false);
 	const [tradesLoading, setTradesLoading] = useState(false);
 	const pairId = typeof router.query.id === 'string' ? router.query.id : '';
 	const loggedIn = !!state.wallet?.connected;
 
 	async function fetchCandles() {
+		candlesRequestId.current += 1;
+		const requestId = candlesRequestId.current;
+
 		setCandlesLoaded(false);
 		setCandles([]);
-		const result = await getCandles(pairId, periodsState.code);
-		if (result.success) {
-			setCandles(result.data);
-		} else {
-			setCandles([]);
-		}
+
+		const [result] = await Promise.all([
+			getCandles(pairId, periodsState.code).catch(() => null),
+			new Promise((resolve) => setTimeout(resolve, MIN_CANDLES_LOADING_MS)),
+		]);
+
+		if (requestId !== candlesRequestId.current) return;
+
+		setCandles(result?.success ? result.data : []);
 		setCandlesLoaded(true);
 	}
 
