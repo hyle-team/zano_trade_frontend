@@ -11,7 +11,6 @@ import DateRangeSelector from '@/components/UI/DateRangeSelector/DateRangeSelect
 import DateState from '@/interfaces/common/DateState';
 import TokenIcon from '@/components/UI/TokenIcon';
 import ConfirmModal from '@/components/UI/ConfirmModal';
-import TooltipWrapper from '@/components/UI/TooltipWrapper';
 import { Switch } from '@/components/UI/Switch/Switch';
 import { ArrowRightIcon, ClockIcon, SwapArrowsIcon } from '@/components/UI/Icons';
 import { Store } from '@/store/store-reducer';
@@ -37,9 +36,9 @@ import { GetUserOrdersAllPairsResPair } from '@/interfaces/responses/orders/GetU
 import ApplyTip from '@/interfaces/common/ApplyTip';
 import UserPendingType from '@/interfaces/common/UserPendingType';
 import SiteFooter from '@/components/default/SiteFooter';
-import { getDexOrderHref, useStoredDexMode } from '@/utils/dexMode';
-import Spinner from '@/components/UI/Spinner';
+import { setStoredDexMode } from '@/utils/dexMode';
 import styles from '@/styles/Orders.module.scss';
+import Spinner from '@/components/UI/Spinner';
 
 type OrdersTab = 'active' | 'history';
 type SideFilter = 'all' | 'buy' | 'sell';
@@ -144,7 +143,6 @@ function Orders() {
 	const { cancelOrder, alertErr } = useOrderActions();
 	const loggedIn = !!state.wallet?.connected && !!state.token;
 
-	const dexMode = useStoredDexMode();
 	const [tab, setTab] = useState<OrdersTab>('active');
 	const [sideFilter, setSideFilter] = useState<SideFilter>('all');
 	const [pairFilter, setPairFilter] = useState('');
@@ -508,7 +506,20 @@ function Orders() {
 							)}
 
 							<div className={styles.card__bottom}>
-								<p className={styles.card__hint}>{meta.hint}</p>
+								<div className={styles.card__info}>
+									<p className={styles.card__hint}>{meta.hint}</p>
+									<button
+										type="button"
+										className={styles.card__advanced}
+										onClick={() => {
+											setStoredDexMode('advanced');
+											router.push(`/dex/trading/${order.pair_id}`);
+										}}
+									>
+										Open in Advanced Mode
+										<ArrowRightIcon width={14} height={14} />
+									</button>
+								</div>
 								<div className={styles.card__actions}>
 									<label
 										className={classes(styles.toggle, styles.toggle__disabled)}
@@ -534,7 +545,7 @@ function Orders() {
 										variant={actionRequired ? 'primary' : 'secondary'}
 										onClick={() =>
 											router.push(
-												getDexOrderHref(dexMode, order.pair_id, order.id),
+												`/dex?pair=${order.pair_id}&order=${order.id}`,
 											)
 										}
 									>

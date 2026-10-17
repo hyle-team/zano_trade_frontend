@@ -14,6 +14,7 @@ import { API_URL } from '@/constants';
 import NProgress from 'nprogress';
 import { Router } from 'next/router';
 import HeroBlurs from '@/components/default/HeroBlurs';
+import GlobalAlert from '@/components/default/GlobalAlert';
 import PageHandler from './PageHandler';
 import NotificationPopups from './NotificationPopups';
 import 'nprogress/nprogress.css';
@@ -93,6 +94,7 @@ function App(data: AppProps & { config?: GetConfigResData }) {
 					<Component {...pageProps} />
 					<PageHandler config={data.config as GetConfigResData} />
 					<NotificationPopups />
+					<GlobalAlert />
 				</ThemeProvider>
 			</StoreProvider>
 		</>

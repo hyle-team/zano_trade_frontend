@@ -9,7 +9,6 @@ import UserPendingType from '@/interfaces/common/UserPendingType';
 import { Store } from '@/store/store-reducer';
 import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
 import { useAlert } from '@/hook/useAlert';
-import Alert from '@/components/UI/Alert/Alert';
 import { tabsType } from '@/components/UI/Tabs/types';
 import Tabs from '@/components/UI/Tabs';
 import { countByKeyRecord, createOrderSorter } from '@/utils/utils';
@@ -43,7 +42,7 @@ const UserOrders = ({
 }: UserOrdersProps) => {
 	const { state } = useContext(Store);
 	const loggedIn = !!state.wallet?.connected;
-	const { setAlertState, setAlertSubtitle, alertState, alertSubtitle } = useAlert();
+	const { setAlertState, setAlertSubtitle } = useAlert();
 	const isSm = useMediaQuery('(max-width: 820px)');
 	const isMobile = useMediaQuery('(max-width: 580px)');
 
@@ -476,14 +475,6 @@ const UserOrders = ({
 				)}
 				{!loggedIn && <EmptyMessage text="Connect wallet to see your orders" />}
 			</div>
-
-			{alertState && (
-				<Alert
-					type={alertState}
-					subtitle={alertSubtitle || ''}
-					close={() => setAlertState(null)}
-				/>
-			)}
 		</>
 	);
 };

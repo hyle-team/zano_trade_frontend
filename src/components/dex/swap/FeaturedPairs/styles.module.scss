@@ -20,6 +20,7 @@
 .table {
 	display: flex;
 	flex-direction: column;
+	margin-inline: -14px;
 
 	&__head,
 	.row {
@@ -45,6 +46,7 @@
 	}
 
 	@include mobile {
+
 		&__head,
 		.row {
 			grid-template-columns: minmax(0, 1fr) auto auto;
@@ -62,7 +64,6 @@
 	width: 100%;
 	padding: 12px 14px;
 	text-align: left;
-	border-radius: 14px;
 	border-bottom: 1px solid var(--divider-color);
 	transition: background-color 0.3s ease;
 

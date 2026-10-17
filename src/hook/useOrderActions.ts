@@ -1,7 +1,6 @@
 import Decimal from 'decimal.js';
 import { useContext } from 'react';
 import {
-	ZanoWebError,
 	AcceptIonicSwapResponse,
 	InitializeIonicSwapParams,
 	InitializeIonicSwapResponse,
@@ -18,6 +17,7 @@ import {
 import { updateAutoClosedNotification } from '@/store/actions';
 import { notationToString } from '@/utils/utils';
 import { zanoWallet } from '@/utils/zanoWallet';
+import { getWalletErrorMessage } from '@/utils/walletErrors';
 import ApplyTip from '@/interfaces/common/ApplyTip';
 import PairData from '@/interfaces/common/PairData';
 
@@ -44,12 +44,9 @@ export function useOrderActions() {
 	};
 
 	const handleWalletError = (error: unknown) => {
-		if (error instanceof ZanoWebError && error.code === 'ZANO_WALLET_NOT_AVAILABLE') {
-			alertErr('Companion is offline');
-			return;
-		}
-
-		throw error;
+		const message = getWalletErrorMessage(error);
+		if (!message) console.error(error);
+		alertErr(message ?? 'Zano Companion responded with an error');
 	};
 
 	async function acceptProposal(tip: ApplyTip): Promise<ActionResult> {
@@ -70,11 +67,7 @@ export function useOrderActions() {
 		}
 
 		if (!confirmSwapResult.success) {
-			alertErr(
-				confirmSwapResult.error === 'WALLET_RPC_ERROR_-7'
-					? 'Insufficient funds'
-					: 'Companion responded with an error',
-			);
+			handleWalletError(confirmSwapResult.error);
 			return false;
 		}
 
@@ -125,11 +118,7 @@ export function useOrderActions() {
 		}
 
 		if (!createSwapResult.success) {
-			alertErr(
-				createSwapResult.error === 'WALLET_RPC_ERROR_-7'
-					? 'Insufficient funds'
-					: 'Companion responded with an error',
-			);
+			handleWalletError(createSwapResult.error);
 			return false;
 		}
 

@@ -7,7 +7,6 @@ import { cancelOrder } from '@/utils/methods';
 import { getCandles, getOrdersPage, getPair, getPairStats, getTrades } from '@/utils/serverMethods';
 import { getForwardedFor } from '@/utils/serverFetch';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
-import Alert from '@/components/UI/Alert/Alert';
 import PeriodState from '@/interfaces/states/pages/dex/trading/InputPanelItem/PeriodState';
 import OrderRow from '@/interfaces/common/OrderRow';
 import ApplyTip from '@/interfaces/common/ApplyTip';
@@ -17,7 +16,6 @@ import PairData from '@/interfaces/common/PairData';
 import CandleRow from '@/interfaces/common/CandleRow';
 import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
 import { periods, buySellValues } from '@/constants';
-import { useAlert } from '@/hook/useAlert';
 import useScroll from '@/hook/useScroll';
 import InputPanelItem from '@/components/dex/InputPanelItem';
 import TradingHeader from '@/components/dex/TradingHeader';
@@ -73,7 +71,6 @@ function Trading({
 	initialCandles,
 }: TradingProps) {
 	const { state } = useContext(Store);
-	const { alertState, alertSubtitle, setAlertState } = useAlert();
 	const { elementRef: orderListRef, scrollToElement: scrollToOrdersList } =
 		useScroll<HTMLDivElement>();
 	const { elementRef: orderFormRef, scrollToElement: scrollToOrderForm } =
@@ -318,14 +315,6 @@ function Trading({
 					requestedTab={requestedOrdersTab}
 					onRequestedTabHandled={() => setRequestedOrdersTab(null)}
 				/>
-
-				{alertState && (
-					<Alert
-						type={alertState}
-						subtitle={alertSubtitle || ''}
-						close={() => setAlertState(null)}
-					/>
-				)}
 			</main>
 			<SiteFooter />
 		</GuideProvider>

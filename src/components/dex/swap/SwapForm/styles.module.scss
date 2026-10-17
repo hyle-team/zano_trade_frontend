@@ -40,7 +40,11 @@
 	}
 
 	&__disabled {
-		opacity: 0.55;
+		.field__top,
+		.field__input,
+		.field__usd {
+			opacity: 0.55;
+		}
 	}
 
 	&__top {

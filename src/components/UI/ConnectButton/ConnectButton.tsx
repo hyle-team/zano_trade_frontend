@@ -9,11 +9,12 @@ import { requestCompanionPermissions } from '@/utils/wallet';
 import { zanoWallet } from '@/utils/zanoWallet';
 import { ZanoWebError, GetWalletDataResponse, RequestMessageSignResponse } from 'zano_web3/web';
 import { WalletState } from '@/interfaces/common/ContextValue';
+import { getWalletErrorMessage } from '@/utils/walletErrors';
 import Button from '../Button/Button';
 
 enum ConnectErrorMessage {
 	NO_EXTENSION = 'Zano Companion extension is not installed',
-	COMPANION_OFFLINE = 'Companion is offline',
+	COMPANION_OFFLINE = 'Zano Companion is locked or offline. Unlock it and try again.',
 	ALIAS_NOT_FOUND = 'Alias not found',
 	INVALID_WALLET_DATA = 'Invalid wallet data',
 	SIGN_DENIED = 'Sign denied',
@@ -159,11 +160,16 @@ function ConnectButton(props: ConnectButtonProps) {
 				errorMessage !== undefined &&
 				Object.values(ConnectErrorMessage).some((msg) => msg === errorMessage);
 
-			const knownError = isErrorKnown
-				? errorMessage
-				: 'Internal error occurred. Please try again.';
+			const walletError = isErrorKnown ? null : getWalletErrorMessage(error);
 
-			if (!isErrorKnown) {
+			const rawMessage = errorMessage?.trim() ? errorMessage : undefined;
+
+			const knownError =
+				(isErrorKnown ? errorMessage : walletError) ??
+				rawMessage ??
+				'Internal error occurred. Please try again.';
+
+			if (!isErrorKnown && !walletError) {
 				console.error('Error connecting wallet:', error);
 			}
 
@@ -198,7 +204,13 @@ function ConnectButton(props: ConnectButtonProps) {
 			{alertState && (
 				<Alert
 					type={alertState}
-					title={alertState === 'loading' ? 'Connecting wallet' : undefined}
+					title={
+						{
+							loading: 'Connecting wallet',
+							success: 'Connected',
+							error: "Couldn't connect wallet",
+						}[alertState as 'loading' | 'success' | 'error']
+					}
 					subtitle={alertSubtitle}
 					close={() => setAlertState(null)}
 				/>

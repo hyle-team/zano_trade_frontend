@@ -9,8 +9,8 @@ import styles from './Alert.module.scss';
 function Alert(props: AlertProps) {
 	const types = {
 		success: {
-			title: props.title || 'Success!',
-			subtitle: props.subtitle || 'Lorem ipsum dolor sit amet',
+			title: props.title || 'Success',
+			subtitle: props.subtitle || '',
 			icon: (
 				<div className={classes(styles.ui__alert__icon, styles.ui__alert__icon_success)}>
 					<CheckIcon width={18} height={18} />
@@ -18,8 +18,8 @@ function Alert(props: AlertProps) {
 			),
 		},
 		error: {
-			title: props.title || 'Fail!',
-			subtitle: props.subtitle || 'Lorem ipsum dolor sit amet',
+			title: props.title || 'Something went wrong',
+			subtitle: props.subtitle || '',
 			icon: (
 				<div className={classes(styles.ui__alert__icon, styles.ui__alert__icon_error)}>
 					<CloseIcon width={16} height={16} />
@@ -27,8 +27,8 @@ function Alert(props: AlertProps) {
 			),
 		},
 		loading: {
-			title: props.title || 'Loading...',
-			subtitle: props.subtitle || 'Lorem ipsum dolor sit amet',
+			title: props.title || 'Loading',
+			subtitle: props.subtitle || '',
 			icon: (
 				<div className={classes(styles.ui__alert__icon, styles.ui__alert__icon_loading)}>
 					<Spinner size="sm" />

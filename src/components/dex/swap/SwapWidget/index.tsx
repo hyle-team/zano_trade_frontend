@@ -1,11 +1,12 @@
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import AssetSelectModal from '@/components/dex/swap/AssetSelectModal';
 import SwapForm from '@/components/dex/swap/SwapForm';
 import SwapOrderStatus from '@/components/dex/swap/SwapOrderStatus';
 import { ArrowRightIcon } from '@/components/UI/Icons';
 import { useSwapMarket } from '@/hook/useSwapMarket';
+import { useKeepInView } from '@/hook/useKeepInView';
 import { classes } from '@/utils/utils';
 import { OrderSwapStage, formatTokenAmount, getOrderSwapState, safeDecimal } from '@/utils/swap';
 import PairData from '@/interfaces/common/PairData';
@@ -40,6 +41,9 @@ const SwapWidget = ({ initialPair, initialStats, initialOrderBook }: SwapWidgetP
 	const orderId = queryOrder ?? null;
 	const [side, setSide] = useState<OfferType>('buy');
 	const [assetModalOpen, setAssetModalOpen] = useState(false);
+	const cardRef = useRef<HTMLDivElement>(null);
+
+	useKeepInView(cardRef);
 
 	const market = useSwapMarket({
 		pairId,
@@ -74,7 +78,7 @@ const SwapWidget = ({ initialPair, initialStats, initialOrderBook }: SwapWidgetP
 
 	return (
 		<>
-			<div className={styles.card}>
+			<div ref={cardRef} className={styles.card}>
 				{orderId ? (
 					<SwapOrderStatus
 						orderId={orderId}

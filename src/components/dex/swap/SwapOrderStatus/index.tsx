@@ -6,6 +6,7 @@ import ConnectButton from '@/components/UI/ConnectButton/ConnectButton';
 import Button from '@/components/UI/Button/Button';
 import TokenIcon from '@/components/UI/TokenIcon';
 import ConfirmModal from '@/components/UI/ConfirmModal';
+import NotificationHelpModal from '@/components/dex/swap/NotificationHelpModal';
 import {
 	ArrowLeftIcon,
 	ArrowRightIcon,
@@ -18,6 +19,7 @@ import {
 import { getAdvancedModeHref } from '@/components/dex/swap/ModeSwitch';
 import { Store } from '@/store/store-reducer';
 import { useOrderActions } from '@/hook/useOrderActions';
+import { getWalletErrorMessage } from '@/utils/walletErrors';
 import { getUserOrders } from '@/utils/methods';
 import { classes, formatTimestamp, shortenAddress, ZANO_ASSET_ID } from '@/utils/utils';
 import { formatTokenAmount, getOrderSwapState, safeDecimal } from '@/utils/swap';
@@ -79,11 +81,13 @@ const SwapOrderStatus = ({
 	onRefresh,
 }: SwapOrderStatusProps) => {
 	const { state } = useContext(Store);
-	const { acceptProposal, requestMatch, cancelOrder, cancelRequest } = useOrderActions();
+	const { acceptProposal, requestMatch, cancelOrder, cancelRequest, alertErr } =
+		useOrderActions();
 
 	const [snapshot, setSnapshot] = useState<OrderRow | null>(null);
 	const [finishedState, setFinishedState] = useState<'completed' | 'closed' | null>(null);
 	const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
+	const [notificationHelpOpen, setNotificationHelpOpen] = useState(false);
 	const [busyAction, setBusyAction] = useState<string | null>(null);
 	const [notificationPermission, setNotificationPermission] = useState<
 		NotificationPermission | 'unsupported'
@@ -112,10 +116,35 @@ const SwapOrderStatus = ({
 	useEffect(() => {
 		if (!('Notification' in window)) {
 			setNotificationPermission('unsupported');
-			return;
+			return undefined;
 		}
-		setNotificationPermission(Notification.permission);
+
+		const refresh = () => setNotificationPermission(Notification.permission);
+		refresh();
+
+		let permissionStatus: PermissionStatus | null = null;
+
+		navigator.permissions
+			?.query({ name: 'notifications' as PermissionName })
+			.then((status) => {
+				permissionStatus = status;
+				status.addEventListener('change', refresh);
+			})
+			.catch(() => undefined);
+
+		window.addEventListener('focus', refresh);
+		document.addEventListener('visibilitychange', refresh);
+
+		return () => {
+			permissionStatus?.removeEventListener('change', refresh);
+			window.removeEventListener('focus', refresh);
+			document.removeEventListener('visibilitychange', refresh);
+		};
 	}, []);
+
+	useEffect(() => {
+		if (notificationPermission === 'granted') setNotificationHelpOpen(false);
+	}, [notificationPermission]);
 
 	useEffect(() => {
 		if (!userDataLoaded || liveOrder || finishedState || !state.token || !pairData) return;
@@ -265,6 +294,9 @@ const SwapOrderStatus = ({
 		try {
 			const success = await action();
 			if (success) await onRefresh();
+		} catch (error) {
+			console.error(error);
+			alertErr(getWalletErrorMessage(error) ?? 'Something went wrong. Please try again.');
 		} finally {
 			setBusyAction(null);
 		}
@@ -274,6 +306,7 @@ const SwapOrderStatus = ({
 		if (!('Notification' in window)) return;
 		const permission = await Notification.requestPermission();
 		setNotificationPermission(permission);
+		if (permission === 'denied') setNotificationHelpOpen(true);
 	}
 
 	const renderSides = (amount: Decimal.Value, price: Decimal.Value, compact?: boolean) => {
@@ -347,10 +380,14 @@ const SwapOrderStatus = ({
 					<Button
 						size="sm"
 						variant="secondary"
-						disabled={notificationPermission !== 'default'}
-						onClick={requestNotifications}
+						disabled={notificationPermission === 'unsupported'}
+						onClick={() =>
+							notificationPermission === 'denied'
+								? setNotificationHelpOpen(true)
+								: requestNotifications()
+						}
 					>
-						Enable
+						{notificationPermission === 'denied' ? 'How to enable' : 'Enable'}
 					</Button>
 				)}
 			</div>
@@ -638,6 +675,11 @@ const SwapOrderStatus = ({
 					)}
 				</div>
 			)}
+
+			<NotificationHelpModal
+				open={notificationHelpOpen}
+				onClose={() => setNotificationHelpOpen(false)}
+			/>
 
 			<ConfirmModal
 				open={confirmCancelOpen}

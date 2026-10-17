@@ -387,3 +387,64 @@ export const EyeOffIcon = (props: IconProps) => (
 		/>
 	</svg>
 );
+
+export const SlidersIcon = (props: IconProps) => (
+	<svg
+		width="20"
+		height="20"
+		viewBox="0 0 24 24"
+		fill="none"
+		{...props}
+		className={classes('ui-icon', props.className)}
+	>
+		<path
+			d="M4 8h9M17 8h3M4 16h3M11 16h9"
+			stroke="currentColor"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+		/>
+		<circle cx="15" cy="8" r="2.2" stroke="currentColor" strokeWidth="1.8" />
+		<circle cx="9" cy="16" r="2.2" stroke="currentColor" strokeWidth="1.8" />
+	</svg>
+);
+
+export const LockIcon = (props: IconProps) => (
+	<svg
+		width="20"
+		height="20"
+		viewBox="0 0 24 24"
+		fill="none"
+		{...props}
+		className={classes('ui-icon', props.className)}
+	>
+		<rect
+			x="5"
+			y="10.5"
+			width="14"
+			height="9.5"
+			rx="2.5"
+			stroke="currentColor"
+			strokeWidth="1.8"
+		/>
+		<path d="M8.5 10.5V8a3.5 3.5 0 1 1 7 0v2.5" stroke="currentColor" strokeWidth="1.8" />
+	</svg>
+);
+
+export const ReloadIcon = (props: IconProps) => (
+	<svg
+		width="20"
+		height="20"
+		viewBox="0 0 24 24"
+		fill="none"
+		{...props}
+		className={classes('ui-icon', props.className)}
+	>
+		<path
+			d="M19 12a7 7 0 1 1-2.05-4.95M19 5v4h-4"
+			stroke="currentColor"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		/>
+	</svg>
+);
