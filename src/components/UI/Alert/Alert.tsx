@@ -3,6 +3,7 @@ import AlertProps from '@/interfaces/props/components/UI/Alert/AlertProps';
 import { CheckIcon, CloseIcon } from '@/components/UI/Icons';
 import { classes } from '@/utils/utils';
 import { figtree } from '@/utils/font';
+import Spinner from '@/components/UI/Spinner';
 import styles from './Alert.module.scss';
 
 function Alert(props: AlertProps) {
@@ -30,7 +31,7 @@ function Alert(props: AlertProps) {
 			subtitle: props.subtitle || 'Lorem ipsum dolor sit amet',
 			icon: (
 				<div className={classes(styles.ui__alert__icon, styles.ui__alert__icon_loading)}>
-					<span className={styles.ui__alert__spinner} />
+					<Spinner size="sm" />
 				</div>
 			),
 		},

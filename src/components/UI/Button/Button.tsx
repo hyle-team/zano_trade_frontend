@@ -1,5 +1,6 @@
 import ButtonProps from '@/interfaces/props/components/UI/Button/ButtonProps';
 import { classes } from '@/utils/utils';
+import Spinner from '@/components/UI/Spinner';
 import styles from './Button.module.scss';
 
 function Button(props: ButtonProps) {
@@ -26,7 +27,7 @@ function Button(props: ButtonProps) {
 			onMouseLeave={props.onMouseLeave}
 			disabled={props.disabled || loading}
 		>
-			{loading && <span className={styles.spinner} />}
+			{loading && <Spinner size="sm" />}
 			{props.children}
 		</button>
 	);

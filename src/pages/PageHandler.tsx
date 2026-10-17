@@ -32,7 +32,6 @@ function PageHandler(props: { config: GetConfigResData }) {
 	}, [state.wallet?.connected, router.route]);
 
 	useEffect(() => {
-		console.log(state);
 		if (state.user?.id) {
 			socket.emit('in-account', {
 				token: state.token,

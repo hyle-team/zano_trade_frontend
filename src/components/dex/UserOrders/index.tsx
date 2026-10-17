@@ -1,7 +1,7 @@
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import useUpdateUser from '@/hook/useUpdateUser';
 import EmptyMessage from '@/components/UI/EmptyMessage';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import GenericTable from '@/components/default/GenericTable';
 import ActionBtn from '@/components/UI/ActionBtn';
 import { getUserOrders, getUserPendings } from '@/utils/methods';
@@ -341,8 +341,12 @@ const UserOrders = ({
 					sortedMatches,
 				});
 
+				if (!matchesGroupsByUserOrders.length) {
+					return <EmptyMessage text="No suitables" />;
+				}
+
 				return matchesGroupsByUserOrders.map((group) => (
-					<>
+					<React.Fragment key={group.userOrder.id}>
 						<OrderGroupHeader
 							order={group.userOrder}
 							firstCurrencyName={firstCurrencyName}
@@ -359,7 +363,7 @@ const UserOrders = ({
 							pairData={pairData}
 							userOrders={userOrders}
 						/>
-					</>
+					</React.Fragment>
 				));
 			}
 			case 'requests':
@@ -467,7 +471,9 @@ const UserOrders = ({
 
 				{!myOrdersLoading && loggedIn && renderOrders()}
 
-				{myOrdersLoading && loggedIn && <ContentPreloader style={{ marginTop: 40 }} />}
+				{myOrdersLoading && loggedIn && (
+					<ContentPreloader className={styles.userOrders__body} />
+				)}
 				{!loggedIn && <EmptyMessage text="Connect wallet to see your orders" />}
 			</div>
 

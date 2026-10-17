@@ -266,20 +266,8 @@
 	color: var(--gray-color) !important;
 }
 
-.details__spinner {
-	width: 14px;
-	height: 14px;
-	border-radius: 50%;
-	border: 2px solid var(--primary-color);
-	border-right-color: transparent;
-	animation: detailsSpin 0.8s linear infinite;
-	transition: none;
-}
-
-@keyframes detailsSpin {
-	to {
-		transform: rotate(360deg);
-	}
+.details__loading .details__spinner {
+	color: var(--primary-color);
 }
 
 .notice {

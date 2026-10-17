@@ -27,6 +27,7 @@ import OrderRow from '@/interfaces/common/OrderRow';
 import ApplyTip from '@/interfaces/common/ApplyTip';
 import UserPendingType from '@/interfaces/common/UserPendingType';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
+import Spinner from '@/components/UI/Spinner';
 import styles from './styles.module.scss';
 
 type OrderStatus =
@@ -388,7 +389,7 @@ const SwapOrderStatus = ({
 			case 'loading':
 				return (
 					<div className={styles.state}>
-						<span className={styles.spinner} />
+						<Spinner className={styles.spinner} />
 						<p className={styles.state__text}>Loading order...</p>
 					</div>
 				);

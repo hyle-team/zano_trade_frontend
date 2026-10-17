@@ -19,7 +19,7 @@ export function buildOrderPoolColumns({
 			cell: (row) => (
 				<p
 					style={{
-						color: row.type === 'buy' ? '#16D1D6' : '#FF6767',
+						color: row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
 						display: 'flex',
 						alignItems: 'center',
 						gap: 8,
@@ -69,7 +69,11 @@ export function buildTradesColumns({
 			header: <>Price ({secondCurrencyName})</>,
 			width: '80px',
 			cell: (row) => (
-				<p style={{ color: row.type === 'buy' ? '#16D1D6' : '#FF6767' }}>
+				<p
+					style={{
+						color: row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
+					}}
+				>
 					{notationToString(row.price)}
 				</p>
 			),

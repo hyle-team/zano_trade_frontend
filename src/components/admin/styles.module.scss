@@ -172,11 +172,9 @@
 		min-width: 0;
 	}
 
-	&__btn {
+	.addForm__btn {
 		height: 46px;
 		padding: 0 20px;
-		border-radius: 12px;
-		font-size: 14px;
 		flex-shrink: 0;
 	}
 }
@@ -257,7 +255,7 @@
 		color: var(--muted-color);
 	}
 
-	&__action {
+	.row__action {
 		width: 36px;
 		height: 36px;
 		padding: 0;
@@ -314,11 +312,9 @@
 		grid-template-columns: minmax(0, 1fr);
 	}
 
-	&__btn {
+	.volume__btn {
 		height: 46px;
 		padding: 0 24px;
-		border-radius: 12px;
-		font-size: 14px;
 	}
 }
 
@@ -435,18 +431,8 @@
 }
 
 .loader {
-	width: 28px;
-	height: 28px;
 	margin: 40px auto;
-	border-radius: 50%;
-	border: 2px solid var(--primary-color);
-	border-right-color: transparent;
-	animation: spin 0.8s linear infinite;
-	transition: none;
-}
-
-@keyframes spin {
-	to {
-		transform: rotate(360deg);
-	}
+	display: flex;
+	justify-content: center;
+	color: var(--primary-color);
 }

@@ -211,7 +211,7 @@ function CandleChart(props: CandleChartProps) {
 						color0: chartColors.red,
 						borderColor: chartColors.green,
 						borderColor0: chartColors.red,
-						borderColorDoji: chartColors.green,
+						borderColorDoji: chartColors.neutral,
 					},
 					markLine: {
 						silent: true,

@@ -110,7 +110,7 @@
 			color: var(--text-color);
 
 			&::placeholder {
-				color: #a0a0be;
+				color: var(--muted-color);
 			}
 		}
 	}

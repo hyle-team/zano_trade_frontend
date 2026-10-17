@@ -70,6 +70,14 @@ const AliasRow = ({ label = 'Alias', children }: { label?: string; children: Rea
 	</div>
 );
 
+const EMPTY_MESSAGES: Record<UniversalCardsProps['type'], string> = {
+	orders: 'No orders',
+	matches: 'No suitables',
+	requests: 'No requests',
+	offers: 'No offers',
+	history: 'No data',
+};
+
 export default function UniversalCards(props: UniversalCardsProps) {
 	const { firstCurrencyName, secondCurrencyName, secondAssetUsdPrice, data, onAfter, type } =
 		props;
@@ -77,7 +85,7 @@ export default function UniversalCards(props: UniversalCardsProps) {
 	if (!data?.length)
 		return (
 			<div className={styles.cards}>
-				<EmptyMessage text="No data" />
+				<EmptyMessage text={EMPTY_MESSAGES[type]} />
 			</div>
 		);
 

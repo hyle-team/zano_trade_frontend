@@ -50,16 +50,6 @@
 		}
 	}
 
-	.ui__alert__spinner {
-		width: 16px;
-		height: 16px;
-		display: block;
-		border-radius: 50%;
-		border: 2px solid currentColor;
-		border-right-color: transparent;
-		animation: alertSpin 0.8s linear infinite;
-	}
-
 	.ui__alert__data {
 		min-width: 0;
 		margin-right: 4px;
@@ -101,12 +91,6 @@
 			background: var(--light-color);
 			color: var(--text-color);
 		}
-	}
-}
-
-@keyframes alertSpin {
-	to {
-		transform: rotate(360deg);
 	}
 }
 

@@ -9,10 +9,11 @@ import { Store } from '@/store/store-reducer';
 import { classes } from '@/utils/utils';
 import { figtree } from '@/utils/font';
 import NotFound from '@/pages/404';
-import styles from './styles.module.scss';
-import PairStats from './PairStats';
-import FeaturedPairs from './FeaturedPairs';
-import Admins from './Admins';
+import Spinner from '@/components/UI/Spinner';
+import styles from '@/components/admin/styles.module.scss';
+import PairStats from '@/components/admin/PairStats';
+import FeaturedPairs from '@/components/admin/FeaturedPairs';
+import Admins from '@/components/admin/Admins';
 
 interface FeaturedPair {
 	name: string;
@@ -377,7 +378,9 @@ const AdminPanel: React.FC = () => {
 						/>
 					</div>
 				) : (
-					<div className={styles.loader} />
+					<div className={styles.loader}>
+						<Spinner />
+					</div>
 				)}
 			</main>
 			<SiteFooter />

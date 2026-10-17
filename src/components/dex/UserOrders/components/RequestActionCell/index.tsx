@@ -37,7 +37,7 @@ export default function RequestActionCell({
 	};
 
 	return (
-		<ActionBtn variant="success" disabled={loading} onClick={() => onClick()}>
+		<ActionBtn variant="success" loading={loading} onClick={() => onClick()}>
 			{type === 'request' ? 'Request' : 'Accept'}
 		</ActionBtn>
 	);

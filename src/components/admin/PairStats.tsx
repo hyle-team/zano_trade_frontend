@@ -121,6 +121,7 @@ const PairStats: React.FC<PairStatsProps> = ({
 
 			<Button
 				variant="primary"
+				size="sm"
 				className={styles.volume__btn}
 				onClick={fetchVolumeStats}
 				loading={loading}

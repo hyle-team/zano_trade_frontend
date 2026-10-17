@@ -7,8 +7,9 @@ import testCandles from './testCandles.json';
 export const TESTING_MODE = false;
 
 export const chartColors = {
-	green: '#16D1D6',
-	red: '#FF6767',
+	green: '#18C8D9',
+	red: '#FF5C5C',
+	neutral: '#8D95AE',
 	default: '#3D3D6C',
 	light: '#e3e3e8',
 	dark: '#1f1f4a',
@@ -20,7 +21,7 @@ export const chartColors = {
 };
 
 export const INITIAL_VISIBLE_BARS = 80;
-export const FUTURE_BARS = 8;
+const MAX_GAP_BARS = 1000;
 const MIN_LABEL_GAP_PX = 90;
 
 const MINUTE = 60_000;
@@ -57,7 +58,7 @@ export const fmtPrice = (n: number | string | undefined, precision: number) =>
 
 export function diffFmt(curr: number | undefined, prev: number | undefined, precision: number) {
 	if (curr === undefined || prev === undefined || Number(prev) === 0) {
-		return { txt: '-', color: '#9CA3AF' };
+		return { txt: '-', color: chartColors.neutral };
 	}
 
 	const diff = d(curr).minus(prev);
@@ -66,7 +67,7 @@ export function diffFmt(curr: number | undefined, prev: number | undefined, prec
 
 	const txt = `${sign}${diff.toFixed(precision)} (${sign}${pct.toFixed(2)}%)`;
 
-	let color = '#9CA3AF';
+	let color = chartColors.neutral;
 	if (diff.greaterThan(0)) {
 		color = chartColors.green;
 	} else if (diff.lessThan(0)) {
@@ -79,7 +80,8 @@ export function diffFmt(curr: number | undefined, prev: number | undefined, prec
 export function candleColor(candle?: ResultCandle) {
 	if (!candle) return chartColors.default;
 	const [, , , open, close] = candle;
-	return close >= open ? chartColors.green : chartColors.red;
+	if (d(close).eq(open)) return chartColors.neutral;
+	return close > open ? chartColors.green : chartColors.red;
 }
 
 export function buildCandles(src: CandleRow[]): ResultCandle[] {
@@ -118,13 +120,15 @@ function prevTs(ts: number, period: Period) {
 	return ts - periodMs[period];
 }
 
-export function buildTimeline(candles: ResultCandle[], period: Period) {
+export function buildTimeline(candles: ResultCandle[], period: Period, now = Date.now()) {
 	const timeline = candles.map((c) => c[0]);
 	let last = timeline[timeline.length - 1];
 	if (last === undefined) return timeline;
-	for (let i = 0; i < FUTURE_BARS; i++) {
-		last = nextTs(last, period);
-		timeline.push(last);
+	for (let i = 0; i < MAX_GAP_BARS; i++) {
+		const next = nextTs(last, period);
+		if (next > now) break;
+		timeline.push(next);
+		last = next;
 	}
 	return timeline;
 }

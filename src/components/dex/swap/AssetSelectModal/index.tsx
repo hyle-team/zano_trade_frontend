@@ -9,6 +9,7 @@ import { PairSortOption } from '@/interfaces/enum/pair';
 import PairData from '@/interfaces/common/PairData';
 import { classes, ZANO_ASSET_ID } from '@/utils/utils';
 import { formatTokenAmount } from '@/utils/swap';
+import Spinner from '@/components/UI/Spinner';
 import styles from './styles.module.scss';
 
 interface AssetSelectModalProps {
@@ -222,7 +223,7 @@ const AssetSelectModal = ({ open, onClose, selectedPairId, onSelect }: AssetSele
 
 				{loading && (
 					<div className={styles.loader}>
-						<span />
+						<Spinner />
 					</div>
 				)}
 

@@ -29,13 +29,9 @@ export default function NotificationPopups() {
 		}
 
 		function onCancel(data: { orderId: number }) {
-			console.log('cancel', data.orderId, notificationOrders);
-
-			setNotificationOrders((prev) => {
-				console.log(prev, data.orderId);
-
-				return prev.filter((e) => parseInt(e.id, 10) !== data.orderId);
-			});
+			setNotificationOrders((prev) =>
+				prev.filter((e) => parseInt(e.id, 10) !== data.orderId),
+			);
 		}
 
 		socket.on('order-notification', onNotify);
@@ -45,8 +41,6 @@ export default function NotificationPopups() {
 			for (const notificationID of state.closed_notifications) {
 				onCancel({ orderId: notificationID });
 			}
-
-			console.log('Closed notifications:', state.closed_notifications);
 
 			updateAutoClosedNotification(dispatch, []);
 		}

@@ -26,6 +26,7 @@ import OfferType from '@/interfaces/common/OfferType';
 import OrderRow from '@/interfaces/common/OrderRow';
 import { PairStats } from '@/interfaces/responses/orders/GetPairStatsRes';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
+import Spinner from '@/components/UI/Spinner';
 import styles from './styles.module.scss';
 
 type PriceMode = 'limit' | 'market';
@@ -601,7 +602,7 @@ const SwapForm = ({
 						<p>
 							{marketPriceLoading && (
 								<span className={styles.details__loading}>
-									<span className={styles.details__spinner} />
+									<Spinner size="sm" className={styles.details__spinner} />
 									Loading
 								</span>
 							)}

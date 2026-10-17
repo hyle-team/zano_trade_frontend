@@ -4,6 +4,7 @@ import Button from '@/components/UI/Button/Button';
 import TokenIcon from '@/components/UI/TokenIcon';
 import { PlusIcon, SearchIcon, TrashIcon } from '@/components/UI/Icons';
 import { shortenAddress } from '@/utils/utils';
+import Spinner from '@/components/UI/Spinner';
 import styles from './styles.module.scss';
 
 interface FeaturedPair {
@@ -32,7 +33,13 @@ const FeaturedPairs: React.FC<FeaturedPairsProps> = ({
 	removeFeaturedPair,
 }) => {
 	const renderList = () => {
-		if (loading) return <div className={styles.loader} />;
+		if (loading) {
+			return (
+				<div className={styles.loader}>
+					<Spinner />
+				</div>
+			);
+		}
 
 		if (!featuredPairs.length) {
 			return (
@@ -104,6 +111,7 @@ const FeaturedPairs: React.FC<FeaturedPairsProps> = ({
 				<Button
 					type="submit"
 					variant="primary"
+					size="sm"
 					className={styles.addForm__btn}
 					loading={adding}
 					disabled={!assetId.trim()}

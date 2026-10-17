@@ -13,11 +13,6 @@
 		@include font;
 	}
 
-	p {
-		font-size: 12px;
-		font-weight: 500;
-	}
-
 	.tooltip__arrow {
 		width: 10px;
 		height: 10px;
@@ -27,4 +22,10 @@
 		transform: translate(-50%, -50%) rotate(45deg);
 		background-color: var(--switch-bg-color);
 	}
+}
+
+:where(.tooltip__content),
+:where(.tooltip__content) :where(p, span) {
+	font-size: 12px;
+	font-weight: 500;
 }

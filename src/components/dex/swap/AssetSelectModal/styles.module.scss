@@ -204,25 +204,10 @@
 	display: flex;
 	justify-content: center;
 	padding: 20px 0;
-
-	span {
-		width: 24px;
-		height: 24px;
-		border-radius: 50%;
-		border: 2px solid var(--primary-color);
-		border-right-color: transparent;
-		animation: spin 0.8s linear infinite;
-		transition: none;
-	}
+	color: var(--primary-color);
 }
 
 .sentinel {
 	flex-shrink: 0;
 	height: 1px;
-}
-
-@keyframes spin {
-	to {
-		transform: rotate(360deg);
-	}
 }

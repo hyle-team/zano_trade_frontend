@@ -2,6 +2,7 @@ import React from 'react';
 import Button from '@/components/UI/Button/Button';
 import { PlusIcon, TrashIcon, UserIcon } from '@/components/UI/Icons';
 import { classes } from '@/utils/utils';
+import Spinner from '@/components/UI/Spinner';
 import styles from './styles.module.scss';
 
 interface Admin {
@@ -34,7 +35,13 @@ const Admins: React.FC<AdminsProps> = ({
 	const sortedAdmins = [...admins].sort((a, b) => Number(b.isOwner) - Number(a.isOwner));
 
 	const renderList = () => {
-		if (loading) return <div className={styles.loader} />;
+		if (loading) {
+			return (
+				<div className={styles.loader}>
+					<Spinner />
+				</div>
+			);
+		}
 
 		if (!admins.length) {
 			return (
@@ -118,6 +125,7 @@ const Admins: React.FC<AdminsProps> = ({
 				<Button
 					type="submit"
 					variant="primary"
+					size="sm"
 					className={styles.addForm__btn}
 					loading={adding}
 					disabled={!alias.trim()}

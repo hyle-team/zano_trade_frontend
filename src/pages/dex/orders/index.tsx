@@ -38,6 +38,7 @@ import ApplyTip from '@/interfaces/common/ApplyTip';
 import UserPendingType from '@/interfaces/common/UserPendingType';
 import SiteFooter from '@/components/default/SiteFooter';
 import { getDexOrderHref, useStoredDexMode } from '@/utils/dexMode';
+import Spinner from '@/components/UI/Spinner';
 import styles from '@/styles/Orders.module.scss';
 
 type OrdersTab = 'active' | 'history';
@@ -412,7 +413,13 @@ function Orders() {
 	}, [historyEndInView, historyLoading, historyTotal, history.length]);
 
 	const renderActive = () => {
-		if (activeLoading) return <div className={styles.loader} />;
+		if (activeLoading) {
+			return (
+				<div className={styles.loader}>
+					<Spinner />
+				</div>
+			);
+		}
 
 		if (!visibleActive.length) {
 			return (
@@ -543,7 +550,13 @@ function Orders() {
 	};
 
 	const renderHistory = () => {
-		if (!history.length && historyLoading) return <div className={styles.loader} />;
+		if (!history.length && historyLoading) {
+			return (
+				<div className={styles.loader}>
+					<Spinner />
+				</div>
+			);
+		}
 
 		if (!history.length) {
 			return (
@@ -607,7 +620,13 @@ function Orders() {
 						</div>
 					);
 				})}
-				<div ref={historyEndRef}>{historyLoading && <div className={styles.loader} />}</div>
+				<div ref={historyEndRef}>
+					{historyLoading && (
+						<div className={styles.loader}>
+							<Spinner />
+						</div>
+					)}
+				</div>
 			</div>
 		);
 	};

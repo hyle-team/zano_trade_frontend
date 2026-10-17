@@ -17,10 +17,12 @@ function StatItem({ Img, title, value, className, coefficient }: StatItemProps) 
 					<p
 						className={classes(
 							styles.statItem__content_coefficient,
-							coefficient >= 0 ? styles.green : styles.red,
+							coefficient > 0 && styles.green,
+							coefficient < 0 && styles.red,
+							coefficient === 0 && styles.neutral,
 						)}
 					>
-						{coefficient >= 0 ? '+' : ''}
+						{coefficient > 0 ? '+' : ''}
 						{coefficient?.toFixed(2)}%
 					</p>
 				)}
