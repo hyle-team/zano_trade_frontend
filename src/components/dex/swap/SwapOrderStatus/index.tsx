@@ -50,6 +50,7 @@ interface SwapOrderStatusProps {
 	userDataLoaded: boolean;
 	onBack: () => void;
 	onRefresh: () => Promise<void>;
+	onExpandedChange?: (_expanded: boolean) => void;
 }
 
 const MAX_MISS_ATTEMPTS = 2;
@@ -77,6 +78,7 @@ const SwapOrderStatus = ({
 	userDataLoaded,
 	onBack,
 	onRefresh,
+	onExpandedChange,
 }: SwapOrderStatusProps) => {
 	const { state } = useContext(Store);
 	const { acceptProposal, requestMatch, cancelOrder, cancelRequest } = useOrderActions();
@@ -553,6 +555,37 @@ const SwapOrderStatus = ({
 
 	const step = STEP_BY_STATUS[status];
 	const isActive = !['completed', 'closed', 'loading', 'disconnected'].includes(status);
+	const expanded = isActive && !!order;
+
+	useEffect(() => {
+		onExpandedChange?.(expanded);
+	}, [expanded, onExpandedChange]);
+
+	useEffect(() => () => onExpandedChange?.(false), [onExpandedChange]);
+
+	const stepsNode = status !== 'closed' && status !== 'disconnected' && (
+		<ol className={styles.steps}>
+			{STEPS.map((label, index) => (
+				<li
+					key={label}
+					className={classes(
+						styles.step,
+						(index < step || status === 'completed') && styles.step__done,
+						index === step && status !== 'completed' && styles.step__current,
+					)}
+				>
+					<span>
+						{index < step || status === 'completed' ? (
+							<CheckIcon width={12} height={12} />
+						) : (
+							index + 1
+						)}
+					</span>
+					<p>{label}</p>
+				</li>
+			))}
+		</ol>
+	);
 
 	return (
 		<div className={styles.wrapper}>
@@ -566,6 +599,7 @@ const SwapOrderStatus = ({
 
 			{order && (
 				<div className={styles.summary}>
+					{stepsNode && <div className={styles.summary__steps}>{stepsNode}</div>}
 					<div className={styles.summary__top}>
 						<span
 							className={classes(
@@ -589,55 +623,32 @@ const SwapOrderStatus = ({
 					<div className={styles.progress}>
 						<span style={{ width: `${Math.min(filledPercent, 100)}%` }} />
 					</div>
-				</div>
-			)}
-
-			{status !== 'closed' && status !== 'disconnected' && (
-				<ol className={styles.steps}>
-					{STEPS.map((label, index) => (
-						<li
-							key={label}
-							className={classes(
-								styles.step,
-								(index < step || status === 'completed') && styles.step__done,
-								index === step && status !== 'completed' && styles.step__current,
+					{isActive && (
+						<div className={styles.footer}>
+							<Button
+								variant="danger"
+								size="sm"
+								loading={busyAction === 'cancel-order'}
+								onClick={() => setConfirmCancelOpen(true)}
+							>
+								Cancel order
+							</Button>
+							{pairData && (
+								<Link
+									className={styles.footer__link}
+									href={getAdvancedModeHref(pairData.id)}
+								>
+									Open in Advanced
+								</Link>
 							)}
-						>
-							<span>
-								{index < step || status === 'completed' ? (
-									<CheckIcon width={12} height={12} />
-								) : (
-									index + 1
-								)}
-							</span>
-							<p>{label}</p>
-						</li>
-					))}
-				</ol>
-			)}
-
-			{renderBody()}
-
-			{isActive && (
-				<div className={styles.footer}>
-					<Button
-						variant="danger"
-						size="sm"
-						loading={busyAction === 'cancel-order'}
-						onClick={() => setConfirmCancelOpen(true)}
-					>
-						Cancel order
-					</Button>
-					{pairData && (
-						<Link
-							className={styles.footer__link}
-							href={getAdvancedModeHref(pairData.id)}
-						>
-							Open in Advanced
-						</Link>
+						</div>
 					)}
 				</div>
 			)}
+
+			{!order && stepsNode}
+
+			<div className={styles.body}>{renderBody()}</div>
 
 			<ConfirmModal
 				open={confirmCancelOpen}

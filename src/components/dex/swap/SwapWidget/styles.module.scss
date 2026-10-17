@@ -4,6 +4,7 @@
 	@include card;
 	width: 100%;
 	padding: 24px;
+	container-type: inline-size;
 
 	@include mobile {
 		padding: 16px;

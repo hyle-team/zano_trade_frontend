@@ -18,6 +18,7 @@ interface SwapWidgetProps {
 	initialPair: PairData | null;
 	initialStats: PairStats | null;
 	initialOrderBook: PageOrderData[];
+	onExpandedChange?: (_expanded: boolean) => void;
 }
 
 const STAGE_LABELS: Record<OrderSwapStage, string | null> = {
@@ -30,7 +31,12 @@ const STAGE_LABELS: Record<OrderSwapStage, string | null> = {
 const queryValue = (value: string | string[] | undefined) =>
 	Array.isArray(value) ? value[0] : value;
 
-const SwapWidget = ({ initialPair, initialStats, initialOrderBook }: SwapWidgetProps) => {
+const SwapWidget = ({
+	initialPair,
+	initialStats,
+	initialOrderBook,
+	onExpandedChange,
+}: SwapWidgetProps) => {
 	const router = useRouter();
 
 	const queryPair = queryValue(router.query.pair);
@@ -86,6 +92,7 @@ const SwapWidget = ({ initialPair, initialStats, initialOrderBook }: SwapWidgetP
 						userDataLoaded={market.userDataLoaded}
 						onBack={() => updateQuery({ order: null })}
 						onRefresh={market.refreshAll}
+						onExpandedChange={onExpandedChange}
 					/>
 				) : (
 					<SwapForm
