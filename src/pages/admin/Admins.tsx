@@ -1,6 +1,7 @@
 import React from 'react';
-import { Table, Button, Form, Input, FormInstance } from 'antd';
-import { ColumnsType } from 'antd/es/table';
+import Button from '@/components/UI/Button/Button';
+import { PlusIcon, TrashIcon, UserIcon } from '@/components/UI/Icons';
+import { classes } from '@/utils/utils';
 import styles from './styles.module.scss';
 
 interface Admin {
@@ -11,69 +12,123 @@ interface Admin {
 
 interface AdminsProps {
 	admins: Admin[];
-	removeAdmin: (_key: number) => void;
-	addAdmin: (_values: { alias: string }) => void;
-	form: FormInstance;
+	loading: boolean;
+	currentAlias?: string;
+	alias: string;
+	setAlias: (_value: string) => void;
+	adding: boolean;
+	addAdmin: () => void;
+	removeAdmin: (_admin: Admin) => void;
 }
 
-const Admins: React.FC<AdminsProps> = ({ admins, removeAdmin, addAdmin, form }) => {
-	const columns: ColumnsType<Admin> = [
-		{
-			title: 'Alias',
-			dataIndex: 'alias',
-			key: 'alias',
-		},
-		{
-			title: 'Is Owner',
-			dataIndex: 'isOwner',
-			key: 'isOwner',
-			render: (text) => (text ? 'Owner' : 'Admin'),
-		},
-		{
-			title: 'Action',
-			key: 'action',
-			render: (_, record) => (
-				<Button
-					className={styles.admin__table_btn}
-					type="primary"
-					style={{ background: '#FF6767', opacity: record.isOwner ? 0.5 : 1 }}
-					onClick={() => removeAdmin(record.key)}
-					disabled={record.isOwner}
-				>
-					Delete
-				</Button>
-			),
-		},
-	];
+const Admins: React.FC<AdminsProps> = ({
+	admins,
+	loading,
+	currentAlias,
+	alias,
+	setAlias,
+	adding,
+	addAdmin,
+	removeAdmin,
+}) => {
+	const sortedAdmins = [...admins].sort((a, b) => Number(b.isOwner) - Number(a.isOwner));
+
+	const renderList = () => {
+		if (loading) return <div className={styles.loader} />;
+
+		if (!admins.length) {
+			return (
+				<div className={styles.placeholder}>
+					<p>No admins found</p>
+				</div>
+			);
+		}
+
+		return (
+			<div className={styles.list}>
+				{sortedAdmins.map((admin) => (
+					<div key={admin.key} className={styles.row}>
+						<div className={styles.row__main}>
+							<span className={styles.avatar}>
+								{admin.alias.charAt(0).toUpperCase()}
+							</span>
+							<div className={styles.row__info}>
+								<p className={styles.row__title}>
+									@{admin.alias}
+									{admin.alias === currentAlias && (
+										<span className={styles.row__you}>You</span>
+									)}
+								</p>
+								<span
+									className={classes(
+										styles.badge,
+										admin.isOwner ? styles.badge__info : styles.badge__muted,
+									)}
+								>
+									{admin.isOwner ? 'Owner' : 'Admin'}
+								</span>
+							</div>
+						</div>
+
+						{!admin.isOwner && (
+							<Button
+								size="sm"
+								variant="danger"
+								className={styles.row__action}
+								aria-label={`Remove @${admin.alias} from admins`}
+								title="Remove admin"
+								onClick={() => removeAdmin(admin)}
+							>
+								<TrashIcon />
+							</Button>
+						)}
+					</div>
+				))}
+			</div>
+		);
+	};
 
 	return (
-		<div>
-			<h2 className={styles.admin__subtitle}>Admins</h2>
-			<div className={styles.admin__form}>
-				<Form size="large" layout="inline" form={form} onFinish={addAdmin}>
-					<Form.Item
-						name="alias"
-						rules={[{ required: true, message: 'Alias is required' }]}
-					>
-						<Input className={styles.admin__form_input} placeholder="Enter Alias" />
-					</Form.Item>
-					<Form.Item>
-						<Button className={styles.admin__form_btn} type="primary" htmlType="submit">
-							Add To Admins
-						</Button>
-					</Form.Item>
-				</Form>
+		<section className={styles.section}>
+			<div className={styles.section__head}>
+				<div>
+					<h2>
+						Admins
+						{!loading && <span className={styles.count}>{admins.length}</span>}
+					</h2>
+					<p>Users with access to this panel</p>
+				</div>
 			</div>
 
-			<Table
-				className={styles.admin__table}
-				dataSource={admins}
-				columns={columns}
-				pagination={false}
-				bordered
-				rowKey="key"
-			/>
-		</div>
+			<form
+				className={styles.addForm}
+				onSubmit={(e) => {
+					e.preventDefault();
+					addAdmin();
+				}}
+			>
+				<label className={styles.input}>
+					<UserIcon width={16} height={16} />
+					<input
+						placeholder="Enter alias"
+						value={alias}
+						onChange={(e) => setAlias(e.target.value)}
+					/>
+				</label>
+				<Button
+					type="submit"
+					variant="primary"
+					className={styles.addForm__btn}
+					loading={adding}
+					disabled={!alias.trim()}
+				>
+					{!adding && <PlusIcon />}
+					Add
+				</Button>
+			</form>
+
+			{renderList()}
+		</section>
 	);
 };
 

@@ -1,6 +1,9 @@
 import React from 'react';
-import { Button, Input, Spin, Typography, Checkbox } from 'antd';
 import DateRangeSelector from '@/components/UI/DateRangeSelector/DateRangeSelector';
+import Button from '@/components/UI/Button/Button';
+import { Switch } from '@/components/UI/Switch/Switch';
+import { ChartIcon } from '@/components/UI/Icons';
+import { formatTokenAmount } from '@/utils/swap';
 import styles from './styles.module.scss';
 
 interface DateState {
@@ -8,9 +11,14 @@ interface DateState {
 	last: Date | null;
 }
 
+interface VolumeStatsResponse {
+	success?: boolean;
+	data?: { volume?: string } | string;
+}
+
 interface PairStatsProps {
 	loading: boolean;
-	volumeStats: number | null;
+	volumeStats: VolumeStatsResponse | null;
 	selectedAddress: string;
 	setSelectedAddress: React.Dispatch<React.SetStateAction<string>>;
 	selectedPairID: string;
@@ -21,6 +29,34 @@ interface PairStatsProps {
 	setDateRange: React.Dispatch<React.SetStateAction<DateState>>;
 	fetchVolumeStats: () => void;
 }
+
+const renderResult = (volumeStats: VolumeStatsResponse) => {
+	const { success, data } = volumeStats;
+
+	if (success && data && typeof data === 'object' && data.volume !== undefined) {
+		return (
+			<div className={styles.result}>
+				<span className={styles.result__icon}>
+					<ChartIcon />
+				</span>
+				<div>
+					<p className={styles.result__label}>Traded volume</p>
+					<p className={styles.result__value}>{formatTokenAmount(data.volume, 8)}</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (success === false && typeof data === 'string') {
+		return (
+			<div className={styles.result}>
+				<p className={styles.result__error}>{data}</p>
+			</div>
+		);
+	}
+
+	return <pre className={styles.result__raw}>{JSON.stringify(volumeStats, null, 2)}</pre>;
+};
 
 const PairStats: React.FC<PairStatsProps> = ({
 	loading,
@@ -35,67 +71,66 @@ const PairStats: React.FC<PairStatsProps> = ({
 	setDateRange,
 	fetchVolumeStats,
 }) => (
-	<div className={styles.admin__volume}>
-		<div className={styles.admin__volume_form}>
-			<Input
-				className={`${styles.admin__volume_input} ${styles.admin__form_input}`}
-				placeholder="Enter Address"
-				value={selectedAddress}
-				onChange={(e) => setSelectedAddress(e.target.value)}
-			/>
-			<Input
-				className={`${styles.admin__volume_input} ${styles.admin__form_input}`}
-				placeholder="Enter Pair ID"
-				value={selectedPairID}
-				onChange={(e) => setSelectedPairID(e.target.value)}
-			/>
-			<div className={styles.admin__volume_range}>
+	<section className={styles.section}>
+		<div className={styles.section__head}>
+			<div>
+				<h2>Volume stats</h2>
+				<p>Traded volume of an address on a pair for the selected period</p>
+			</div>
+		</div>
+
+		<div className={styles.volume}>
+			<div className={styles.field}>
+				<span className={styles.field__label}>Address</span>
+				<label className={styles.input}>
+					<input
+						placeholder="Enter address"
+						value={selectedAddress}
+						onChange={(e) => setSelectedAddress(e.target.value)}
+					/>
+				</label>
+			</div>
+
+			<div className={styles.field}>
+				<span className={styles.field__label}>Pair ID</span>
+				<label className={styles.input}>
+					<input
+						placeholder="Enter pair ID"
+						inputMode="numeric"
+						value={selectedPairID}
+						onChange={(e) => setSelectedPairID(e.target.value)}
+					/>
+				</label>
+			</div>
+
+			<div className={styles.field}>
+				<div className={styles.field__row}>
+					<span className={styles.field__label}>Period</span>
+					<label className={styles.toggle}>
+						<span>All dates</span>
+						<Switch checked={allDates} onChange={setAllDates} />
+					</label>
+				</div>
 				<DateRangeSelector
 					disabled={allDates}
-					className={styles.admin__volume_range__date}
+					className={styles.dateFilter}
 					value={dateRange}
 					setValue={setDateRange}
 				/>
 			</div>
-		</div>
 
-		<div className={styles.admin__volume_btns}>
 			<Button
-				type="primary"
-				size="large"
-				className={styles.admin__form_btn}
+				variant="primary"
+				className={styles.volume__btn}
 				onClick={fetchVolumeStats}
-				disabled={loading}
+				loading={loading}
 			>
-				{loading ? <Spin /> : 'Fetch Volume Stats'}
+				Fetch stats
 			</Button>
-
-			<label className={styles.allDates} htmlFor="all-date">
-				<Checkbox
-					checked={allDates}
-					onChange={(e) => setAllDates(e.target.checked)}
-					id="all-date"
-				/>
-				<span> All dates</span>
-			</label>
 		</div>
 
-		{volumeStats !== null && (
-			<Typography.Paragraph
-				style={{
-					margin: '20px 0',
-					backgroundColor: '#000000',
-					color: '#ffffff',
-					padding: '16px',
-					borderRadius: '8px',
-					fontFamily: 'monospace',
-					whiteSpace: 'pre-wrap',
-				}}
-			>
-				{JSON.stringify(volumeStats, null, 2)}
-			</Typography.Paragraph>
-		)}
-	</div>
+		{volumeStats !== null && renderResult(volumeStats)}
+	</section>
 );
 
 export default PairStats;

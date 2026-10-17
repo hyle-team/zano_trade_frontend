@@ -111,6 +111,38 @@ export const CloseIcon = (props: IconProps) => (
 	</svg>
 );
 
+export const PlusIcon = (props: IconProps) => (
+	<svg
+		width="16"
+		height="16"
+		viewBox="0 0 24 24"
+		fill="none"
+		{...props}
+		className={classes('ui-icon', props.className)}
+	>
+		<path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+	</svg>
+);
+
+export const TrashIcon = (props: IconProps) => (
+	<svg
+		width="16"
+		height="16"
+		viewBox="0 0 24 24"
+		fill="none"
+		{...props}
+		className={classes('ui-icon', props.className)}
+	>
+		<path
+			d="M4 7h16M10 11v6M14 11v6M5.5 7l1 12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2l1-12M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"
+			stroke="currentColor"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		/>
+	</svg>
+);
+
 export const CheckIcon = (props: IconProps) => (
 	<svg
 		width="16"

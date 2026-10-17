@@ -1,76 +1,120 @@
 import React from 'react';
-import { Table, Button, Input, Form, FormInstance } from 'antd';
-import { ColumnsType } from 'antd/es/table';
+import Link from 'next/link';
+import Button from '@/components/UI/Button/Button';
+import TokenIcon from '@/components/UI/TokenIcon';
+import { PlusIcon, SearchIcon, TrashIcon } from '@/components/UI/Icons';
+import { shortenAddress } from '@/utils/utils';
 import styles from './styles.module.scss';
 
 interface FeaturedPair {
 	name: string;
+	assetId?: string;
 	key: number;
 }
 
 interface FeaturedPairsProps {
 	featuredPairs: FeaturedPair[];
-	form: FormInstance;
-	addFeaturedPair: (_values: { asset_id: string }) => void;
-	removeFeaturedPair: (_key: number) => void;
+	loading: boolean;
+	assetId: string;
+	setAssetId: (_value: string) => void;
+	adding: boolean;
+	addFeaturedPair: () => void;
+	removeFeaturedPair: (_pair: FeaturedPair) => void;
 }
 
 const FeaturedPairs: React.FC<FeaturedPairsProps> = ({
 	featuredPairs,
-	form,
+	loading,
+	assetId,
+	setAssetId,
+	adding,
 	addFeaturedPair,
 	removeFeaturedPair,
 }) => {
-	const columns: ColumnsType<FeaturedPair> = [
-		{
-			title: 'Name',
-			dataIndex: 'name',
-			key: 'name',
-		},
-		{
-			title: 'Action',
-			key: 'action',
-			render: (_, record) => (
-				<Button
-					className={styles.admin__table_btn}
-					type="primary"
-					style={{ background: '#FF6767' }}
-					onClick={() => removeFeaturedPair(record.key)}
-				>
-					Delete
-				</Button>
-			),
-		},
-	];
+	const renderList = () => {
+		if (loading) return <div className={styles.loader} />;
+
+		if (!featuredPairs.length) {
+			return (
+				<div className={styles.placeholder}>
+					<p>No featured pairs yet</p>
+					<span>Add an asset ID above to highlight its pair on the swap page.</span>
+				</div>
+			);
+		}
+
+		return (
+			<div className={styles.list}>
+				{featuredPairs.map((pair) => (
+					<div key={pair.key} className={styles.row}>
+						<Link href={`/dex/trading/${pair.key}`} className={styles.row__main}>
+							<TokenIcon assetId={pair.assetId} size={36} />
+							<div className={styles.row__info}>
+								<p className={styles.row__title}>{pair.name}</p>
+								<span className={styles.row__subtitle}>
+									Pair #{pair.key}
+									{pair.assetId && ` · ${shortenAddress(pair.assetId, 6, 6)}`}
+								</span>
+							</div>
+						</Link>
+
+						<Button
+							size="sm"
+							variant="danger"
+							className={styles.row__action}
+							aria-label={`Remove ${pair.name} from featured`}
+							title="Remove from featured"
+							onClick={() => removeFeaturedPair(pair)}
+						>
+							<TrashIcon />
+						</Button>
+					</div>
+				))}
+			</div>
+		);
+	};
 
 	return (
-		<div>
-			<h2 className={styles.admin__subtitle}>Featured pairs</h2>
-			<div className={styles.admin__form}>
-				<Form size="large" layout="inline" form={form} onFinish={addFeaturedPair}>
-					<Form.Item
-						name="asset_id"
-						rules={[{ required: true, message: 'Asset ID is required' }]}
-					>
-						<Input className={styles.admin__form_input} placeholder="Enter Asset ID" />
-					</Form.Item>
-					<Form.Item>
-						<Button className={styles.admin__form_btn} type="primary" htmlType="submit">
-							Add To Featured
-						</Button>
-					</Form.Item>
-				</Form>
+		<section className={styles.section}>
+			<div className={styles.section__head}>
+				<div>
+					<h2>
+						Featured pairs
+						{!loading && <span className={styles.count}>{featuredPairs.length}</span>}
+					</h2>
+					<p>Pairs highlighted on the swap page</p>
+				</div>
 			</div>
 
-			<Table
-				className={styles.admin__table}
-				dataSource={featuredPairs}
-				columns={columns}
-				pagination={false}
-				bordered
-				rowKey="key"
-			/>
-		</div>
+			<form
+				className={styles.addForm}
+				onSubmit={(e) => {
+					e.preventDefault();
+					addFeaturedPair();
+				}}
+			>
+				<label className={styles.input}>
+					<SearchIcon />
+					<input
+						placeholder="Enter asset ID"
+						value={assetId}
+						onChange={(e) => setAssetId(e.target.value)}
+					/>
+				</label>
+				<Button
+					type="submit"
+					variant="primary"
+					className={styles.addForm__btn}
+					loading={adding}
+					disabled={!assetId.trim()}
+				>
+					{!adding && <PlusIcon />}
+					Add
+				</Button>
+			</form>
+
+			{renderList()}
+		</section>
 	);
 };
 
