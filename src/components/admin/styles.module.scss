@@ -278,6 +278,12 @@
 	font-weight: 800;
 	color: #fff;
 	background: var(--primary-gradient);
+
+	svg,
+	svg * {
+		color: #fff;
+		fill: #fff;
+	}
 }
 
 .badge {

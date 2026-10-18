@@ -57,7 +57,7 @@ const Admins: React.FC<AdminsProps> = ({
 					<div key={admin.key} className={styles.row}>
 						<div className={styles.row__main}>
 							<span className={styles.avatar}>
-								{admin.alias.charAt(0).toUpperCase()}
+								<UserIcon />
 							</span>
 							<div className={styles.row__info}>
 								<p className={styles.row__title}>

@@ -10,6 +10,7 @@ import { classes } from '@/utils/utils';
 import { figtree } from '@/utils/font';
 import NotFound from '@/pages/404';
 import Spinner from '@/components/UI/Spinner';
+import { UserIcon } from '@/components/UI/Icons';
 import styles from '@/components/admin/styles.module.scss';
 import PairStats from '@/components/admin/PairStats';
 import FeaturedPairs from '@/components/admin/FeaturedPairs';
@@ -323,7 +324,7 @@ const AdminPanel: React.FC = () => {
 					{accessAllowed && currentAlias && (
 						<div className={styles.role}>
 							<span className={styles.role__avatar}>
-								{currentAlias.charAt(0).toUpperCase()}
+								<UserIcon />
 							</span>
 							<p>@{currentAlias}</p>
 							<span

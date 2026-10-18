@@ -14,6 +14,7 @@ import {
 	CheckIcon,
 	ClockIcon,
 	LightningIcon,
+	UserIcon,
 	MailIcon,
 } from '@/components/UI/Icons';
 import { getAdvancedModeHref } from '@/components/dex/swap/ModeSwitch';
@@ -336,7 +337,7 @@ const SwapOrderStatus = ({
 	const renderCounterparty = (alias?: string, address?: string, instant?: boolean) => (
 		<div className={styles.counterparty}>
 			<span className={styles.counterparty__avatar}>
-				{(alias || address || '?').slice(0, 1).toUpperCase()}
+				<UserIcon />
 			</span>
 			<div>
 				<p className={styles.counterparty__alias}>
