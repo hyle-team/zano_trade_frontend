@@ -414,6 +414,37 @@ export async function getZanoPrice() {
 		.then((res) => res.data);
 }
 
+export async function getNotificationSettings({
+	token,
+}: AuthParams): Promise<ErrorRes | { success: true; data: { email: string | null } }> {
+	return axios
+		.post('/api/user/get-notification-settings', { token }, { validateStatus: () => true })
+		.then((res) => res.data);
+}
+
+export async function setAccountEmail(
+	email: string | null,
+	{ token }: AuthParams,
+): Promise<ErrorRes | { success: true; data: { email: string | null } }> {
+	return axios
+		.post('/api/user/set-email', { token, email }, { validateStatus: () => true })
+		.then((res) => res.data);
+}
+
+export async function setOrderEmailNotifications(
+	orderId: string | number,
+	enabled: boolean,
+	{ token }: AuthParams,
+): Promise<ErrorRes | { success: true; data: { enabled: boolean } }> {
+	return axios
+		.post(
+			'/api/orders/set-email-notifications',
+			{ token, orderId: Number(orderId), enabled },
+			{ validateStatus: () => true },
+		)
+		.then((res) => res.data);
+}
+
 export async function getAssetExplorerPrice(
 	assetId: string,
 ): Promise<{ success: boolean; data?: { zano_price?: number | null; usd?: number | null } }> {

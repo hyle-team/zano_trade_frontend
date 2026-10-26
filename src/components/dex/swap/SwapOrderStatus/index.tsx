@@ -7,6 +7,7 @@ import Button from '@/components/UI/Button/Button';
 import TokenIcon from '@/components/UI/TokenIcon';
 import ConfirmModal from '@/components/UI/ConfirmModal';
 import NotificationHelpModal from '@/components/dex/swap/NotificationHelpModal';
+import EmailNotificationRow from '@/components/dex/swap/EmailNotificationRow';
 import {
 	ArrowLeftIcon,
 	ArrowRightIcon,
@@ -14,8 +15,8 @@ import {
 	CheckIcon,
 	ClockIcon,
 	LightningIcon,
+	MessageIcon,
 	UserIcon,
-	MailIcon,
 } from '@/components/UI/Icons';
 import { getAdvancedModeHref } from '@/components/dex/swap/ModeSwitch';
 import { Store } from '@/store/store-reducer';
@@ -91,6 +92,11 @@ const SwapOrderStatus = ({
 	const [finishedState, setFinishedState] = useState<'completed' | 'closed' | null>(null);
 	const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
 	const [notificationHelpOpen, setNotificationHelpOpen] = useState(false);
+	const [emailSubscribed, setEmailSubscribed] = useState<boolean | null>(null);
+
+	useEffect(() => {
+		setEmailSubscribed(null);
+	}, [orderId]);
 	const [busyAction, setBusyAction] = useState<string | null>(null);
 	const [notificationPermission, setNotificationPermission] = useState<
 		NotificationPermission | 'unsupported'
@@ -395,20 +401,28 @@ const SwapOrderStatus = ({
 				)}
 			</div>
 
-			{/* <div className={classes(styles.notify__row, styles.notify__row_disabled)}>
+			{order && (
+				<EmailNotificationRow
+					orderId={String(order.id)}
+					subscribed={emailSubscribed ?? !!order.email_notifications}
+					onSubscribedChange={setEmailSubscribed}
+				/>
+			)}
+
+			<div className={classes(styles.notify__row, styles.notify__row_disabled)}>
 				<span className={styles.notify__icon}>
-					<MailIcon />
+					<MessageIcon />
 				</span>
 				<div className={styles.notify__text}>
 					<p>
-						Email notifications <span className={styles.soon}>Soon</span>
+						Zano Matrix notifications <span className={styles.soon}>Soon</span>
 					</p>
-					<span>Receive an email when a counter order appears</span>
+					<span>Get a message in Zano Matrix when your order moves</span>
 				</div>
 				<Button size="sm" variant="secondary" disabled>
-					Subscribe
+					Connect
 				</Button>
-			</div> */}
+			</div>
 		</div>
 	);
 

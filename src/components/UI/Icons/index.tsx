@@ -448,3 +448,27 @@ export const ReloadIcon = (props: IconProps) => (
 		/>
 	</svg>
 );
+
+export const MessageIcon = (props: IconProps) => (
+	<svg
+		width="20"
+		height="20"
+		viewBox="0 0 24 24"
+		fill="none"
+		{...props}
+		className={classes('ui-icon', props.className)}
+	>
+		<path
+			d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17.5H5A1.5 1.5 0 0 1 3.5 16V7A1.5 1.5 0 0 1 5 5.5Z"
+			stroke="currentColor"
+			strokeWidth="1.8"
+			strokeLinejoin="round"
+		/>
+		<path
+			d="M8 10.5h8M8 13.5h5"
+			stroke="currentColor"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+		/>
+	</svg>
+);
