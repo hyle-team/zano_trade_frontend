@@ -2,9 +2,12 @@
 	display: flex;
 	align-items: center;
 	gap: 4px;
-	font-size: 14px;
+	font-size: 12px;
 
 	&__text {
+		font-size: inherit !important;
+		font-weight: inherit !important;
+		line-height: inherit !important;
 		color: var(--font-main-color) !important;
 	}
 

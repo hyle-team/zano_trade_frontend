@@ -1,18 +1,24 @@
-import { useContext, useEffect, useState } from 'react';
-import { Form, message, Spin } from 'antd';
+import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
+import Head from 'next/head';
 import Header from '@/components/default/Header/Header';
-import PageTitle from '@/components/default/PageTitle/PageTitle';
-
-import ConnectButton from '@/components/UI/ConnectButton/ConnectButton';
+import SiteFooter from '@/components/default/SiteFooter';
+import ConfirmModal from '@/components/UI/ConfirmModal';
+import Alert from '@/components/UI/Alert/Alert';
 import { Store } from '@/store/store-reducer';
-import styles from './styles.module.scss';
-import PairStats from './PairStats';
-import FeaturedPairs from './FeaturedPairs';
-import Admins from './Admins';
+import { classes } from '@/utils/utils';
+import { figtree } from '@/utils/font';
+import NotFound from '@/pages/404';
+import Spinner from '@/components/UI/Spinner';
+import { UserIcon } from '@/components/UI/Icons';
+import styles from '@/components/admin/styles.module.scss';
+import PairStats from '@/components/admin/PairStats';
+import FeaturedPairs from '@/components/admin/FeaturedPairs';
+import Admins from '@/components/admin/Admins';
 
 interface FeaturedPair {
 	name: string;
+	assetId?: string;
 	key: number;
 }
 
@@ -29,27 +35,59 @@ interface DateState {
 
 interface CurrencyType {
 	name: string;
+	asset_id?: string;
 }
 
 interface PairType {
-	id: string | number;
+	id: number;
 	first_currency: CurrencyType;
 }
 
-const AdminPanel: React.FC = () => {
-	const [accessAllowed, setAccessAllowed] = useState<boolean | null>(null);
-	const { state } = useContext(Store);
+interface VolumeStatsResponse {
+	success?: boolean;
+	data?: { volume?: string } | string;
+}
 
-	const [form] = Form.useForm();
-	const [adminForm] = Form.useForm();
+type Notice = { type: 'success' | 'error'; text: string } | null;
+
+type PendingRemoval = { type: 'pair'; pair: FeaturedPair } | { type: 'admin'; admin: Admin } | null;
+
+const NOTICE_TIMEOUT = 3000;
+
+const AdminPanel: React.FC = () => {
+	const { state } = useContext(Store);
+	const accessAllowed = !!state.token && state.isAdmin === true;
+
 	const [featuredPairs, setFeaturedPairs] = useState<FeaturedPair[]>([]);
+	const [featuredLoading, setFeaturedLoading] = useState(true);
+	const [assetIdInput, setAssetIdInput] = useState('');
+	const [addingPair, setAddingPair] = useState(false);
+
 	const [admins, setAdmins] = useState<Admin[]>([]);
+	const [adminsLoading, setAdminsLoading] = useState(true);
+	const [aliasInput, setAliasInput] = useState('');
+	const [addingAdmin, setAddingAdmin] = useState(false);
+
 	const [selectedAddress, setSelectedAddress] = useState<string>('');
 	const [selectedPairID, setSelectedPairID] = useState<string>('');
 	const [dateRange, setDateRange] = useState<DateState>({ first: null, last: null });
 	const [loading, setLoading] = useState(false);
-	const [volumeStats, setVolumeStats] = useState<number | null>(null);
+	const [volumeStats, setVolumeStats] = useState<VolumeStatsResponse | null>(null);
 	const [allDates, setAllDates] = useState(false);
+
+	const [pendingRemoval, setPendingRemoval] = useState<PendingRemoval>(null);
+	const [removing, setRemoving] = useState(false);
+
+	const [notice, setNotice] = useState<Notice>(null);
+	const noticeTimer = useRef<ReturnType<typeof setTimeout>>();
+
+	const notify = (type: 'success' | 'error', text: string) => {
+		clearTimeout(noticeTimer.current);
+		setNotice({ type, text });
+		noticeTimer.current = setTimeout(() => setNotice(null), NOTICE_TIMEOUT);
+	};
+
+	useEffect(() => () => clearTimeout(noticeTimer.current), []);
 
 	const fetchFeaturedPairs = async () => {
 		try {
@@ -60,17 +98,17 @@ const AdminPanel: React.FC = () => {
 				setFeaturedPairs(
 					response.data.data.map((pair: PairType) => ({
 						name: pair.first_currency.name,
+						assetId: pair.first_currency.asset_id,
 						key: pair.id,
 					})),
 				);
 			} else {
-				message.error({
-					content: 'Error fetching featured pairs',
-					className: styles.message,
-				});
+				notify('error', 'Error fetching featured pairs');
 			}
 		} catch (error) {
-			message.error({ content: 'Error fetching featured pairs', className: styles.message });
+			notify('error', 'Error fetching featured pairs');
+		} finally {
+			setFeaturedLoading(false);
 		}
 	};
 
@@ -80,163 +118,149 @@ const AdminPanel: React.FC = () => {
 				token: state.token,
 			});
 			if (response.data.success) {
-				const fetchedAdmins = response.data.data;
 				setAdmins(
-					fetchedAdmins.map((admin: { alias: string; isOwner: boolean; id: string }) => ({
-						alias: admin.alias,
-						isOwner: admin.isOwner,
-						key: admin.id,
-					})),
+					response.data.data.map(
+						(admin: { alias: string; isOwner: boolean; id: number }) => ({
+							alias: admin.alias,
+							isOwner: admin.isOwner,
+							key: admin.id,
+						}),
+					),
 				);
 			} else {
-				message.error({
-					content: 'Failed to fetch admins',
-					className: styles.message,
-				});
+				notify('error', 'Failed to fetch admins');
 			}
 		} catch (error) {
-			message.error({
-				content: 'Error fetching admins',
-				className: styles.message,
-			});
+			notify('error', 'Error fetching admins');
+		} finally {
+			setAdminsLoading(false);
 		}
 	};
 
-	// Add featured pair to the backend
-	const addFeaturedPair = async (values: { asset_id: string }) => {
+	const addFeaturedPair = async () => {
+		const assetId = assetIdInput.trim();
+
+		if (!assetId) {
+			notify('error', 'Asset ID is required');
+			return;
+		}
+
+		setAddingPair(true);
+
 		try {
 			const response = await axios.post('/api/admin/add-featured', {
-				asset_id: values.asset_id,
+				asset_id: assetId,
 				token: state.token,
 			});
 
 			if (response.data.success) {
-				fetchFeaturedPairs();
-				message.success({
-					content: 'Pair added to featured',
-					className: styles.message,
-				});
-				form.resetFields();
+				await fetchFeaturedPairs();
+				notify('success', 'Pair added to featured');
+				setAssetIdInput('');
 			} else {
-				message.error({
-					content: response.data.message,
-					className: styles.message,
-				});
+				notify('error', response.data.message);
 			}
 		} catch (error) {
-			message.error({
-				content: 'Error adding featured pair',
-				className: styles.message,
-			});
+			notify('error', 'Error adding featured pair');
+		} finally {
+			setAddingPair(false);
 		}
 	};
 
-	// Remove featured pair from the backend
 	const removeFeaturedPair = async (key: number) => {
 		try {
-			const pairToRemove = featuredPairs.find((pair) => pair.key === key);
-			if (pairToRemove) {
-				const response = await axios.post('/api/admin/delete-featured', {
-					token: state.token,
-					id: pairToRemove.key,
-				});
-
-				if (response.data.success) {
-					fetchFeaturedPairs();
-					message.success({
-						content: 'Pair removed from featured',
-						className: styles.message,
-					});
-				} else {
-					message.error({
-						content: response.data.message,
-						className: styles.message,
-					});
-				}
-			}
-		} catch (error) {
-			message.error({ content: 'Error removing featured pair', className: styles.message });
-		}
-	};
-
-	useEffect(() => {
-		if (!accessAllowed) {
-			return;
-		}
-
-		fetchAdmins();
-		fetchFeaturedPairs();
-	}, [accessAllowed]);
-
-	// Add Admin function
-	const addAdmin = async (values: { alias: string }) => {
-		try {
-			if (admins.some((admin) => admin.alias === values.alias)) {
-				return message.error({
-					content: 'Admin already exists',
-					className: styles.message,
-				});
-			}
-
-			const { data } = await axios.post('/api/admin/add-admin', {
-				alias: values.alias,
-				token: state.token,
-			});
-
-			message[data.success ? 'success' : 'error']({
-				content: data.success ? 'Admin added successfully' : data.message,
-				className: styles.message,
-			});
-
-			if (data.success) {
-				fetchAdmins();
-			}
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} catch (error: any) {
-			message.error({
-				content:
-					error.response?.status === 401
-						? 'Unauthorized: Please log in.'
-						: 'Error adding admin',
-				className: styles.message,
-			});
-			console.log(error);
-		} finally {
-			adminForm.resetFields();
-		}
-	};
-
-	// Remove Admin function
-	const removeAdmin = async (key: number) => {
-		const adminToRemove = admins.find((admin) => admin.key === key);
-		if (adminToRemove && adminToRemove.isOwner) {
-			return;
-		}
-
-		try {
-			const response = await axios.post('/api/admin/delete-admin', {
+			const response = await axios.post('/api/admin/delete-featured', {
 				token: state.token,
 				id: key,
 			});
 
 			if (response.data.success) {
-				await fetchAdmins();
-				message.success({
-					content: 'Admin deleted successfully',
-					className: styles.message,
-				});
+				await fetchFeaturedPairs();
+				notify('success', 'Pair removed from featured');
 			} else {
-				message.error({
-					content: response.data.message,
-					className: styles.message,
-				});
+				notify('error', response.data.message);
 			}
 		} catch (error) {
-			message.error({
-				content: 'Error deleting admin',
-				className: styles.message,
-			});
+			notify('error', 'Error removing featured pair');
 		}
+	};
+
+	const addAdmin = async () => {
+		const alias = aliasInput.trim().replace(/^@/, '');
+
+		if (!alias) {
+			notify('error', 'Alias is required');
+			return;
+		}
+
+		if (admins.some((admin) => admin.alias === alias)) {
+			notify('error', 'Admin already exists');
+			return;
+		}
+
+		setAddingAdmin(true);
+
+		try {
+			const { data } = await axios.post('/api/admin/add-admin', {
+				alias,
+				token: state.token,
+			});
+
+			notify(
+				data.success ? 'success' : 'error',
+				data.success ? 'Admin added successfully' : data.message,
+			);
+
+			if (data.success) {
+				await fetchAdmins();
+				setAliasInput('');
+			}
+		} catch (error) {
+			notify(
+				'error',
+				axios.isAxiosError(error) && error.response?.status === 401
+					? 'Unauthorized: Please log in.'
+					: 'Error adding admin',
+			);
+			console.log(error);
+		} finally {
+			setAddingAdmin(false);
+		}
+	};
+
+	const removeAdmin = async (admin: Admin) => {
+		if (admin.isOwner) return;
+
+		try {
+			const response = await axios.post('/api/admin/delete-admin', {
+				token: state.token,
+				id: admin.key,
+			});
+
+			if (response.data.success) {
+				await fetchAdmins();
+				notify('success', 'Admin deleted successfully');
+			} else {
+				notify('error', response.data.message);
+			}
+		} catch (error) {
+			notify('error', 'Error deleting admin');
+		}
+	};
+
+	const onConfirmRemoval = async () => {
+		if (!pendingRemoval) return;
+
+		setRemoving(true);
+
+		if (pendingRemoval.type === 'pair') {
+			await removeFeaturedPair(pendingRemoval.pair.key);
+		} else {
+			await removeAdmin(pendingRemoval.admin);
+		}
+
+		setRemoving(false);
+		setPendingRemoval(null);
 	};
 
 	const fetchVolumeStats = async () => {
@@ -245,10 +269,7 @@ const AdminPanel: React.FC = () => {
 			!selectedPairID ||
 			(allDates ? false : !dateRange.first || !dateRange.last)
 		) {
-			message.error({
-				content: 'Please fill in all fields to fetch volume stats',
-				className: styles.message,
-			});
+			notify('error', 'Please fill in all fields to fetch volume stats');
 			return;
 		}
 
@@ -262,95 +283,134 @@ const AdminPanel: React.FC = () => {
 			});
 
 			setVolumeStats(response.data);
-
-			message.success({
-				content: 'Volume stats fetched successfully!',
-				className: styles.message,
-			});
+			notify('success', 'Volume stats fetched successfully!');
 		} catch (error) {
 			console.error(error);
-			message.error({
-				content: 'Failed to fetch volume stats. Please try again',
-				className: styles.message,
-			});
+			notify('error', 'Failed to fetch volume stats. Please try again');
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	useEffect(() => {
-		if (!state?.wallet?.alias) {
+		if (!accessAllowed) {
 			return;
 		}
 
-		axios
-			.post('/api/admin/check-admin', {
-				token: state.token,
-			})
-			.then(async (res) => {
-				await new Promise((resolve) => setTimeout(resolve, 500));
-				setAccessAllowed(res?.data?.success);
-			})
-			.catch((err) => {
-				console.error(err);
-				setAccessAllowed(false);
-			});
-	}, [state?.wallet?.alias]);
+		fetchAdmins();
+		fetchFeaturedPairs();
+	}, [accessAllowed, state.token]);
 
-	if (!state?.wallet?.alias) {
-		return (
-			<div className={styles.admin__connect}>
-				<ConnectButton />
-			</div>
-		);
-	}
+	const currentAlias = state?.wallet?.alias;
+	const isOwner = admins.some((admin) => admin.alias === currentAlias && admin.isOwner);
 
-	if (!accessAllowed) {
-		return (
-			<>
-				<br />
-				<br />
-				<Spin />
-			</>
-		);
+	if (!state.token || state.isAdmin === false) {
+		return <NotFound />;
 	}
 
 	return (
 		<>
+			<Head>
+				<meta name="robots" content="noindex, nofollow" />
+			</Head>
 			<Header />
-			<div className={styles.admin}>
-				<div className={styles.admin__content}>
-					<PageTitle>
+			<main className={classes(styles.adminPage, figtree.variable)}>
+				<div className={styles.adminPage__head}>
+					<div>
 						<h1>Admin panel</h1>
-					</PageTitle>
+						<p>Manage featured pairs, admins and trading volume stats</p>
+					</div>
 
-					<PairStats
-						loading={loading}
-						volumeStats={volumeStats}
-						selectedAddress={selectedAddress}
-						setSelectedAddress={setSelectedAddress}
-						selectedPairID={selectedPairID}
-						setSelectedPairID={setSelectedPairID}
-						allDates={allDates}
-						setAllDates={setAllDates}
-						dateRange={dateRange}
-						setDateRange={setDateRange}
-						fetchVolumeStats={fetchVolumeStats}
-					/>
-					<FeaturedPairs
-						featuredPairs={featuredPairs}
-						form={form}
-						addFeaturedPair={addFeaturedPair}
-						removeFeaturedPair={removeFeaturedPair}
-					/>
-					<Admins
-						admins={admins}
-						removeAdmin={removeAdmin}
-						addAdmin={addAdmin}
-						form={adminForm}
-					/>
+					{accessAllowed && currentAlias && (
+						<div className={styles.role}>
+							<span className={styles.role__avatar}>
+								<UserIcon />
+							</span>
+							<p>@{currentAlias}</p>
+							<span
+								className={classes(
+									styles.badge,
+									isOwner ? styles.badge__info : styles.badge__muted,
+								)}
+							>
+								{isOwner ? 'Owner' : 'Admin'}
+							</span>
+						</div>
+					)}
 				</div>
-			</div>
+
+				{accessAllowed ? (
+					<div className={styles.grid}>
+						<div className={styles.grid__wide}>
+							<PairStats
+								loading={loading}
+								volumeStats={volumeStats}
+								selectedAddress={selectedAddress}
+								setSelectedAddress={setSelectedAddress}
+								selectedPairID={selectedPairID}
+								setSelectedPairID={setSelectedPairID}
+								allDates={allDates}
+								setAllDates={setAllDates}
+								dateRange={dateRange}
+								setDateRange={setDateRange}
+								fetchVolumeStats={fetchVolumeStats}
+							/>
+						</div>
+
+						<FeaturedPairs
+							featuredPairs={featuredPairs}
+							loading={featuredLoading}
+							assetId={assetIdInput}
+							setAssetId={setAssetIdInput}
+							adding={addingPair}
+							addFeaturedPair={addFeaturedPair}
+							removeFeaturedPair={(pair) => setPendingRemoval({ type: 'pair', pair })}
+						/>
+
+						<Admins
+							admins={admins}
+							loading={adminsLoading}
+							currentAlias={currentAlias}
+							alias={aliasInput}
+							setAlias={setAliasInput}
+							adding={addingAdmin}
+							addAdmin={addAdmin}
+							removeAdmin={(admin) => setPendingRemoval({ type: 'admin', admin })}
+						/>
+					</div>
+				) : (
+					<div className={styles.loader}>
+						<Spinner />
+					</div>
+				)}
+			</main>
+			<SiteFooter />
+
+			<ConfirmModal
+				open={!!pendingRemoval}
+				title={pendingRemoval?.type === 'admin' ? 'Remove admin?' : 'Remove featured pair?'}
+				description={
+					pendingRemoval?.type === 'admin'
+						? `@${pendingRemoval.admin.alias} will lose access to the admin panel.`
+						: `${pendingRemoval?.pair.name ?? ''} will no longer be shown in featured pairs.`
+				}
+				confirmLabel="Remove"
+				cancelLabel="Keep"
+				loading={removing}
+				onConfirm={onConfirmRemoval}
+				onClose={() => setPendingRemoval(null)}
+			/>
+
+			{notice && (
+				<Alert
+					type={notice.type}
+					subtitle={notice.text}
+					close={() => {
+						clearTimeout(noticeTimer.current);
+						setNotice(null);
+					}}
+				/>
+			)}
 		</>
 	);
 };

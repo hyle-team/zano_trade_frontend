@@ -37,7 +37,7 @@ export default function CancelActionCell({ type = 'cancel', id, onAfter }: Cance
 	return (
 		<ActionBtn
 			variant={type === 'reject' ? 'danger' : 'primary'}
-			disabled={loading}
+			loading={loading}
 			onClick={() => onClick()}
 		>
 			{type === 'cancel' || type === 'cancel_tx' ? 'Cancel' : 'Reject'}

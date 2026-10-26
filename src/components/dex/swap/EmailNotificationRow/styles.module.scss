@@ -1,0 +1,80 @@
+@use '../../../../styles/mixins' as *;
+
+.row__form {
+	flex-direction: column;
+	align-items: stretch;
+}
+
+.row__main {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
+	flex: 1;
+}
+
+.email {
+	display: flex !important;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+
+	&__value {
+		font-size: 12px;
+		color: var(--gray-color);
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+.edit {
+	@include reset-button;
+	flex-shrink: 0;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--primary-color);
+	background: transparent !important;
+}
+
+.form {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+
+	@include mobile {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	&__input {
+		flex: 1;
+		min-width: 0;
+		height: 38px;
+		padding: 0 12px;
+		border-radius: 10px;
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--text-color);
+		background: var(--light-color);
+		border: 1px solid var(--border-color);
+		transition: border-color 0.2s ease;
+
+		&::placeholder {
+			color: var(--muted-color);
+		}
+
+		&:focus {
+			border-color: var(--primary-color);
+		}
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 6px;
+		flex-shrink: 0;
+	}
+}

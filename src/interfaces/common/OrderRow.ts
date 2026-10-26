@@ -15,6 +15,7 @@ interface OrderRow {
 	min_per_apply_amount: number | null;
 	max_per_apply_amount: number | null;
 	isInstant: boolean;
+	email_notifications?: boolean;
 }
 
 export default OrderRow;

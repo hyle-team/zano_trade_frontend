@@ -167,8 +167,6 @@ function InputPanelItem(props: InputPanelItemProps) {
 		}
 	}
 
-	const buttonText = creatingState ? 'Creating...' : 'Create Order';
-
 	const isMinPerApplyAmountValidForCreation =
 		minPerApplyAmountState === '' || minPerApplyAmountValid;
 
@@ -323,13 +321,14 @@ function InputPanelItem(props: InputPanelItemProps) {
 					{state.wallet?.connected ? (
 						<Button
 							disabled={isButtonDisabled}
+							loading={creatingState}
 							onClick={postOrder}
 							className={classes(
 								styles.inputPanel__body_btn,
 								isBuy ? styles.buy : styles.sell,
 							)}
 						>
-							{buttonText}
+							Create Order
 						</Button>
 					) : (
 						<ConnectButton className={styles.inputPanel__body_btn} />

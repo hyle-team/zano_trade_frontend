@@ -20,6 +20,12 @@ export const updateToken = (dispatch: Dispatch<ContextAction>, token: string | n
 		payload: token,
 	});
 
+export const updateIsAdmin = (dispatch: Dispatch<ContextAction>, isAdmin: boolean | null) =>
+	dispatch({
+		type: 'IS_ADMIN_UPDATED',
+		payload: isAdmin,
+	});
+
 export const updateConfig = (dispatch: Dispatch<ContextAction>, state: GetConfigResData | null) =>
 	dispatch({
 		type: 'CONFIG_UPDATED',

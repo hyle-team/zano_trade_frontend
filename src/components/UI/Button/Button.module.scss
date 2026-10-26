@@ -1,14 +1,18 @@
 .button {
+	position: relative;
+	isolation: isolate;
 	padding: 16px 40px;
 	color: #ffffff;
-	font-weight: 500;
-	font-size: 18px;
-	border-radius: 10px;
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 100%;
+	border-radius: 16px;
 	cursor: pointer;
 
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	gap: 8px;
 
 	&:disabled {
 		opacity: 0.5;
@@ -17,17 +21,129 @@
 	}
 }
 
+:where(.button) * {
+	color: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+}
+
 .transparent {
-	background-color: #ffffff00 !important;
-	border: 2px solid #1f8feb;
-	border-radius: 10px;
+	background: transparent !important;
+	border: none;
 	color: var(--font-main-color);
+	transition: background-color 0.3s ease;
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		padding: 2px;
+		border-radius: inherit;
+		background: var(--primary-gradient);
+		-webkit-mask:
+			linear-gradient(#fff 0 0) content-box,
+			linear-gradient(#fff 0 0);
+		-webkit-mask-composite: xor;
+		mask-composite: exclude;
+		pointer-events: none;
+	}
 
 	&:hover {
-		background-color: var(--button-bordered-hover) !important;
+		background: var(--light-color) !important;
 	}
 }
 
 .btn__no_border {
 	border: 0;
+
+	&::before {
+		display: none;
+	}
+}
+
+.variant {
+	transition:
+		background-color 0.3s ease,
+		color 0.3s ease,
+		opacity 0.3s ease;
+
+	* {
+		color: inherit;
+		font-weight: inherit;
+		font-size: inherit;
+	}
+}
+
+.primary {
+	background: var(--primary-gradient);
+	color: #fff;
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		border-radius: inherit;
+		background: var(--primary-gradient);
+		filter: blur(10px);
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: var(--primary-gradient);
+
+		&::before {
+			opacity: 1;
+		}
+	}
+}
+
+.secondary {
+	background-color: var(--light-color);
+	color: var(--text-color);
+
+	&:hover {
+		background-color: var(--light-hover-color);
+	}
+}
+
+.ghost {
+	background-color: transparent;
+	color: var(--gray-color);
+
+	&:hover {
+		color: var(--text-color);
+		background-color: var(--light-color);
+	}
+}
+
+.danger {
+	background-color: var(--danger-bg-color);
+	color: var(--red-color);
+
+	&:hover {
+		background-color: rgba(255, 92, 92, 0.18);
+	}
+}
+
+.success {
+	background-color: var(--success-bg-color);
+	color: var(--green-color);
+
+	&:hover {
+		background-color: rgba(24, 200, 217, 0.18);
+	}
+}
+
+.sm {
+	padding: 10px 16px;
+	font-size: 14px;
+	border-radius: 12px;
+}
+
+.block {
+	width: 100%;
 }

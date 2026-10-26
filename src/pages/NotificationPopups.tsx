@@ -4,7 +4,6 @@ import socket from '@/utils/socket';
 import { useContext, useEffect, useState } from 'react';
 import styles from '@/styles/NotificationPopups.module.scss';
 import OrderNotification from '@/components/default/OrderNotification/OrderNotification';
-import { nanoid } from 'nanoid';
 import { updateAutoClosedNotification } from '@/store/actions';
 
 export default function NotificationPopups() {
@@ -24,17 +23,15 @@ export default function NotificationPopups() {
 
 	useEffect(() => {
 		function onNotify({ orderData }: { orderData: OrderDataWithPair }) {
-			setNotificationOrders((prev) => [orderData, ...prev].slice(0, 2));
+			setNotificationOrders((prev) =>
+				[orderData, ...prev.filter((e) => e.id !== orderData.id)].slice(0, 2),
+			);
 		}
 
 		function onCancel(data: { orderId: number }) {
-			console.log('cancel', data.orderId, notificationOrders);
-
-			setNotificationOrders((prev) => {
-				console.log(prev, data.orderId);
-
-				return prev.filter((e) => parseInt(e.id, 10) !== data.orderId);
-			});
+			setNotificationOrders((prev) =>
+				prev.filter((e) => parseInt(e.id, 10) !== data.orderId),
+			);
 		}
 
 		socket.on('order-notification', onNotify);
@@ -44,8 +41,6 @@ export default function NotificationPopups() {
 			for (const notificationID of state.closed_notifications) {
 				onCancel({ orderId: notificationID });
 			}
-
-			console.log('Closed notifications:', state.closed_notifications);
 
 			updateAutoClosedNotification(dispatch, []);
 		}
@@ -62,7 +57,7 @@ export default function NotificationPopups() {
 				{notificationOrders.map((e, i) => (
 					<OrderNotification
 						setNotificationOrders={setNotificationOrders}
-						key={nanoid()}
+						key={e.id}
 						order={e}
 						index={i}
 					/>

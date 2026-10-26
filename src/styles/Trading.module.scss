@@ -1,34 +1,44 @@
+@use './mixins' as *;
+
 .trading {
-	padding-inline: 60px;
+	@include site-padding;
 	padding-top: 16px;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 
-	@media screen and (max-width: 1600px) {
-		padding-inline: 40px;
-	}
+	--window-bg-color: var(--card-bg-color);
+	--delimiter-color: var(--divider-color);
+	--window-border-color: var(--border-color);
+	--selector-bg-color: var(--surface-color);
+	--bordered-input-bg: var(--surface-color);
+	--table-tr-hover-color: var(--light-color);
+	--table-group-header-bg: var(--surface-color);
+	--dex-tooltip-bg: var(--tooltip-bg-color);
+	--dex-tooltip-border-color: var(--tooltip-border-color);
 
-	@media screen and (max-width: 1200px) {
-		padding-inline: 20px;
+	* {
+		@include font;
 	}
 
 	&__top {
-		margin-top: 16px;
-		display: flex;
-		gap: 10px;
-
-		&_trades {
-			max-width: 415px;
-			width: 100%;
-			height: 100%;
-		}
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) min(var(--orders-width, 360px), 45%) 360px;
+		align-items: stretch;
+		gap: 8px;
+		transition: none;
 
 		&_chart {
-			width: 100%;
+			order: 1;
+			min-width: 0;
+			min-height: 560px;
+			padding: 12px 16px 8px;
 			overflow: hidden;
 			display: flex;
 			flex-direction: column;
+			border-radius: 16px;
+			background: var(--window-bg-color);
+			border: 1px solid var(--delimiter-color);
 
 			.settings {
 				display: flex;
@@ -46,30 +56,50 @@
 			}
 		}
 
-		&_form {
-			width: 100%;
+		&_trades {
+			position: relative;
+			order: 2;
+			min-width: 0;
 			height: 100%;
-			max-width: 415px;
 		}
+
+		&_form {
+			order: 3;
+			min-width: 0;
+			height: 100%;
+		}
+	}
+}
+
+@media screen and (max-width: 1440px) {
+	.trading__top {
+		grid-template-columns: minmax(0, 1fr) min(var(--orders-width, 320px), 45%) 330px;
 	}
 }
 
 @media screen and (max-width: 1180px) {
 	.trading__top {
-		gap: 8px;
+		grid-template-columns: minmax(0, 1fr) min(var(--orders-width, 290px), 45%) 310px;
 	}
 }
 
 @media screen and (max-width: 1024px) {
 	.trading__top {
-
-		&_trades,
-		&_form {
-			max-width: 100%;
-		}
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 
 		&_chart {
 			display: none;
 		}
+	}
+
+	.trading__top .trading__resizer {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 640px) {
+	.trading__top_trades {
+		position: relative;
+		min-height: 320px;
 	}
 }

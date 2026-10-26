@@ -5,7 +5,7 @@
 
 	&__label {
 		font-size: 12px;
-		font-family: 500;
+		font-weight: 500;
 		line-height: 100%;
 		color: var(--table-th-color);
 	}
@@ -28,7 +28,7 @@
 		}
 
 		&.invalid {
-			border-color: #ff6767;
+			border-color: var(--red-color);
 		}
 
 		input {
@@ -61,7 +61,7 @@
 	&__error {
 		font-size: 12px;
 		line-height: 120%;
-		color: #ff6767;
+		color: var(--red-color);
 	}
 }
 

@@ -19,6 +19,13 @@ type Ctx = {
 
 const TourCtx = createContext<Ctx | null>(null);
 const STORAGE_PREFIX = 'tour.seen:';
+const GUIDE_SCROLL_OFFSET = 280;
+const GUIDE_SCROLL_OFFSET_MOBILE = 90;
+
+function getGuideScrollOffset() {
+	if (typeof window === 'undefined') return GUIDE_SCROLL_OFFSET;
+	return window.innerWidth <= 620 ? GUIDE_SCROLL_OFFSET_MOBILE : GUIDE_SCROLL_OFFSET;
+}
 
 export function GuideProvider({ children }: { children: React.ReactNode }) {
 	const registryRef = useRef<Registry>({});
@@ -150,6 +157,7 @@ export function GuideProvider({ children }: { children: React.ReactNode }) {
 				showSkipButton
 				hideCloseButton
 				scrollToFirstStep
+				scrollOffset={getGuideScrollOffset()}
 				disableScrolling={false}
 				spotlightPadding={0}
 				disableOverlayClose
