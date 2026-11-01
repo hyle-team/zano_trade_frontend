@@ -271,3 +271,32 @@
 		display: none;
 	}
 }
+
+.headerWithInfo {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	max-width: 100%;
+	min-width: 0;
+	vertical-align: middle;
+	white-space: nowrap;
+	font: inherit;
+	color: inherit;
+
+	&__text {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font: inherit;
+		color: inherit;
+	}
+
+	> span:last-child {
+		flex-shrink: 0;
+	}
+
+	svg {
+		width: 12px;
+		height: 12px;
+	}
+}

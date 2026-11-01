@@ -13,7 +13,7 @@ import Alert from '@/components/UI/Alert/Alert';
 import infoIcon from '@/assets/images/UI/info_alert_icon.svg?url';
 import Image from 'next/image';
 import { useAlert } from '@/hook/useAlert';
-import { buySellValues } from '@/constants';
+import { buySellValues, MIN_FILL_AMOUNT_TOOLTIP } from '@/constants';
 import styles from './styles.module.scss';
 import LabeledInput from './components/LabeledInput';
 
@@ -270,7 +270,8 @@ function InputPanelItem(props: InputPanelItemProps) {
 					value={minPerApplyAmountState}
 					setValue={setMinPerApplyAmountFunction}
 					currency={firstCurrencyName}
-					label="Min Per Apply Amount (Optional)"
+					label="Minimum fill amount (Optional)"
+					labelTooltip={MIN_FILL_AMOUNT_TOOLTIP}
 					invalid={minPerApplyAmountState !== '' && !minPerApplyAmountValid}
 					errorText={minPerApplyAmountError}
 				/>
