@@ -1,4 +1,6 @@
 import { formatTimestamp, notationToString } from '@/utils/utils';
+import InfoTooltip from '@/components/UI/InfoTooltip';
+import { MIN_FILL_AMOUNT_TOOLTIP } from '@/constants';
 import { ColumnDef } from '@/components/default/GenericTable/types';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
@@ -38,7 +40,12 @@ export function buildOrderPoolColumns({
 		},
 		{
 			key: 'min_per_apply_amount',
-			header: <>Min ({firstCurrencyName})</>,
+			header: (
+				<span className={styles.headerWithInfo}>
+					<span className={styles.headerWithInfo__text}>Min ({firstCurrencyName})</span>
+					<InfoTooltip text={MIN_FILL_AMOUNT_TOOLTIP} />
+				</span>
+			),
 			width: '80px',
 			cell: (row) => (
 				<p>
