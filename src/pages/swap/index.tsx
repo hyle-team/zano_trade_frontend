@@ -18,7 +18,7 @@ import CurvePairChart from '@/components/UI/CurvePairChart/CurvePairChart';
 import SwapItemProps from '@/interfaces/props/pages/swap/SwapItemProps';
 import CurrencyRow from '@/interfaces/common/CurrencyRow';
 import { useRouter } from 'next/router';
-import { Footer } from '@/zano_ui/src';
+import SiteFooter from '@/components/default/SiteFooter';
 
 function Swap() {
 	const { state } = useContext(Store);
@@ -256,7 +256,7 @@ function Swap() {
 					</div>
 				</div>
 			</main>
-			<Footer className="no-svg-style" />
+			<SiteFooter />
 		</>
 	);
 }

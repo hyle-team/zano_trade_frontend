@@ -12,11 +12,23 @@
 }
 
 #__next {
+	position: relative;
+	isolation: isolate;
 	width: 100%;
 	max-width: 2200px;
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
+}
+
+html {
+	scrollbar-color: rgba(128, 128, 160, 0.45) transparent;
+}
+
+html::-webkit-scrollbar,
+html::-webkit-scrollbar-track,
+html::-webkit-scrollbar-corner {
+	background: transparent;
 }
 
 html,
@@ -26,6 +38,10 @@ body {
 	display: flex;
 	justify-content: center;
 	background-color: var(--main-bg-color);
+}
+
+body {
+	overflow-x: clip;
 }
 
 main {
@@ -147,12 +163,16 @@ h6 {
 	-webkit-text-fill-color: transparent;
 }
 
-svg:not(.stroked):not(.no-svg-style svg) {
+:where(.ui-icon),
+:where(.ui-icon) * {
+	color: inherit;
+}
+
+:where(#__next) svg:not(.stroked):not(.no-svg-style svg):not(:where(.ui-icon)) {
 	* {
 		fill: var(--font-main-color);
 	}
 }
-
 
 svg {
 	&.dimmed {
@@ -291,4 +311,22 @@ svg {
 	left: 0;
 	width: 100%;
 	height: 3px;
+}
+
+:root {
+	--primary-hover-color: #4ca5ef;
+	--red-color: #ff5c5c;
+	--warning-color: #f5a623;
+	--primary-gradient: radial-gradient(100% 188.88% at 0% 0%, #16d1d6 0%, #274cff 100%);
+}
+
+[class*='styles_popup__addresses_item']>svg {
+	width: 14px;
+	height: 14px;
+	min-width: 14px;
+}
+
+[class*='styles_popup__close'],
+[class*='styles_popup__close']:hover {
+	background-color: transparent;
 }

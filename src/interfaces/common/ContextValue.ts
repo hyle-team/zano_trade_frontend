@@ -46,6 +46,7 @@ interface ContextState {
 	wallet: WalletState | null;
 	user: UserState;
 	token: string | null;
+	isAdmin: boolean | null;
 	config: GetConfigResData | null;
 	assetsRates: Map<string, number>;
 	__triggers: {
@@ -68,6 +69,10 @@ type ContextAction =
 	| {
 			type: 'TOKEN_UPDATED';
 			payload: string | null;
+	  }
+	| {
+			type: 'IS_ADMIN_UPDATED';
+			payload: boolean | null;
 	  }
 	| {
 			type: 'CONFIG_UPDATED';

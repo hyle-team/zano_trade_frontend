@@ -1,37 +1,37 @@
 import Popup from '@/components/UI/Popup/Popup';
-import successIcon from '@/assets/images/UI/success.svg?url';
-import smallCrossIcon from '@/assets/images/UI/cross_icon_small.svg?url';
-import errorIcon from '@/assets/images/UI/error.svg?url';
 import AlertProps from '@/interfaces/props/components/UI/Alert/AlertProps';
-import Preloader from '../Preloader/Preloader';
+import { CheckIcon, CloseIcon } from '@/components/UI/Icons';
+import { classes } from '@/utils/utils';
+import { figtree } from '@/utils/font';
+import Spinner from '@/components/UI/Spinner';
 import styles from './Alert.module.scss';
 
 function Alert(props: AlertProps) {
 	const types = {
 		success: {
-			title: props.title || 'Success!',
-			subtitle: props.subtitle || 'Lorem ipsum dolor sit amet',
+			title: props.title || 'Success',
+			subtitle: props.subtitle || '',
 			icon: (
-				<div className={styles.ui__alert__success}>
-					<img src={successIcon} alt="success"></img>
+				<div className={classes(styles.ui__alert__icon, styles.ui__alert__icon_success)}>
+					<CheckIcon width={18} height={18} />
 				</div>
 			),
 		},
 		error: {
-			title: props.title || 'Fail!',
-			subtitle: props.subtitle || 'Lorem ipsum dolor sit amet',
+			title: props.title || 'Something went wrong',
+			subtitle: props.subtitle || '',
 			icon: (
-				<div className={styles.ui__alert__error}>
-					<img src={errorIcon} alt="error"></img>
+				<div className={classes(styles.ui__alert__icon, styles.ui__alert__icon_error)}>
+					<CloseIcon width={16} height={16} />
 				</div>
 			),
 		},
 		loading: {
-			title: props.title || 'Loading...',
-			subtitle: props.subtitle || 'Lorem ipsum dolor sit amet',
+			title: props.title || 'Loading',
+			subtitle: props.subtitle || '',
 			icon: (
-				<div className={styles.ui__alert__loader}>
-					<Preloader />
+				<div className={classes(styles.ui__alert__icon, styles.ui__alert__icon_loading)}>
+					<Spinner size="sm" />
 				</div>
 			),
 		},
@@ -48,34 +48,37 @@ function Alert(props: AlertProps) {
 
 	if (!currentType) return null;
 
+	const closeButton = props.close && (
+		<button
+			type="button"
+			className={styles.ui__alert__close}
+			onClick={props.close}
+			aria-label="Close"
+		>
+			<CloseIcon width={14} height={14} />
+		</button>
+	);
+
 	function PopupContent() {
 		if (props.type === 'custom' && props.customContent) {
 			return (
-				<div className={styles.ui__alert}>
-					{props.close && (
-						<div className={styles.ui__alert__close} onClick={props.close}>
-							<img src={smallCrossIcon} alt="close" />
-						</div>
-					)}
+				<div className={classes(styles.ui__alert, figtree.variable)} role="status">
 					{props.customContent}
+					{closeButton}
 				</div>
 			);
 		}
 
 		if (currentType) {
 			return (
-				<div className={styles.ui__alert}>
-					{props.close && (
-						<div className={styles.ui__alert__close} onClick={props.close}>
-							<img src={smallCrossIcon} alt="close" />
-						</div>
-					)}
+				<div className={classes(styles.ui__alert, figtree.variable)} role="status">
 					{currentType.icon}
 					<div className={styles.ui__alert__data}>
 						<h3>{currentType.title}</h3>
 						{currentType.subtitle && <p>{currentType.subtitle}</p>}
 						{props.type === 'custom' && props.children}
 					</div>
+					{closeButton}
 				</div>
 			);
 		}

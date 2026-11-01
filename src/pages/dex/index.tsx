@@ -1,199 +1,216 @@
-import styles from '@/styles/Dex.module.scss';
-import Header from '@/components/default/Header/Header';
-import HistoryIcon from '@/assets/images/UI/history_icon.svg';
-import { useEffect, useRef, useState } from 'react';
-import Button from '@/components/UI/Button/Button';
-import Link from 'next/link';
-import { nanoid } from 'nanoid';
-import MainPageTitle from '@/components/default/MainPageTitle/MainPageTitle';
-import { getPairsPage, getPairsPagesAmount, getZanoPrice } from '@/utils/methods';
-import { getPairsPage as getPairsPageServer } from '@/utils/serverMethods';
-import { getForwardedFor } from '@/utils/serverFetch';
+import { useEffect, useState } from 'react';
 import { GetServerSidePropsContext } from 'next';
-import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
+import { useRouter } from 'next/router';
+import Header from '@/components/default/Header/Header';
+import SiteFooter from '@/components/default/SiteFooter';
+import ModeSwitch from '@/components/dex/swap/ModeSwitch';
+import SwapWidget from '@/components/dex/swap/SwapWidget';
+import HowItWorks from '@/components/dex/swap/HowItWorks';
+import FeaturedPairs from '@/components/dex/swap/FeaturedPairs';
+import AssetSelectModal from '@/components/dex/swap/AssetSelectModal';
+import AssetFlight from '@/components/dex/AssetFlight';
+import { ListIcon } from '@/components/UI/Icons';
+import Button from '@/components/UI/Button/Button';
+import {
+	findPairID,
+	getFeaturedPairs,
+	getOrdersPage,
+	getPair,
+	getPairStats,
+} from '@/utils/serverMethods';
+import { getForwardedFor } from '@/utils/serverFetch';
+import { classes, ZANO_ASSET_ID } from '@/utils/utils';
+import { figtree } from '@/utils/font';
+import { SwapMode } from '@/utils/swap';
+import { setStoredDexMode } from '@/utils/dexMode';
 import PairData from '@/interfaces/common/PairData';
-import { useInView } from 'react-intersection-observer';
-import Preloader from '@/components/UI/Preloader/Preloader';
-import { PairSortOption } from '@/interfaces/enum/pair';
-import PairsTable from '@/components/default/PairsTable/PairsTable';
-import { Footer } from '@/zano_ui/src';
-import DexHeader from './DexHeader/DexHeader';
-import PairsList from './pairs/PairsList/PairsList';
+import { PairStats } from '@/interfaces/responses/orders/GetPairStatsRes';
+import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
+import styles from '@/styles/Dex.module.scss';
 
-function Dex({
-	initialPairs,
-	initialZanoUsd,
-}: {
-	initialPairs: PairData[];
-	initialZanoUsd: number | null;
-}) {
-	const fetchIdRef = useRef<string>(nanoid());
-	const bottomInView = useRef<boolean>(false);
-	const isFirstLoad = useRef(true);
+interface DexProps {
+	initialPair: PairData | null;
+	initialStats: PairStats | null;
+	initialOrderBook: PageOrderData[];
+	featuredPairs: PairData[];
+}
 
-	const [pairInputState, setPairInputState] = useState('');
-	const [pairs, setPairs] = useState<PairData[]>(initialPairs);
-	const [allLoaded, setLoadedState] = useState(initialPairs.length > 0);
-	const [pagesAmount, setPagesAmount] = useState<number>();
-	const [pageLoading, setPageLoading] = useState(false);
-	const [currentPage, setCurrentPage] = useState(1);
-	const [whitelistedOnly, setWhitelistedOnly] = useState(true);
-	const [shouldUpdatePairSearch, setShouldUpdatePairSearch] = useState(true);
-	const [sortOption, setSortOption] = useState<PairSortOption>(PairSortOption.VOLUME_HIGH_TO_LOW);
+const FEATURED_PAIRS_COUNT = 3;
 
-	const { ref: inViewRef, inView } = useInView({
-		threshold: 0,
-	});
+const queryValue = (value: string | string[] | undefined) =>
+	Array.isArray(value) ? value[0] : value;
 
-	useEffect(() => {
-		if (typeof window !== 'undefined') {
-			const currentState = localStorage.getItem('all_pairs') ?? '';
+function Dex({ initialPair, initialStats, initialOrderBook, featuredPairs }: DexProps) {
+	const router = useRouter();
+	const [assetPickerOpen, setAssetPickerOpen] = useState(false);
+	const [flight, setFlight] = useState<{ pair: PairData; rect: DOMRect } | null>(null);
 
-			if (currentState === '' || currentState === 'true') {
-				setWhitelistedOnly(true);
-				return;
-			}
+	const currentPairId =
+		queryValue(router.query.pair) ?? (initialPair ? String(initialPair.id) : null);
+	const [expanded, setExpanded] = useState(false);
 
-			if (currentState === 'false') {
-				setWhitelistedOnly(false);
-			}
-		}
-	}, []);
+	const openAdvanced = (pairId: string | number) => {
+		setStoredDexMode('advanced');
+		router.push(`/dex/trading/${pairId}`);
+	};
 
-	useEffect(() => {
-		if (!shouldUpdatePairSearch) return;
-		getPairsPagesAmount(pairInputState, whitelistedOnly)
-			.then((result) => {
-				if (!result.success) throw new Error('Error fetch pages amount');
-				setPagesAmount(result.data);
-			})
-			.catch((e) => {
-				console.error(e);
-				setPagesAmount((prev) => prev && 1);
-			});
-	}, [pairInputState, whitelistedOnly, shouldUpdatePairSearch]);
+	const onModeChange = (next: SwapMode) => {
+		if (next !== 'advanced') return;
 
-	async function fetchPairs() {
-		const initial = currentPage === 1;
-
-		if (initial && initialPairs.length > 0 && isFirstLoad.current) {
-			isFirstLoad.current = false;
+		if (currentPairId) {
+			openAdvanced(currentPairId);
 			return;
 		}
 
-		if (!initial) {
-			setPageLoading(true);
-		}
-		const newFetchId = nanoid();
-		fetchIdRef.current = newFetchId;
-		const result = await getPairsPage(currentPage, pairInputState, whitelistedOnly, sortOption);
+		setAssetPickerOpen(true);
+	};
 
-		const fetchId = fetchIdRef.current;
-		if (fetchId !== newFetchId) return;
-		if (!result.success) return;
-
-		if (initial) {
-			setPairs(result.data);
-		} else {
-			setPairs((prev) => [
-				...prev,
-				...result.data.filter((e) => !prev.some((prevEl) => prevEl.id === e.id)),
-			]);
-		}
-
-		if (initial) {
-			setLoadedState(true);
-		} else {
-			setPageLoading(false);
-		}
-
-		if (bottomInView.current && pagesAmount && currentPage < pagesAmount) {
-			setCurrentPage((prev) => prev + 1);
-		}
-	}
+	const selectFeaturedPair = (pair: PairData) => {
+		router.replace({ pathname: router.pathname, query: { pair: String(pair.id) } }, undefined, {
+			shallow: true,
+			scroll: false,
+		});
+	};
 
 	useEffect(() => {
-		fetchPairs();
-	}, [currentPage, pairInputState, whitelistedOnly, pagesAmount, sortOption]);
+		if (!router.isReady || queryValue(router.query.mode) !== 'advanced') return;
 
-	useEffect(() => {
-		if (inView && allLoaded && !pageLoading && pagesAmount && currentPage < pagesAmount) {
-			setCurrentPage((prev) => prev + 1);
+		const query = { ...router.query };
+		delete query.mode;
+		router.replace({ pathname: router.pathname, query }, undefined, {
+			shallow: true,
+			scroll: false,
+		});
+
+		if (currentPairId) {
+			openAdvanced(currentPairId);
+		} else {
+			setAssetPickerOpen(true);
 		}
-	}, [inView, allLoaded, pageLoading, pagesAmount, currentPage]);
+	}, [router.isReady, router.query.mode]);
 
 	return (
 		<>
 			<Header />
-			<main className={styles.main}>
-				<MainPageTitle
-					blue="Decentralized"
-					white=" Exchange"
-					description="Peer-to-Peer Trading with Ionic Swaps"
-					mobileDescription="Peer-to-Peer Trading App on Zano blockchain"
-				>
-					<Link href="/dex/orders">
-						<Button className={styles.history__btn} transparent>
-							<div>
-								<HistoryIcon />
-								<p>My Orders</p>
-							</div>
-						</Button>
-					</Link>
-				</MainPageTitle>
-
-				<div className={styles.dex__charts__wrapper}>
-					<DexHeader
-						pairInputState={pairInputState}
-						setCurrentPage={setCurrentPage}
-						setLoadedState={setLoadedState}
-						setPairInputState={setPairInputState}
-						setPairs={setPairs}
-						setShouldUpdatePairSearch={setShouldUpdatePairSearch}
-						setWhitelistedOnly={setWhitelistedOnly}
-						whitelistedOnly={whitelistedOnly}
-						setSortOption={setSortOption}
-						sortOption={sortOption}
-						fetchPairs={fetchPairs}
-					/>
-					{allLoaded ? (
-						<>
-							<PairsTable data={pairs} initialZanoUsd={initialZanoUsd} />
-							<PairsList data={pairs} initialZanoUsd={initialZanoUsd} />
-						</>
-					) : (
-						<ContentPreloader className={styles.dex__preloader} />
+			<main className={classes(styles.swapPage, figtree.variable)}>
+				<div
+					className={classes(
+						styles.swapPage__top,
+						expanded && styles.swapPage__top_expanded,
 					)}
-					<div ref={inViewRef}>{pageLoading && <Preloader />}</div>
+				>
+					<section className={styles.swapPage__hero}>
+						<h1 className={styles.swapPage__title}>
+							Swap <span>Zano assets</span>
+						</h1>
+						<p className={styles.swapPage__subtitle}>
+							Peer-to-peer ionic swaps with ZANO. Non-custodial, settled directly
+							between wallets.
+						</p>
+
+						<div className={styles.swapPage__actions}>
+							<ModeSwitch mode="standard" onChange={onModeChange} />
+							<Button
+								variant="secondary"
+								size="sm"
+								className={styles.swapPage__ordersLink}
+								onClick={() => router.push('/dex/orders')}
+								aria-label="My orders"
+							>
+								<ListIcon />
+								<span className={styles.swapPage__ordersText}>My orders</span>
+							</Button>
+						</div>
+					</section>
+
+					<div className={styles.swapPage__widget}>
+						<SwapWidget
+							initialPair={initialPair}
+							initialStats={initialStats}
+							initialOrderBook={initialOrderBook}
+							onExpandedChange={setExpanded}
+						/>
+					</div>
+
+					{featuredPairs.length > 0 && !expanded && (
+						<div className={styles.swapPage__featured}>
+							<FeaturedPairs
+								pairs={featuredPairs}
+								selectedPairId={currentPairId}
+								onSelect={selectFeaturedPair}
+							/>
+						</div>
+					)}
+				</div>
+
+				<div className={styles.swapPage__content}>
+					<HowItWorks />
 				</div>
 			</main>
 
-			<Footer className="no-svg-style" />
+			<SiteFooter />
+
+			<AssetSelectModal
+				open={assetPickerOpen}
+				onClose={() => setAssetPickerOpen(false)}
+				onSelect={(pair, rect) => {
+					router.prefetch(`/dex/trading/${pair.id}`);
+
+					if (rect) {
+						setFlight({ pair, rect });
+					} else {
+						openAdvanced(pair.id);
+					}
+				}}
+			/>
+
+			{flight && (
+				<AssetFlight
+					pair={flight.pair}
+					from={flight.rect}
+					onDone={() => openAdvanced(flight.pair.id)}
+				/>
+			)}
 		</>
 	);
 }
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 	const xForwardedFor = getForwardedFor(ctx.req);
+	const { pair, asset } = ctx.query;
 
-	const [pairsRes, priceRes] = await Promise.all([
-		getPairsPageServer(1, '', true, PairSortOption.VOLUME_HIGH_TO_LOW, { xForwardedFor }).catch(
-			() => null,
-		),
-		getZanoPrice().catch(() => null),
-	]);
+	let pairId: string | null = typeof pair === 'string' && pair ? pair : null;
 
-	let initialZanoUsd: number | null = null;
-
-	if (priceRes?.success && typeof priceRes.data?.usd === 'number') {
-		initialZanoUsd = priceRes.data.usd;
+	if (!pairId && typeof asset === 'string' && asset) {
+		const found = await findPairID(asset, ZANO_ASSET_ID, { xForwardedFor }).catch(
+			() => undefined,
+		);
+		if (found) pairId = String(found);
 	}
+
+	const featuredRes = await getFeaturedPairs(FEATURED_PAIRS_COUNT, { xForwardedFor }).catch(
+		() => null,
+	);
+	const featuredPairs = (featuredRes?.success ? featuredRes.data : []).filter(
+		(p) => p.second_currency?.asset_id === ZANO_ASSET_ID,
+	);
+
+	const [pairRes, statsRes, ordersRes] = pairId
+		? await Promise.all([
+				getPair(pairId, { xForwardedFor }).catch(() => null),
+				getPairStats(pairId, { xForwardedFor }).catch(() => null),
+				getOrdersPage(pairId, { xForwardedFor }).catch(() => null),
+			])
+		: [null, null, null];
 
 	return {
 		props: {
-			initialPairs: pairsRes?.success ? pairsRes.data : [],
-			initialZanoUsd,
+			initialPair: pairRes?.success ? pairRes.data : null,
+			initialStats: statsRes?.success ? statsRes.data : null,
+			initialOrderBook: ordersRes?.success ? ordersRes.data : [],
+			featuredPairs,
 		},
 	};
 }
+
 export default Dex;

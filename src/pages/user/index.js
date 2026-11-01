@@ -5,7 +5,7 @@ import zanoIcon from '@/assets/images/UI/zano.svg?url';
 import Offers from '@/components/default/Offers/Offers';
 import BackButton from '@/components/default/BackButton/BackButton';
 import { nanoid } from 'nanoid';
-import { Footer } from '@/zano_ui/src';
+import SiteFooter from '@/components/default/SiteFooter';
 
 function User() {
 	// const userInfo = {
@@ -115,7 +115,7 @@ function User() {
 					</div>
 				</div>
 			</main>
-			<Footer className="no-svg-style" />
+			<SiteFooter />
 		</>
 	);
 }

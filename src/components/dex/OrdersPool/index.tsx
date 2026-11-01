@@ -233,7 +233,7 @@ const OrdersPool = (props: OrdersPoolProps) => {
 								/>
 							</div>
 						) : (
-							<ContentPreloader style={{ marginTop: 40 }} />
+							<ContentPreloader className={styles.ordersPool__content_orders} />
 						)}
 					</>
 				);
@@ -251,7 +251,9 @@ const OrdersPool = (props: OrdersPoolProps) => {
 								getRowKey={(r) => r.id}
 							/>
 						) : (
-							<ContentPreloader style={{ marginTop: 40 }} />
+							<ContentPreloader
+								className={classes(styles.ordersPool__content_orders, styles.full)}
+							/>
 						)}
 					</>
 				);
@@ -366,8 +368,8 @@ const OrdersPool = (props: OrdersPoolProps) => {
 									style={{
 										color:
 											ordersInfoTooltip?.type === 'buy'
-												? '#16D1D6'
-												: '#FF6767',
+												? 'var(--green-color)'
+												: 'var(--red-color)',
 									}}
 								>
 									{ordersInfoTooltip?.price}

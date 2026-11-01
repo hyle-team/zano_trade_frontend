@@ -7,6 +7,7 @@ interface NavItemProps {
 	Img: ElementType;
 	disabled?: boolean;
 	notifications?: number;
+	badge?: string;
 }
 
 export default NavItemProps;

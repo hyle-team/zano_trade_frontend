@@ -2,11 +2,21 @@ import LabeledInputProps from '@/interfaces/props/pages/dex/trading/InputPanelIt
 import { classes } from '@/utils/utils';
 import { useRef } from 'react';
 import Input from '@/components/UI/Input/Input';
+import InfoTooltip from '@/components/UI/InfoTooltip';
 import styles from './styles.module.scss';
 
 function LabeledInput(props: LabeledInputProps) {
 	const labelRef = useRef<HTMLParagraphElement>(null);
-	const { label = '', currency = '', value, readonly, setValue, invalid, errorText } = props;
+	const {
+		label = '',
+		labelTooltip,
+		currency = '',
+		value,
+		readonly,
+		setValue,
+		invalid,
+		errorText,
+	} = props;
 
 	const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
 		if (!readonly && setValue) {
@@ -16,7 +26,10 @@ function LabeledInput(props: LabeledInputProps) {
 
 	return (
 		<div className={styles.labeledInput}>
-			<h6 className={styles.labeledInput__label}>{label}</h6>
+			<h6 className={styles.labeledInput__label}>
+				{label}
+				{labelTooltip && <InfoTooltip text={labelTooltip} />}
+			</h6>
 			<div className={classes(styles.labeledInput__wrapper, invalid && styles.invalid)}>
 				<Input
 					bordered

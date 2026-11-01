@@ -1,12 +1,12 @@
 import styles from '@/styles/Trading.module.scss';
 import Header from '@/components/default/Header/Header';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
 import { cancelOrder } from '@/utils/methods';
 import { getCandles, getOrdersPage, getPair, getPairStats, getTrades } from '@/utils/serverMethods';
 import { getForwardedFor } from '@/utils/serverFetch';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
-import Alert from '@/components/UI/Alert/Alert';
 import PeriodState from '@/interfaces/states/pages/dex/trading/InputPanelItem/PeriodState';
 import OrderRow from '@/interfaces/common/OrderRow';
 import ApplyTip from '@/interfaces/common/ApplyTip';
@@ -16,7 +16,6 @@ import PairData from '@/interfaces/common/PairData';
 import CandleRow from '@/interfaces/common/CandleRow';
 import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
 import { periods, buySellValues } from '@/constants';
-import { useAlert } from '@/hook/useAlert';
 import useScroll from '@/hook/useScroll';
 import InputPanelItem from '@/components/dex/InputPanelItem';
 import TradingHeader from '@/components/dex/TradingHeader';
@@ -35,7 +34,34 @@ import { GuideProvider } from '@/store/guide-provider';
 import { Store } from '@/store/store-reducer';
 import { GetServerSidePropsContext } from 'next';
 import { TradingProps } from '@/interfaces/props/pages/dex/trading/TradingProps';
-import { Footer } from '@/zano_ui/src';
+import SiteFooter from '@/components/default/SiteFooter';
+import { classes } from '@/utils/utils';
+import { figtree } from '@/utils/font';
+import PanelResizer from '@/components/dex/PanelResizer';
+
+const ORDERS_WIDTH_KEY = 'dex_orders_pool_width';
+const ORDERS_MIN_WIDTH = 260;
+const CHART_MIN_WIDTH = 360;
+const ORDERS_MAX_RATIO = 0.45;
+
+function readOrdersWidth(): number | null {
+	try {
+		const stored = Number(localStorage.getItem(ORDERS_WIDTH_KEY));
+		return stored > 0 ? stored : null;
+	} catch {
+		return null;
+	}
+}
+
+function saveOrdersWidth(width: number | null): boolean {
+	try {
+		if (width === null) localStorage.removeItem(ORDERS_WIDTH_KEY);
+		else localStorage.setItem(ORDERS_WIDTH_KEY, String(width));
+		return true;
+	} catch {
+		return false;
+	}
+}
 
 function Trading({
 	initialOrders,
@@ -45,13 +71,28 @@ function Trading({
 	initialCandles,
 }: TradingProps) {
 	const { state } = useContext(Store);
-	const { alertState, alertSubtitle, setAlertState } = useAlert();
 	const { elementRef: orderListRef, scrollToElement: scrollToOrdersList } =
 		useScroll<HTMLDivElement>();
 	const { elementRef: orderFormRef, scrollToElement: scrollToOrderForm } =
 		useScroll<HTMLDivElement>();
 
 	const [requestedOrdersTab, setRequestedOrdersTab] = useState<UserOrdersTabType | null>(null);
+
+	const topRef = useRef<HTMLDivElement>(null);
+	const chartRef = useRef<HTMLDivElement>(null);
+	const tradesRef = useRef<HTMLDivElement>(null);
+
+	const applyOrdersWidth = useCallback((width: number | null) => {
+		const el = topRef.current;
+		if (!el) return;
+		if (width === null) el.style.removeProperty('--orders-width');
+		else el.style.setProperty('--orders-width', `${width}px`);
+	}, []);
+
+	useEffect(() => {
+		const stored = readOrdersWidth();
+		if (stored) applyOrdersWidth(stored);
+	}, [applyOrdersWidth]);
 
 	const [pairData, setPairData] = useState<PairData | null>(initialPair);
 	const [pairStats, setPairStats] = useState<PairStats | null>(initialStats);
@@ -165,7 +206,7 @@ function Trading({
 		<GuideProvider>
 			<Header isLg={true} />
 
-			<main className={styles.trading}>
+			<main className={classes(styles.trading, figtree.variable)}>
 				<TradingHeader
 					pairStats={pairStats}
 					pairRateUsd={pairRateUsd}
@@ -176,8 +217,23 @@ function Trading({
 					pairData={pairData}
 				/>
 
-				<div className={styles.trading__top}>
-					<div className={styles.trading__top_trades}>
+				<div ref={topRef} className={styles.trading__top}>
+					<div ref={tradesRef} className={styles.trading__top_trades}>
+						<PanelResizer
+							className={styles.trading__resizer}
+							targetRef={tradesRef}
+							neighborRef={chartRef}
+							minWidth={ORDERS_MIN_WIDTH}
+							minNeighborWidth={CHART_MIN_WIDTH}
+							maxRatio={ORDERS_MAX_RATIO}
+							onResize={applyOrdersWidth}
+							onResizeEnd={saveOrdersWidth}
+							onReset={() => {
+								applyOrdersWidth(null);
+								saveOrdersWidth(null);
+							}}
+						/>
+
 						<OrdersPool
 							currencyNames={currencyNames}
 							secondAssetUsdPrice={secondAssetUsdPrice}
@@ -192,7 +248,7 @@ function Trading({
 						/>
 					</div>
 
-					<div className={styles.trading__top_chart}>
+					<div ref={chartRef} className={styles.trading__top_chart}>
 						<div className={styles.settings}>
 							<HorizontalSelect
 								body={periods}
@@ -259,16 +315,8 @@ function Trading({
 					requestedTab={requestedOrdersTab}
 					onRequestedTabHandled={() => setRequestedOrdersTab(null)}
 				/>
-
-				{alertState && (
-					<Alert
-						type={alertState}
-						subtitle={alertSubtitle || ''}
-						close={() => setAlertState(null)}
-					/>
-				)}
 			</main>
-			<Footer className="no-svg-style" />
+			<SiteFooter />
 		</GuideProvider>
 	);
 }
@@ -296,4 +344,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 	};
 }
 
-export default Trading;
+function TradingPage(props: TradingProps) {
+	const router = useRouter();
+	return <Trading key={String(router.query.id)} {...props} />;
+}
+
+export default TradingPage;

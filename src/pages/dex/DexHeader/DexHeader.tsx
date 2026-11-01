@@ -3,12 +3,11 @@ import styles from '@/styles/Dex.module.scss';
 import SearchLogo from '@/assets/images/UI/search_icon.svg';
 import RefreshIcon from '@/assets/images/UI/refrash_small_icon.svg';
 import InfoSmallIcon from '@/assets/images/UI/info_outlined.svg';
-import DropdownArrowIcon from '@/assets/images/UI/dropdown_arrow_small.svg';
 import FilterIcon from '@/assets/images/UI/filter_icon.svg';
 import Input from '@/components/UI/Input/Input';
 import { Switch } from '@/components/UI/Switch/Switch';
 import { IconDropdown } from '@/components/UI/IconDropdown/IconDropdown';
-import Dropdown from '@/components/UI/Dropdown/Dropdown';
+import Select from '@/components/UI/Select';
 import { getPairsPagesAmount } from '@/utils/methods';
 import PairData from '@/interfaces/common/PairData';
 import { PairSortOption } from '@/interfaces/enum/pair';
@@ -35,8 +34,8 @@ const SORT_OPTION = {
 };
 
 const sortOptions = [
-	{ name: SORT_OPTION.VOLUME.LOW_TO_HIGH, value: PairSortOption.VOLUME_LOW_TO_HIGH },
-	{ name: SORT_OPTION.VOLUME.HIGH_TO_LOW, value: PairSortOption.VOLUME_HIGH_TO_LOW },
+	{ label: SORT_OPTION.VOLUME.LOW_TO_HIGH, value: PairSortOption.VOLUME_LOW_TO_HIGH },
+	{ label: SORT_OPTION.VOLUME.HIGH_TO_LOW, value: PairSortOption.VOLUME_HIGH_TO_LOW },
 ];
 
 function DexHeader({
@@ -92,8 +91,10 @@ function DexHeader({
 	};
 
 	const handleSortChange = (option: PairSortOption) => {
+		if (option === sortOption) return;
+
 		setSortOption(option);
-		handleClickRefetch();
+		setCurrentPage(1);
 	};
 
 	return (
@@ -124,18 +125,11 @@ function DexHeader({
 				</div>
 
 				<div className={styles['dex__action-block']}>
-					<Dropdown
-						body={sortOptions.map((option) => ({
-							name: option.name,
-							value: option.value,
-						}))}
-						value={{
-							name: sortOptions.find((o) => o.value === sortOption)?.name || '',
-						}}
-						setValue={(val) => handleSortChange(val.value as PairSortOption)}
-						icon={<DropdownArrowIcon />}
+					<Select<PairSortOption>
+						options={sortOptions}
+						value={sortOption}
+						onChange={handleSortChange}
 						className={styles.sort_dropdown}
-						selfContained
 					/>
 
 					<button

@@ -17,7 +17,7 @@ import MainPageTitle from '@/components/default/MainPageTitle/MainPageTitle';
 import HomeProps from '@/interfaces/props/pages/p2p/HomeProps';
 import OfferData from '@/interfaces/responses/offers/OfferData';
 import { useRouter } from 'next/router';
-import { Footer } from '@/zano_ui/src';
+import SiteFooter from '@/components/default/SiteFooter';
 
 function Home(props: HomeProps) {
 	const [offers, setOffers] = useState<OfferData[]>([]);
@@ -99,7 +99,7 @@ function Home(props: HomeProps) {
 					/>
 				)}
 			</main>
-			<Footer className="no-svg-style" />
+			<SiteFooter />
 		</>
 	);
 }

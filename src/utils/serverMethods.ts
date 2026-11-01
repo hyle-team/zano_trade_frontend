@@ -99,6 +99,18 @@ export async function getPairsPage(
 	}).then((res) => res.json());
 }
 
+export async function getFeaturedPairs(
+	limit: number,
+	{ xForwardedFor }: ForwardedForParam = {},
+): Promise<ErrorRes | GetPairsPageRes> {
+	return serverFetch(`${API_URL}/api/dex/get-featured-pairs`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ limit }),
+		xForwardedFor,
+	}).then((res) => res.json());
+}
+
 export async function getStats({ xForwardedFor }: ForwardedForParam = {}): Promise<GetStatsRes> {
 	return serverFetch(`${API_URL}/api/offers/get-stats`, { xForwardedFor }).then((res) =>
 		res.json(),

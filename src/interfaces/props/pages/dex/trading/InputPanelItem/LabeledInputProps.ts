@@ -1,5 +1,6 @@
 interface LabeledInputProps {
 	label: string;
+	labelTooltip?: string;
 	value: string;
 	setValue: (_value: string) => void;
 	currency: string;

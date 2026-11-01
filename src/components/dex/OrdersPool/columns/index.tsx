@@ -1,4 +1,6 @@
 import { formatTimestamp, notationToString } from '@/utils/utils';
+import InfoTooltip from '@/components/UI/InfoTooltip';
+import { MIN_FILL_AMOUNT_TOOLTIP } from '@/constants';
 import { ColumnDef } from '@/components/default/GenericTable/types';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
@@ -19,7 +21,7 @@ export function buildOrderPoolColumns({
 			cell: (row) => (
 				<p
 					style={{
-						color: row.type === 'buy' ? '#16D1D6' : '#FF6767',
+						color: row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
 						display: 'flex',
 						alignItems: 'center',
 						gap: 8,
@@ -38,7 +40,12 @@ export function buildOrderPoolColumns({
 		},
 		{
 			key: 'min_per_apply_amount',
-			header: <>Min ({firstCurrencyName})</>,
+			header: (
+				<span className={styles.headerWithInfo}>
+					<span className={styles.headerWithInfo__text}>Min ({firstCurrencyName})</span>
+					<InfoTooltip text={MIN_FILL_AMOUNT_TOOLTIP} />
+				</span>
+			),
 			width: '80px',
 			cell: (row) => (
 				<p>
@@ -69,7 +76,11 @@ export function buildTradesColumns({
 			header: <>Price ({secondCurrencyName})</>,
 			width: '80px',
 			cell: (row) => (
-				<p style={{ color: row.type === 'buy' ? '#16D1D6' : '#FF6767' }}>
+				<p
+					style={{
+						color: row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
+					}}
+				>
 					{notationToString(row.price)}
 				</p>
 			),

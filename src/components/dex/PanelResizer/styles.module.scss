@@ -1,0 +1,45 @@
+.resizer {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: -8px;
+	z-index: 5;
+	width: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: col-resize;
+	touch-action: none;
+	outline: none;
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 16px 3px;
+		border-radius: 2px;
+		background: var(--primary-color);
+		opacity: 0;
+		transition: opacity 0.2s ease;
+	}
+
+	&__grip {
+		position: relative;
+		width: 4px;
+		height: 40px;
+		border-radius: 100px;
+		background: var(--border-color);
+		transition: background-color 0.2s ease;
+	}
+
+	&:hover,
+	&:focus-visible,
+	&__active {
+		&::before {
+			opacity: 0.35;
+		}
+
+		.resizer__grip {
+			background: var(--primary-color);
+		}
+	}
+}

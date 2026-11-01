@@ -23,21 +23,21 @@
 
 	&.buy {
 		.header__type {
-			color: #16d1d6;
+			color: var(--green-color);
 		}
 
 		&::before {
-			background-color: #16d1d6;
+			background-color: var(--green-color);
 		}
 	}
 
 	&.sell {
 		.header__type {
-			color: #ff6767;
+			color: var(--red-color);
 		}
 
 		&::before {
-			background-color: #ff6767;
+			background-color: var(--red-color);
 		}
 	}
 
