@@ -38,7 +38,7 @@ export const updateAssetsRate = (dispatch: Dispatch<ContextAction>, state: Map<s
 		payload: state,
 	});
 
-export const updateAutoClosedNotification = (dispatch: Dispatch<ContextAction>, state: number[]) =>
+export const updateAutoClosedNotification = (dispatch: Dispatch<ContextAction>, state: string[]) =>
 	dispatch({
 		type: 'CLOSED_NOTIFICATIONS_UPDATED',
 		payload: state,

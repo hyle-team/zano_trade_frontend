@@ -52,7 +52,7 @@ interface ContextState {
 	__triggers: {
 		offers: number;
 	};
-	closed_notifications: number[];
+	closed_notifications: string[];
 	alertState: AlertType;
 	alertSubtitle: string;
 }
@@ -87,7 +87,7 @@ type ContextAction =
 	  }
 	| {
 			type: 'CLOSED_NOTIFICATIONS_UPDATED';
-			payload: number[];
+			payload: string[];
 	  }
 	| {
 			type: 'ALERT_STATE_UPDATED';

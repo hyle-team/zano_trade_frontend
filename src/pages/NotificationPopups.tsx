@@ -1,6 +1,7 @@
 import { OrderDataWithPair } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import { Store } from '@/store/store-reducer';
-import socket from '@/utils/socket';
+import socket, { SocketEvent } from '@/utils/socket';
+import { onOrderMatchNotification } from '@/utils/v2/events';
 import { useContext, useEffect, useState } from 'react';
 import styles from '@/styles/NotificationPopups.module.scss';
 import OrderNotification from '@/components/default/OrderNotification/OrderNotification';
@@ -12,30 +13,26 @@ export default function NotificationPopups() {
 	const [notificationOrders, setNotificationOrders] = useState<OrderDataWithPair[]>([]);
 
 	useEffect(() => {
-		if (state.token) {
-			socket.emit('in-dex-notifications', { token: state.token });
-
-			return () => {
-				socket.emit('out-dex-notifications', { token: state.token });
-			};
-		}
-	}, [state.user?.address, state.token]);
+		if (!state.token) setNotificationOrders([]);
+	}, [state.token]);
 
 	useEffect(() => {
-		function onNotify({ orderData }: { orderData: OrderDataWithPair }) {
+		function onNotify(orderData: OrderDataWithPair) {
 			setNotificationOrders((prev) =>
 				[orderData, ...prev.filter((e) => e.id !== orderData.id)].slice(0, 2),
 			);
 		}
 
-		function onCancel(data: { orderId: number }) {
-			setNotificationOrders((prev) =>
-				prev.filter((e) => parseInt(e.id, 10) !== data.orderId),
-			);
+		function onCancel(data: { orderId: string }) {
+			setNotificationOrders((prev) => prev.filter((e) => String(e.id) !== data.orderId));
 		}
 
-		socket.on('order-notification', onNotify);
-		socket.on('order-notification-cancelation', onCancel);
+		function onPublicCancel({ id }: { id: string }) {
+			onCancel({ orderId: String(id) });
+		}
+
+		const offMatch = state.token ? onOrderMatchNotification(onNotify) : () => undefined;
+		socket.on(SocketEvent.CANCEL_ORDER_PUBLIC, onPublicCancel);
 
 		if (state.closed_notifications.length > 0) {
 			for (const notificationID of state.closed_notifications) {
@@ -46,10 +43,10 @@ export default function NotificationPopups() {
 		}
 
 		return () => {
-			socket.off('order-notification', onNotify);
-			socket.off('order-notification-cancelation', onCancel);
+			offMatch();
+			socket.off(SocketEvent.CANCEL_ORDER_PUBLIC, onPublicCancel);
 		};
-	}, [dispatch, state.user, notificationOrders, state.closed_notifications]);
+	}, [dispatch, state.token, state.user, notificationOrders, state.closed_notifications]);
 
 	return (
 		<>

@@ -150,6 +150,7 @@ function Trading({
 		setOrdersHistory,
 		setPairStats,
 		updateOrders,
+		setTrades,
 	});
 
 	// Take order from trades

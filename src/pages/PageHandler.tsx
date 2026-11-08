@@ -1,9 +1,10 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import useUpdateUser from '@/hook/useUpdateUser';
 import { Store } from '@/store/store-reducer';
 import { updateAssetsRate, updateConfig, updateIsAdmin } from '@/store/actions';
 import { useRouter } from 'next/router';
-import socket from '@/utils/socket';
+import legacySocket from '@/utils/legacySocket';
+import { onAuthorizedEvents, subscribeAuthorizedEvents } from '@/utils/socket';
 import { GetConfigResData } from '@/interfaces/responses/config/GetConfigRes';
 import { checkAdmin, getZanoPrice } from '@/utils/methods';
 import { ZANO_ASSET_ID } from '@/utils/utils';
@@ -12,6 +13,9 @@ function PageHandler(props: { config: GetConfigResData }) {
 	const { state, dispatch } = useContext(Store);
 	const fetchUser = useUpdateUser();
 	const router = useRouter();
+
+	const fetchUserRef = useRef(fetchUser);
+	fetchUserRef.current = fetchUser;
 
 	useEffect(() => {
 		async function authUser() {
@@ -33,19 +37,33 @@ function PageHandler(props: { config: GetConfigResData }) {
 
 	useEffect(() => {
 		if (state.user?.id) {
-			socket.emit('in-account', {
+			legacySocket.emit('in-account', {
 				token: state.token,
 			});
 
-			socket.on('refresh-request', () => {
+			legacySocket.on('refresh-request', () => {
 				fetchUser();
 			});
 		}
 
 		return () => {
-			socket.off('refresh-request');
+			legacySocket.off('refresh-request');
 		};
 	}, [state.user?.id]);
+
+	useEffect(() => {
+		if (!state.token) return undefined;
+
+		const unsubscribe = subscribeAuthorizedEvents(state.token);
+		const offEvents = onAuthorizedEvents(() => {
+			fetchUserRef.current();
+		});
+
+		return () => {
+			offEvents();
+			unsubscribe();
+		};
+	}, [state.token]);
 
 	useEffect(() => {
 		if (!state.token) {

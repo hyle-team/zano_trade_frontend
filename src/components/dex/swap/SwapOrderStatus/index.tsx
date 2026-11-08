@@ -7,7 +7,7 @@ import Button from '@/components/UI/Button/Button';
 import TokenIcon from '@/components/UI/TokenIcon';
 import ConfirmModal from '@/components/UI/ConfirmModal';
 import NotificationHelpModal from '@/components/dex/swap/NotificationHelpModal';
-import EmailNotificationRow from '@/components/dex/swap/EmailNotificationRow';
+// import EmailNotificationRow from '@/components/dex/swap/EmailNotificationRow';
 import {
 	ArrowLeftIcon,
 	ArrowRightIcon,
@@ -92,11 +92,11 @@ const SwapOrderStatus = ({
 	const [finishedState, setFinishedState] = useState<'completed' | 'closed' | null>(null);
 	const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
 	const [notificationHelpOpen, setNotificationHelpOpen] = useState(false);
-	const [emailSubscribed, setEmailSubscribed] = useState<boolean | null>(null);
+	// const [emailSubscribed, setEmailSubscribed] = useState<boolean | null>(null);
 
-	useEffect(() => {
-		setEmailSubscribed(null);
-	}, [orderId]);
+	// useEffect(() => {
+	// 	setEmailSubscribed(null);
+	// }, [orderId]);
 	const [busyAction, setBusyAction] = useState<string | null>(null);
 	const [notificationPermission, setNotificationPermission] = useState<
 		NotificationPermission | 'unsupported'
@@ -166,7 +166,7 @@ const SwapOrderStatus = ({
 					limit: 50,
 					offset: 0,
 					filterInfo: {
-						pairId: Number(pairData.id),
+						pairId: String(pairData.id),
 						status: GetUserOrdersBodyStatus.FINISHED,
 					},
 				},
@@ -401,13 +401,13 @@ const SwapOrderStatus = ({
 				)}
 			</div>
 
-			{order && (
+			{/* {order && (
 				<EmailNotificationRow
 					orderId={String(order.id)}
 					subscribed={emailSubscribed ?? !!order.email_notifications}
 					onSubscribedChange={setEmailSubscribed}
 				/>
-			)}
+			)} */}
 
 			<div className={classes(styles.notify__row, styles.notify__row_disabled)}>
 				<span className={styles.notify__icon}>

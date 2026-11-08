@@ -1,15 +1,15 @@
 interface UserPendingType {
-	id: number;
+	id: string;
 	amount: string;
 	price: string;
 	finalizer: {
 		address: string;
 		alias: string;
-		id: number;
-		order_id: number;
+		id: string;
+		order_id: string;
 	};
-	buy_order_id: number;
-	sell_order_id: number;
+	buy_order_id: string;
+	sell_order_id: string;
 	creator: 'sell' | 'buy';
 	hex_raw_proposal: string;
 	status: string;

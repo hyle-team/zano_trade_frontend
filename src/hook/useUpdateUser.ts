@@ -1,23 +1,37 @@
 import { useContext } from 'react';
-import { getUser } from '@/utils/methods';
 import { Store } from '@/store/store-reducer';
 import { updateUser as updateUserAction } from '@/store/actions';
+import { GetUserResData } from '@/interfaces/responses/user/GetUserRes';
+import { getActionRequiredCount } from '@/utils/v2/client';
 import sha256 from 'sha256';
 
 function useUpdateUser() {
 	const { state, dispatch } = useContext(Store);
+
 	async function fetchUser() {
-		if (!state.token) return false;
-		return getUser({ token: state.token }).then((result) => {
-			if (!result.success) return false;
+		const { token, wallet } = state;
 
-			if (sha256(JSON.stringify(state.user)) !== sha256(JSON.stringify(result.data))) {
-				updateUserAction(dispatch, result.data);
-			}
+		if (!token || !wallet?.connected || !wallet.address) return false;
 
-			return true;
-		});
+		const exchangeNotifications = await getActionRequiredCount(token).catch(() => 0);
+
+		const user: GetUserResData = {
+			id: wallet.address,
+			alias: wallet.alias,
+			address: wallet.address,
+			favourite_currencies: [],
+			offers: [],
+			chats: [],
+			exchange_notifications: exchangeNotifications,
+		};
+
+		if (sha256(JSON.stringify(state.user)) !== sha256(JSON.stringify(user))) {
+			updateUserAction(dispatch, user);
+		}
+
+		return true;
 	}
+
 	return fetchUser;
 }
 

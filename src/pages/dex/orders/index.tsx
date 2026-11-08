@@ -15,7 +15,7 @@ import { Switch } from '@/components/UI/Switch/Switch';
 import { ArrowRightIcon, ClockIcon, SwapArrowsIcon } from '@/components/UI/Icons';
 import { Store } from '@/store/store-reducer';
 import { useOrderActions } from '@/hook/useOrderActions';
-import socket from '@/utils/socket';
+import { onAuthorizedEvents, onPairEvents, subscribePair } from '@/utils/socket';
 import {
 	cancelAllOrders,
 	getUserOrders,
@@ -235,7 +235,7 @@ function Orders() {
 					filterInfo: {
 						status: GetUserOrdersBodyStatus.FINISHED,
 						type: typeFilter,
-						pairId: pairFilter ? Number(pairFilter) : undefined,
+						pairId: pairFilter || undefined,
 						date: dateFilter,
 					},
 				},
@@ -286,16 +286,14 @@ function Orders() {
 			loadActive();
 		};
 
-		activePairIds.forEach((id) => socket.emit('in-trading', { id }));
-		socket.on('update-orders', onChange);
-		socket.on('delete-order', onChange);
-		socket.on('new-order', onChange);
+		const unsubscribers = activePairIds.map((id) => subscribePair(id));
+		const offPair = onPairEvents(activePairIds, onChange);
+		const offAuthorized = onAuthorizedEvents(onChange);
 
 		return () => {
-			activePairIds.forEach((id) => socket.emit('out-trading', { id }));
-			socket.off('update-orders', onChange);
-			socket.off('delete-order', onChange);
-			socket.off('new-order', onChange);
+			offPair();
+			offAuthorized();
+			unsubscribers.forEach((unsubscribe) => unsubscribe());
 		};
 	}, [activePairIds.join(',')]);
 
@@ -388,7 +386,7 @@ function Orders() {
 		const result = await cancelAllOrders(
 			{
 				filterInfo: {
-					pairId: pairFilter ? Number(pairFilter) : undefined,
+					pairId: pairFilter || undefined,
 					type: sideFilter === 'all' ? undefined : CANCEL_SIDE_TYPES[sideFilter],
 					date: dateFilter,
 				},

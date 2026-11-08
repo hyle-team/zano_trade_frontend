@@ -13,7 +13,6 @@ import GetOrdersPageRes from '@/interfaces/responses/orders/GetOrdersPageRes';
 import GetUserRes from '@/interfaces/responses/user/GetUserRes';
 import GetUserOrdersRes from '@/interfaces/responses/orders/GetUserOrdersRes';
 import GetCandlesRes from '@/interfaces/responses/candles/GetCandlesRes';
-import GetChartOrdersRes from '@/interfaces/responses/orders/GetChartOrdersRes';
 import GetPairStatsRes from '@/interfaces/responses/orders/GetPairStatsRes';
 import GetUserOrdersPageRes from '@/interfaces/responses/orders/GetUserOrdersPageRes';
 import GetChatRes from '@/interfaces/responses/chats/GetChatRes';
@@ -29,8 +28,9 @@ import { CancelAllData } from '@/interfaces/fetch-data/cancel-all-orders/CancelA
 import CancelAllRes from '@/interfaces/responses/orders/CancelAllRes';
 import AuthParams from '@/interfaces/common/AuthParams';
 import OrderRow from '@/interfaces/common/OrderRow';
-
-const baseUrl = '';
+import UserPendingType from '@/interfaces/common/UserPendingType';
+import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
+import * as v2 from '@/utils/v2/client';
 
 export async function getUser({ token }: AuthParams): Promise<ErrorRes | GetUserRes> {
 	return axios
@@ -175,205 +175,105 @@ export async function getPairsPage(
 	searchText: string,
 	whitelistedOnly: boolean,
 	sortOption: PairSortOption,
-): Promise<ErrorRes | GetPairsPageRes> {
-	return axios
-		.post(`${baseUrl}/api/dex/get-pairs-page`, {
-			page,
-			searchText,
-			whitelistedOnly,
-			sortOption,
-		})
-		.then((res) => res.data);
+): Promise<ErrorRes | (GetPairsPageRes & { hasMore: boolean })> {
+	return v2.getPairsPage(page, searchText, whitelistedOnly, sortOption);
 }
 
 export async function getPairsPagesAmount(
 	searchText: string,
 	whitelistedOnly: boolean,
 ): Promise<ErrorRes | GetPairsPagesAmountRes> {
-	return axios
-		.post('/api/dex/get-pairs-pages-amount', {
-			searchText,
-			whitelistedOnly,
-		})
-		.then((res) => res.data);
+	return v2.getPairsPagesAmount(searchText, whitelistedOnly);
 }
 
 export async function getPair(id: string): Promise<ErrorRes | GetPairRes> {
-	return axios
-		.post(`${baseUrl}/api/dex/get-pair`, {
-			id,
-		})
-		.then((res) => res.data);
+	return v2.getPair(id);
 }
 
 export async function createOrder(
 	orderData: CreateOrderData,
 	{ token }: AuthParams,
 ): Promise<ErrorRes | { success: true; data: OrderRow & { immediateMatch?: boolean } }> {
-	return axios
-		.post(
-			'/api/orders/create',
-			{
-				token,
-				orderData,
-			},
-			{
-				validateStatus: () => true,
-			},
-		)
-		.then((res) => res.data);
+	return v2.createOrder(orderData, token);
 }
 
 export async function getOrdersPage(pairId: string): Promise<ErrorRes | GetOrdersPageRes> {
-	return axios
-		.post(`${baseUrl}/api/orders/get-page`, {
-			pairId,
-		})
-		.then((res) => res.data);
+	return v2.getOrdersPage(pairId);
 }
 
 export async function getUserOrdersPage(
 	pairId: string,
 	{ token }: AuthParams,
 ): Promise<ErrorRes | GetUserOrdersPageRes> {
-	return axios
-		.post('/api/orders/get-user-page', {
-			token,
-			pairId,
-		})
-		.then((res) => res.data);
+	return v2.getUserOrdersPage(pairId, token);
 }
 
 export async function getUserOrders(
-	{ limit, offset, filterInfo: { pairId, status, type, date } }: GetUserOrdersData,
+	data: GetUserOrdersData,
 	{ token }: AuthParams,
 ): Promise<ErrorRes | GetUserOrdersRes> {
-	return axios
-		.patch('/api/orders/get', {
-			token,
-
-			limit,
-			offset,
-			filterInfo: {
-				pairId,
-				status,
-				type,
-				date: date
-					? {
-							from: date.from,
-							to: date.to,
-						}
-					: undefined,
-			},
-		})
-		.then((res) => res.data);
+	return v2.getUserOrders(data, token);
 }
 
 export async function getUserOrdersAllPairs({
 	token,
 }: AuthParams): Promise<ErrorRes | GetUserOrdersAllPairsRes> {
-	return axios
-		.patch('/api/orders/get-user-orders-pairs', {
-			token,
-		})
-		.then((res) => res.data);
+	return v2.getUserOrdersAllPairs(token);
 }
 
 export async function cancelOrder(
 	id: string,
 	{ token }: AuthParams,
 ): Promise<ErrorRes | { success: true }> {
-	return axios
-		.post('/api/orders/cancel', {
-			token,
-			orderId: id,
-		})
-		.then((res) => res.data);
+	return v2.cancelOrder(id, token);
 }
 
 export async function cancelTransaction(
 	id: string,
 	{ token }: AuthParams,
 ): Promise<ErrorRes | { success: true }> {
-	return axios
-		.post('/api/transactions/cancel', {
-			token,
-			transactionId: id,
-		})
-		.then((res) => res.data);
+	return v2.rejectSwapProposal(id, token);
 }
 
 export async function getCandles(
 	pairId: string,
 	period: Period,
 ): Promise<ErrorRes | GetCandlesRes> {
-	return axios
-		.post(`${baseUrl}/api/orders/get-candles`, {
-			pairId,
-			period,
-		})
-		.then((res) => res.data);
-}
-
-export async function getChartOrders(pairId: string): Promise<ErrorRes | GetChartOrdersRes> {
-	return axios
-		.post('/api/orders/get-chart-orders', {
-			pairId,
-		})
-		.then((res) => res.data);
+	return v2.getCandles(pairId, period);
 }
 
 export async function getPairStats(pairId: string): Promise<ErrorRes | GetPairStatsRes> {
-	return axios
-		.post(`${baseUrl}/api/orders/get-pair-stats`, {
-			pairId,
-		})
-		.then((res) => res.data);
+	return v2.getPairStats(pairId);
 }
 
 export async function applyOrder(
 	orderData: ApplyOrderData,
 	{ token }: AuthParams,
 ): Promise<ErrorRes | { success: true }> {
-	return axios
-		.post('/api/orders/apply-order', {
-			token,
-			orderData,
-		})
-		.then((res) => res.data);
+	return v2.createSwapProposal(
+		{
+			myOrderId: orderData.connected_order_id,
+			counterOrderId: orderData.id,
+			hexRawProposal: orderData.hex_raw_proposal,
+			baseAmountInAtomics: orderData.base_amount_in_atomics,
+			quoteAmountInAtomics: orderData.quote_amount_in_atomics,
+		},
+		token,
+	);
 }
 
 export async function cancelAllOrders(
-	{ filterInfo: { pairId, type, date } }: CancelAllData,
+	data: CancelAllData,
 	{ token }: AuthParams,
 ): Promise<ErrorRes | CancelAllRes> {
-	return axios
-		.patch('/api/orders/cancel-all', {
-			token,
-			filterInfo: {
-				pairId,
-				type,
-				date: date
-					? {
-							from: date.from,
-							to: date.to,
-						}
-					: undefined,
-			},
-		})
-		.then((res) => res.data);
+	return v2.cancelAllOrders(data, token);
 }
 
 export async function confirmTransaction(
 	transactionId: string,
 	{ token }: AuthParams,
 ): Promise<ErrorRes | { success: true }> {
-	return axios
-		.post('/api/transactions/confirm', {
-			transactionId,
-			token,
-		})
-		.then((res) => res.data);
+	return v2.acceptSwapProposal(transactionId, token);
 }
 
 export async function getChatChunk(
@@ -390,20 +290,17 @@ export async function getChatChunk(
 		.then((res) => res.data);
 }
 
-export async function getTrades(pairId: string) {
-	return axios
-		.post(`${baseUrl}/api/orders/get-trades`, {
-			pairId,
-		})
-		.then((res) => res.data);
+export async function getTrades(
+	_pairId: string,
+): Promise<ErrorRes | { success: true; data: Trade[] }> {
+	return { success: true, data: [] };
 }
 
-export async function getUserPendings({ token }: AuthParams) {
-	return axios
-		.post('/api/transactions/get-my-pending', {
-			token,
-		})
-		.then((res) => res.data);
+export async function getUserPendings(
+	{ token }: AuthParams,
+	pairId?: string,
+): Promise<ErrorRes | { success: true; data: UserPendingType[] }> {
+	return v2.getUserPendings(token, pairId);
 }
 
 export async function getZanoPrice() {

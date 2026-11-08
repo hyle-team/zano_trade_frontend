@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { getChat, getChatChunk } from '@/utils/methods';
 import { intToStrFixedLen } from '@/utils/utils';
 import { Store } from '@/store/store-reducer';
-import socket from '@/utils/socket';
+import socket from '@/utils/legacySocket';
 import DepositTitle from '@/components/UI/DepositTitle/DepositTitle';
 import { ChatData, Message } from '@/interfaces/responses/chats/GetChatRes';
 import DepositState from '@/interfaces/common/DepositState';

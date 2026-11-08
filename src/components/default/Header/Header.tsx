@@ -22,7 +22,8 @@ import { figtree } from '@/utils/font';
 import useAdvancedTheme from '@/hook/useTheme';
 import { Store } from '@/store/store-reducer';
 import { updateAutoClosedNotification, updateToken, updateWalletState } from '@/store/actions';
-import socket from '@/utils/socket';
+import socket, { SocketEvent } from '@/utils/socket';
+import { onOrderMatchNotification } from '@/utils/v2/events';
 import { OrderDataWithPair } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import zanoImg from '@/assets/images/UI/zano.svg?url';
 import useUpdateUser from '@/hook/useUpdateUser';
@@ -66,24 +67,14 @@ function Header({ isLg }: { isLg?: boolean }) {
 		updateWalletState(dispatch, null);
 	}
 
-	useEffect(() => {
-		if (state.token) {
-			socket.emit('in-dex-notifications', { token: state.token });
-
-			return () => {
-				socket.emit('out-dex-notifications', { token: state.token });
-			};
-		}
-	}, [state.user?.address, state.token]);
-
 	const [activeNotifications, setActiveNotifications] = useState(
-		new Map<number, { Notification: Notification; orderData: OrderDataWithPair }>(),
+		new Map<string, { Notification: Notification; orderData: OrderDataWithPair }>(),
 	);
 
 	const fetchUser = useUpdateUser();
 
 	useEffect(() => {
-		function onNotify({ orderData }: { orderData: OrderDataWithPair }) {
+		function onNotify(orderData: OrderDataWithPair) {
 			if (state.user) {
 				fetchUser();
 				if (!!('Notification' in window) && Notification.permission === 'granted') {
@@ -107,7 +98,7 @@ function Header({ isLg }: { isLg?: boolean }) {
 					setActiveNotifications((prevNotifications) => {
 						const newNotifications = new Map(prevNotifications);
 
-						newNotifications.set(parseInt(orderData.id, 10), {
+						newNotifications.set(String(orderData.id), {
 							Notification: notification,
 							orderData,
 						});
@@ -117,7 +108,7 @@ function Header({ isLg }: { isLg?: boolean }) {
 			}
 		}
 
-		function onCancel({ orderId }: { orderId: number }) {
+		function onCancel({ orderId }: { orderId: string }) {
 			fetchUser();
 			setActiveNotifications((prevNotifications) => {
 				const newNotifications = new Map(prevNotifications);
@@ -132,6 +123,10 @@ function Header({ isLg }: { isLg?: boolean }) {
 			});
 		}
 
+		function onPublicCancel({ id }: { id: string }) {
+			onCancel({ orderId: String(id) });
+		}
+
 		if (state.closed_notifications.length > 0) {
 			for (const notificationID of state.closed_notifications) {
 				onCancel({ orderId: notificationID });
@@ -140,12 +135,12 @@ function Header({ isLg }: { isLg?: boolean }) {
 			updateAutoClosedNotification(dispatch, []);
 		}
 
-		socket.on('order-notification', onNotify);
-		socket.on('order-notification-cancelation', onCancel);
+		const offMatch = onOrderMatchNotification(onNotify);
+		socket.on(SocketEvent.CANCEL_ORDER_PUBLIC, onPublicCancel);
 
 		return () => {
-			socket.off('order-notification', onNotify);
-			socket.off('order-notification-cancelation', onCancel);
+			offMatch();
+			socket.off(SocketEvent.CANCEL_ORDER_PUBLIC, onPublicCancel);
 		};
 	}, [state.user, activeNotifications, state.closed_notifications]);
 

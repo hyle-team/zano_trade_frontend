@@ -37,10 +37,7 @@ export function useOrderActions() {
 	};
 
 	const closeNotification = (id: string) => {
-		updateAutoClosedNotification(dispatch, [
-			...state.closed_notifications,
-			parseInt(String(id), 10),
-		]);
+		updateAutoClosedNotification(dispatch, [...state.closed_notifications, String(id)]);
 	};
 
 	const handleWalletError = (error: unknown) => {
@@ -92,19 +89,22 @@ export function useOrderActions() {
 			return false;
 		}
 
-		const leftDecimal = new Decimal(tip.left);
-		const priceDecimal = new Decimal(tip.price);
+		const toBeTraded = tip.to_be_traded;
+
+		if (!toBeTraded) {
+			alertErr('Invalid transaction data received');
+			return false;
+		}
+
+		const baseAmount = notationToString(new Decimal(toBeTraded.baseAmount).toString());
+		const quoteAmount = notationToString(new Decimal(toBeTraded.quoteAmount).toString());
 		const isOpponentBuy = tip.type === 'buy';
 
 		const params: InitializeIonicSwapParams = {
 			destinationAssetID: isOpponentBuy ? secondCurrencyId : firstCurrencyId,
-			destinationAssetAmount: notationToString(
-				isOpponentBuy ? leftDecimal.mul(priceDecimal).toString() : leftDecimal.toString(),
-			),
+			destinationAssetAmount: isOpponentBuy ? quoteAmount : baseAmount,
 			currentAssetID: isOpponentBuy ? firstCurrencyId : secondCurrencyId,
-			currentAssetAmount: notationToString(
-				isOpponentBuy ? leftDecimal.toString() : leftDecimal.mul(priceDecimal).toString(),
-			),
+			currentAssetAmount: isOpponentBuy ? baseAmount : quoteAmount,
 			destinationAddress: tip.user.address,
 		};
 
@@ -123,7 +123,13 @@ export function useOrderActions() {
 		}
 
 		const result = await applyOrder(
-			{ ...tip, hex_raw_proposal: createSwapResult.data },
+			{
+				id: tip.id,
+				connected_order_id: tip.connected_order_id,
+				hex_raw_proposal: createSwapResult.data,
+				base_amount_in_atomics: toBeTraded.baseAmountInAtomics,
+				quote_amount_in_atomics: toBeTraded.quoteAmountInAtomics,
+			},
 			{ token: state.token },
 		);
 

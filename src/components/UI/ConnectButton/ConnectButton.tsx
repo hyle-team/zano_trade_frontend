@@ -10,6 +10,7 @@ import { zanoWallet } from '@/utils/zanoWallet';
 import { ZanoWebError, GetWalletDataResponse, RequestMessageSignResponse } from 'zano_web3/web';
 import { WalletState } from '@/interfaces/common/ContextValue';
 import { getWalletErrorMessage } from '@/utils/walletErrors';
+import { api as v2AuthApi } from '@/utils/v2/client';
 import Button from '../Button/Button';
 
 enum ConnectErrorMessage {
@@ -79,21 +80,15 @@ function ConnectButton(props: ConnectButtonProps) {
 				throw new Error(ConnectErrorMessage.INVALID_WALLET_DATA);
 			}
 
-			const authRequestRes = await fetch('/api/auth/request-auth', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					address: walletAddress,
-					alias: walletAlias,
-					path: window.location.pathname,
-				}),
-			}).then((res) => res.json());
+			const authRequestRes = await v2AuthApi.requestAuth({
+				address: walletAddress,
+				alias: walletAlias,
+				path: window.location.pathname,
+			});
 
-			const authMessage = authRequestRes?.data;
+			const authMessage = authRequestRes.success ? authRequestRes.result.message : undefined;
 
-			if (!authRequestRes.success || typeof authMessage !== 'string') {
+			if (typeof authMessage !== 'string') {
 				throw new Error(ConnectErrorMessage.SERVER_AUTH_ERROR);
 			}
 
@@ -122,27 +117,19 @@ function ConnectButton(props: ConnectButtonProps) {
 			const signature = signResultData.sig;
 			const publicKey = signResultData.pkey;
 
-			const result = await fetch('/api/auth', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					data: {
-						alias: walletAlias,
-						address: walletAddress,
-						signature,
-						pkey: publicKey,
-						message: authMessage,
-					},
-				}),
-			}).then((res) => res.json());
+			const result = await v2AuthApi.auth({
+				alias: walletAlias,
+				address: walletAddress,
+				signature,
+				pkey: publicKey,
+				message: authMessage,
+			});
 
-			if (!result?.success) {
+			if (!result.success) {
 				throw new Error(ConnectErrorMessage.SERVER_AUTH_ERROR);
 			}
 
-			updateToken(dispatch, result?.data);
+			updateToken(dispatch, result.result.data);
 
 			updateWalletState(dispatch, { ...walletData, connected: true } as WalletState);
 

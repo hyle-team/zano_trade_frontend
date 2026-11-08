@@ -1,3 +1,4 @@
+import { V2ToBeTraded } from '@/utils/v2/types';
 import OfferType from './OfferType';
 import UserData from './UserData';
 
@@ -13,6 +14,7 @@ interface ApplyTip {
 	transaction: boolean;
 	hex_raw_proposal?: string;
 	isInstant: boolean;
+	to_be_traded?: V2ToBeTraded;
 }
 
 export default ApplyTip;

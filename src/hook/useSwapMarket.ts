@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import socket from '@/utils/socket';
+import { SocketEvent, onAuthorizedEvents, onPairEvents, subscribePair } from '@/utils/socket';
 import { Store } from '@/store/store-reducer';
 import {
 	getOrdersPage,
@@ -65,7 +65,7 @@ export function useSwapMarket({
 
 		const [userPage, pendingRes] = await Promise.all([
 			getUserOrdersPage(id, { token }).catch(() => null),
-			getUserPendings({ token }).catch(() => null),
+			getUserPendings({ token }, id).catch(() => null),
 		]);
 
 		if (pairIdRef.current !== id) return;
@@ -133,32 +133,34 @@ export function useSwapMarket({
 		return () => clearInterval(interval);
 	}, [pairId, loggedIn, state.wallet?.address]);
 
+	const refreshStats = useCallback(async () => {
+		const id = pairIdRef.current;
+		if (!id) return;
+		const result = await getPairStats(id).catch(() => null);
+		if (!result?.success || pairIdRef.current !== id) return;
+		setPairStats(result.data);
+	}, []);
+
 	useEffect(() => {
 		if (!pairId) return;
 
-		socket.emit('in-trading', { id: pairId });
+		const unsubscribe = subscribePair(String(pairId));
 
-		const onBookChanged = () => {
+		const offPair = onPairEvents([String(pairId)], (eventName) => {
 			refreshAll();
-		};
+			if (eventName === SocketEvent.TRADE_PERFORMED_PUBLIC) refreshStats();
+		});
 
-		const onStats = ({ pairStats: stats }: { pairStats: PairStats }) => {
-			setPairStats(stats);
-		};
-
-		socket.on('new-order', onBookChanged);
-		socket.on('delete-order', onBookChanged);
-		socket.on('update-orders', onBookChanged);
-		socket.on('update-pair-stats', onStats);
+		const offAuthorized = onAuthorizedEvents(() => {
+			refreshUserData();
+		});
 
 		return () => {
-			socket.emit('out-trading', { id: pairId });
-			socket.off('new-order', onBookChanged);
-			socket.off('delete-order', onBookChanged);
-			socket.off('update-orders', onBookChanged);
-			socket.off('update-pair-stats', onStats);
+			offPair();
+			offAuthorized();
+			unsubscribe();
 		};
-	}, [pairId, refreshAll]);
+	}, [pairId, refreshAll, refreshStats, refreshUserData]);
 
 	return {
 		pairData,

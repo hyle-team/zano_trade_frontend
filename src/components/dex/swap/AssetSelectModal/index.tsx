@@ -4,7 +4,7 @@ import Modal from '@/components/UI/Modal';
 import TokenIcon from '@/components/UI/TokenIcon';
 import { CheckIcon, SearchIcon } from '@/components/UI/Icons';
 import { Switch } from '@/components/UI/Switch/Switch';
-import { getPairsPage, getPairsPagesAmount } from '@/utils/methods';
+import { getPairsPage } from '@/utils/methods';
 import { PairSortOption } from '@/interfaces/enum/pair';
 import PairData from '@/interfaces/common/PairData';
 import { classes, ZANO_ASSET_ID } from '@/utils/utils';
@@ -59,21 +59,16 @@ const AssetSelectModal = ({ open, onClose, selectedPairId, onSelect }: AssetSele
 		(async () => {
 			setLoading(true);
 
-			const [pageRes, amountRes] = await Promise.all([
-				getPairsPage(
-					page,
-					debouncedSearch,
-					whitelistedOnly,
-					PairSortOption.VOLUME_HIGH_TO_LOW,
-				).catch(() => null),
-				page === 1
-					? getPairsPagesAmount(debouncedSearch, whitelistedOnly).catch(() => null)
-					: Promise.resolve(null),
-			]);
+			const pageRes = await getPairsPage(
+				page,
+				debouncedSearch,
+				whitelistedOnly,
+				PairSortOption.VOLUME_HIGH_TO_LOW,
+			).catch(() => null);
 
 			if (fetchIdRef.current !== fetchId) return;
 
-			if (amountRes?.success) setPagesAmount(amountRes.data);
+			if (pageRes?.success) setPagesAmount(pageRes.hasMore ? page + 1 : page);
 
 			if (pageRes?.success) {
 				const zanoPairs = pageRes.data.filter(
