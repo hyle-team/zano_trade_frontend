@@ -17,7 +17,18 @@ import {
 	GetUserOrdersData,
 } from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
 import { CancelAllData } from '@/interfaces/fetch-data/cancel-all-orders/CancelAllData';
-import { V2Error, V2MyPairOrder, V2Order, V2OrderStatus, V2Pair, V2Response } from './types';
+import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
+import { ZANO_ASSET_ID } from '@/utils/utils';
+import {
+	V2Admin,
+	V2Error,
+	V2FeaturedPair,
+	V2MyPairOrder,
+	V2Order,
+	V2OrderStatus,
+	V2Pair,
+	V2Response,
+} from './types';
 import { clientTransport } from './transport';
 import { V2_MAX_PAGE_COUNT, V2PairsSort, getAllPublicOrders, v2Api } from './api';
 import {
@@ -31,6 +42,7 @@ import {
 	toPairData,
 	toPairStats,
 	toOrderRow,
+	toTrades,
 	toUserOrderData,
 	typeToSide,
 } from './mappers';
@@ -185,6 +197,14 @@ export async function getCandles(
 	const res = await api.getCandles(pairId, period);
 	if (!res.success) return fail(res);
 	return { success: true, data: toCandleRows(res.result.candles) };
+}
+
+export async function getTrades(
+	pairId: string,
+): Promise<ErrorRes | { success: true; data: Trade[] }> {
+	const res = await api.getTrades(pairId, null, V2_MAX_PAGE_COUNT);
+	if (!res.success) return fail(res);
+	return { success: true, data: toTrades(res.result.trades) };
 }
 
 const CREATE_ORDER_ERRORS: Record<string, string> = {
@@ -540,4 +560,120 @@ export async function rejectSwapProposal(
 	const res = await api.rejectSwapProposal(token, swapProposalId);
 	if (!res.success) return fail(res);
 	return { success: true };
+}
+
+export async function checkAdmin(token: string | null): Promise<boolean> {
+	if (!token) return false;
+
+	const res = await api.getMe(token);
+	return res.success && res.result.role !== 'USER';
+}
+
+const CONTROL_PAGE_SIZE = 50;
+
+const CONTROL_ERRORS: Record<string, string> = {
+	USER_NOT_FOUND: 'User not found',
+	ALREADY_ADMIN: 'Admin already exists',
+	NOT_ADMIN: 'User is not an admin',
+	OWNER_CANNOT_BE_DELETED: 'Owner cannot be removed',
+	CANNOT_DELETE_SELF: 'You cannot remove yourself',
+	PAIR_NOT_FOUND: 'Pair not found',
+	ALREADY_FEATURED: 'Pair is already featured',
+	NOT_FEATURED: 'Pair is not featured',
+	VALIDATION_ERROR: 'Invalid value',
+	FORBIDDEN: 'Access denied',
+	UNAUTHORIZED: 'Unauthorized: Please log in.',
+};
+
+const controlFail = (res: { success: false; error: V2Error }): ErrorRes => ({
+	success: false,
+	data: CONTROL_ERRORS[res.error.code] ?? res.error.code,
+});
+
+async function collectByOffset<T>(
+	fetchPage: (offset: number) => Promise<V2Response<{ items: T[]; totalCount: number }>>,
+): Promise<ErrorRes | { success: true; data: T[] }> {
+	const items: T[] = [];
+
+	for (;;) {
+		const res = await fetchPage(items.length);
+		if (!res.success) return controlFail(res);
+
+		items.push(...res.result.items);
+
+		if (res.result.items.length === 0 || items.length >= res.result.totalCount) {
+			return { success: true, data: items };
+		}
+	}
+}
+
+export async function getAdmins(
+	token: string | null,
+): Promise<ErrorRes | { success: true; data: V2Admin[] }> {
+	return collectByOffset(async (offset) => {
+		const res = await api.getAdmins(token, CONTROL_PAGE_SIZE, offset);
+		if (!res.success) return res;
+		return {
+			success: true,
+			result: { items: res.result.admins, totalCount: res.result.totalCount },
+		};
+	});
+}
+
+export async function addAdmin(
+	alias: string,
+	token: string | null,
+): Promise<ErrorRes | { success: true; data: V2Admin }> {
+	const res = await api.addAdmin(token, alias);
+	if (!res.success) return controlFail(res);
+	return { success: true, data: res.result };
+}
+
+export async function deleteAdmin(
+	userId: string,
+	token: string | null,
+): Promise<ErrorRes | { success: true }> {
+	const res = await api.deleteAdmin(token, userId);
+	if (!res.success) return controlFail(res);
+	return { success: true };
+}
+
+export async function getFeaturedPairs(
+	token: string | null,
+): Promise<ErrorRes | { success: true; data: V2FeaturedPair[] }> {
+	return collectByOffset(async (offset) => {
+		const res = await api.getFeaturedPairs(token, CONTROL_PAGE_SIZE, offset);
+		if (!res.success) return res;
+		return {
+			success: true,
+			result: { items: res.result.pairs, totalCount: res.result.totalCount },
+		};
+	});
+}
+
+export async function addFeaturedPair(
+	baseAssetId: string,
+	token: string | null,
+): Promise<ErrorRes | { success: true; data: V2FeaturedPair }> {
+	const res = await api.addFeaturedPair(token, baseAssetId, ZANO_ASSET_ID);
+	if (!res.success) return controlFail(res);
+	return { success: true, data: res.result };
+}
+
+export async function deleteFeaturedPair(
+	pairId: string,
+	token: string | null,
+): Promise<ErrorRes | { success: true }> {
+	const res = await api.deleteFeaturedPair(token, pairId);
+	if (!res.success) return controlFail(res);
+	return { success: true };
+}
+
+export async function getVolumeStats(
+	query: { address: string; pairId: string; from: number; to: number },
+	token: string | null,
+): Promise<ErrorRes | { success: true; data: { volume: string } }> {
+	const res = await api.getVolumeStats(token, query);
+	if (!res.success) return controlFail(res);
+	return { success: true, data: res.result };
 }

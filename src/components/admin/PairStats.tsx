@@ -96,7 +96,6 @@ const PairStats: React.FC<PairStatsProps> = ({
 				<label className={styles.input}>
 					<input
 						placeholder="Enter pair ID"
-						inputMode="numeric"
 						value={selectedPairID}
 						onChange={(e) => setSelectedPairID(e.target.value)}
 					/>

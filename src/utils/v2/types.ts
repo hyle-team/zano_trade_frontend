@@ -38,6 +38,8 @@ export type V2Pair = {
 	baseAsset: V2Asset;
 	quoteAsset: V2Asset;
 	stats: V2PairStats;
+	isWhitelisted: boolean;
+	isFeatured: boolean;
 };
 
 export type V2PairsPage = {
@@ -48,6 +50,8 @@ export type V2PairsPage = {
 export type V2PairByAssets = {
 	id: string;
 	stats: V2PairStats;
+	isWhitelisted: boolean;
+	isFeatured: boolean;
 };
 
 export type V2User = {
@@ -143,7 +147,7 @@ export type V2CandleMode = '1m' | '5m' | '15m' | '30m' | '1h' | '4h' | '1d' | '1
 
 export type V2NewOrderMatchEvent = V2Order & { matchingOrderId: string };
 
-export type V2TradePerformedEvent = {
+export type V2Trade = {
 	id: string;
 	pairId: string;
 	acceptedAt: string;
@@ -155,11 +159,31 @@ export type V2TradePerformedEvent = {
 	priceInAtomics: string;
 };
 
-export type V2CancelOrderEvent = {
-	id: string;
-	pairId: string;
+export type V2TradePerformedEvent = V2Trade;
+
+export type V2TradesPage = {
+	trades: V2Trade[];
+	nextCursor: string | null;
 };
 
-export type V2PairEvent = {
-	pairId: string;
+export type V2UserRole = 'USER' | 'ADMIN' | 'OWNER';
+
+export type V2Me = V2User & { role: V2UserRole };
+
+export type V2Admin = V2User & { isOwner: boolean };
+
+export type V2AdminsPage = {
+	admins: V2Admin[];
+	totalCount: number;
+};
+
+export type V2FeaturedPair = {
+	id: string;
+	baseAsset: V2Asset;
+	quoteAsset: V2Asset;
+};
+
+export type V2FeaturedPairsPage = {
+	pairs: V2FeaturedPair[];
+	totalCount: number;
 };

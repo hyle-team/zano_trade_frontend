@@ -8,7 +8,7 @@ import styles from './styles.module.scss';
 interface Admin {
 	alias: string;
 	isOwner: boolean;
-	key: number;
+	key: string;
 }
 
 interface AdminsProps {

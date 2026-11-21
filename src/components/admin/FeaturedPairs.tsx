@@ -10,7 +10,7 @@ import styles from './styles.module.scss';
 interface FeaturedPair {
 	name: string;
 	assetId?: string;
-	key: number;
+	key: string;
 }
 
 interface FeaturedPairsProps {
@@ -59,8 +59,7 @@ const FeaturedPairs: React.FC<FeaturedPairsProps> = ({
 							<div className={styles.row__info}>
 								<p className={styles.row__title}>{pair.name}</p>
 								<span className={styles.row__subtitle}>
-									Pair #{pair.key}
-									{pair.assetId && ` · ${shortenAddress(pair.assetId, 6, 6)}`}
+									{pair.assetId && shortenAddress(pair.assetId, 6, 6)}
 								</span>
 							</div>
 						</Link>

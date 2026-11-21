@@ -41,10 +41,7 @@ export async function getUser({ token }: AuthParams): Promise<ErrorRes | GetUser
 }
 
 export async function checkAdmin({ token }: AuthParams): Promise<boolean> {
-	return axios
-		.post('/api/admin/check-admin', { token })
-		.then((res) => !!res.data?.success)
-		.catch(() => false);
+	return v2.checkAdmin(token).catch(() => false);
 }
 
 export async function getConfig(): Promise<ErrorRes | GetConfigRes> {
@@ -291,9 +288,9 @@ export async function getChatChunk(
 }
 
 export async function getTrades(
-	_pairId: string,
+	pairId: string,
 ): Promise<ErrorRes | { success: true; data: Trade[] }> {
-	return { success: true, data: [] };
+	return v2.getTrades(pairId);
 }
 
 export async function getUserPendings(

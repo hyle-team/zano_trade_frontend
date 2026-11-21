@@ -1,5 +1,4 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 import Head from 'next/head';
 import Header from '@/components/default/Header/Header';
 import SiteFooter from '@/components/default/SiteFooter';
@@ -15,32 +14,31 @@ import styles from '@/components/admin/styles.module.scss';
 import PairStats from '@/components/admin/PairStats';
 import FeaturedPairs from '@/components/admin/FeaturedPairs';
 import Admins from '@/components/admin/Admins';
+import {
+	addAdmin as addAdminRequest,
+	addFeaturedPair as addFeaturedPairRequest,
+	deleteAdmin,
+	deleteFeaturedPair,
+	getAdmins,
+	getFeaturedPairs,
+	getVolumeStats,
+} from '@/utils/v2/client';
 
 interface FeaturedPair {
 	name: string;
 	assetId?: string;
-	key: number;
+	key: string;
 }
 
 interface Admin {
 	alias: string;
 	isOwner: boolean;
-	key: number;
+	key: string;
 }
 
 interface DateState {
 	first: Date | null;
 	last: Date | null;
-}
-
-interface CurrencyType {
-	name: string;
-	asset_id?: string;
-}
-
-interface PairType {
-	id: number;
-	first_currency: CurrencyType;
 }
 
 interface VolumeStatsResponse {
@@ -91,14 +89,12 @@ const AdminPanel: React.FC = () => {
 
 	const fetchFeaturedPairs = async () => {
 		try {
-			const response = await axios.post('/api/admin/get-featured', {
-				token: state.token,
-			});
-			if (response.data.success) {
+			const response = await getFeaturedPairs(state.token);
+			if (response.success) {
 				setFeaturedPairs(
-					response.data.data.map((pair: PairType) => ({
-						name: pair.first_currency.name,
-						assetId: pair.first_currency.asset_id,
+					response.data.map((pair) => ({
+						name: `${pair.baseAsset.ticker}/${pair.quoteAsset.ticker}`,
+						assetId: pair.baseAsset.assetId,
 						key: pair.id,
 					})),
 				);
@@ -114,18 +110,14 @@ const AdminPanel: React.FC = () => {
 
 	const fetchAdmins = async () => {
 		try {
-			const response = await axios.post('/api/admin/get-admins', {
-				token: state.token,
-			});
-			if (response.data.success) {
+			const response = await getAdmins(state.token);
+			if (response.success) {
 				setAdmins(
-					response.data.data.map(
-						(admin: { alias: string; isOwner: boolean; id: number }) => ({
-							alias: admin.alias,
-							isOwner: admin.isOwner,
-							key: admin.id,
-						}),
-					),
+					response.data.map((admin) => ({
+						alias: admin.alias,
+						isOwner: admin.isOwner,
+						key: admin.id,
+					})),
 				);
 			} else {
 				notify('error', 'Failed to fetch admins');
@@ -148,17 +140,14 @@ const AdminPanel: React.FC = () => {
 		setAddingPair(true);
 
 		try {
-			const response = await axios.post('/api/admin/add-featured', {
-				asset_id: assetId,
-				token: state.token,
-			});
+			const response = await addFeaturedPairRequest(assetId.toLowerCase(), state.token);
 
-			if (response.data.success) {
+			if (response.success) {
 				await fetchFeaturedPairs();
 				notify('success', 'Pair added to featured');
 				setAssetIdInput('');
 			} else {
-				notify('error', response.data.message);
+				notify('error', response.data);
 			}
 		} catch (error) {
 			notify('error', 'Error adding featured pair');
@@ -167,18 +156,15 @@ const AdminPanel: React.FC = () => {
 		}
 	};
 
-	const removeFeaturedPair = async (key: number) => {
+	const removeFeaturedPair = async (key: string) => {
 		try {
-			const response = await axios.post('/api/admin/delete-featured', {
-				token: state.token,
-				id: key,
-			});
+			const response = await deleteFeaturedPair(key, state.token);
 
-			if (response.data.success) {
+			if (response.success) {
 				await fetchFeaturedPairs();
 				notify('success', 'Pair removed from featured');
 			} else {
-				notify('error', response.data.message);
+				notify('error', response.data);
 			}
 		} catch (error) {
 			notify('error', 'Error removing featured pair');
@@ -186,7 +172,7 @@ const AdminPanel: React.FC = () => {
 	};
 
 	const addAdmin = async () => {
-		const alias = aliasInput.trim().replace(/^@/, '');
+		const alias = aliasInput.trim().replace(/^@/, '').toLowerCase();
 
 		if (!alias) {
 			notify('error', 'Alias is required');
@@ -201,28 +187,17 @@ const AdminPanel: React.FC = () => {
 		setAddingAdmin(true);
 
 		try {
-			const { data } = await axios.post('/api/admin/add-admin', {
-				alias,
-				token: state.token,
-			});
+			const response = await addAdminRequest(alias, state.token);
 
-			notify(
-				data.success ? 'success' : 'error',
-				data.success ? 'Admin added successfully' : data.message,
-			);
-
-			if (data.success) {
+			if (response.success) {
 				await fetchAdmins();
 				setAliasInput('');
+				notify('success', 'Admin added successfully');
+			} else {
+				notify('error', response.data);
 			}
-		} catch (error) {
-			notify(
-				'error',
-				axios.isAxiosError(error) && error.response?.status === 401
-					? 'Unauthorized: Please log in.'
-					: 'Error adding admin',
-			);
-			console.log(error);
+		} catch {
+			notify('error', 'Error adding admin');
 		} finally {
 			setAddingAdmin(false);
 		}
@@ -232,16 +207,13 @@ const AdminPanel: React.FC = () => {
 		if (admin.isOwner) return;
 
 		try {
-			const response = await axios.post('/api/admin/delete-admin', {
-				token: state.token,
-				id: admin.key,
-			});
+			const response = await deleteAdmin(admin.key, state.token);
 
-			if (response.data.success) {
+			if (response.success) {
 				await fetchAdmins();
 				notify('success', 'Admin deleted successfully');
 			} else {
-				notify('error', response.data.message);
+				notify('error', response.data);
 			}
 		} catch (error) {
 			notify('error', 'Error deleting admin');
@@ -275,15 +247,23 @@ const AdminPanel: React.FC = () => {
 
 		setLoading(true);
 		try {
-			const response = await axios.post('/api/dex/volume-stats', {
-				address: selectedAddress,
-				pairID: selectedPairID,
-				from: allDates ? 0 : dateRange?.first?.getTime(),
-				to: allDates ? 999999999999999 : dateRange?.last?.getTime(),
-			});
+			const response = await getVolumeStats(
+				{
+					address: selectedAddress.trim(),
+					pairId: selectedPairID.trim(),
+					from: allDates ? 0 : (dateRange.first?.getTime() ?? 0),
+					to: allDates ? 999999999999999 : (dateRange.last?.getTime() ?? Date.now()),
+				},
+				state.token,
+			);
 
-			setVolumeStats(response.data);
-			notify('success', 'Volume stats fetched successfully!');
+			setVolumeStats(response);
+
+			if (response.success) {
+				notify('success', 'Volume stats fetched successfully!');
+			} else {
+				notify('error', response.data);
+			}
 		} catch (error) {
 			console.error(error);
 			notify('error', 'Failed to fetch volume stats. Please try again');

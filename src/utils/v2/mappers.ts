@@ -23,7 +23,7 @@ import {
 	V2PairStats,
 	V2PublicOrder,
 	V2Side,
-	V2TradePerformedEvent,
+	V2Trade,
 } from './types';
 
 const toNumber = (value: string | null | undefined) => {
@@ -89,8 +89,8 @@ export function toPairData(pair: V2Pair): PairData {
 		high: stats.high,
 		low: stats.low,
 		volume: stats.volume,
-		featured: false,
-		whitelisted: pair.baseAsset.isWhitelisted,
+		featured: pair.isFeatured,
+		whitelisted: pair.isWhitelisted,
 	};
 }
 
@@ -150,7 +150,7 @@ export function toUserOrderData(order: V2Order, pair: V2Pair | undefined): UserO
 			high: pairData?.high,
 			low: pairData?.low,
 			volume: pairData?.volume ?? 0,
-			featured: false,
+			featured: pairData?.featured ?? false,
 			first_currency: firstCurrency as unknown as UserOrderData['pair']['first_currency'],
 			second_currency: secondCurrency as unknown as UserOrderData['pair']['second_currency'],
 		},
@@ -264,7 +264,7 @@ export function toCandleRows(candles: V2Candle[], now = Date.now()): CandleRow[]
 	return rows;
 }
 
-export function toTrade(trade: V2TradePerformedEvent, previousPrice?: string): Trade {
+export function toTrade(trade: V2Trade, previousPrice?: string): Trade {
 	const isDown = previousPrice !== undefined && new Decimal(trade.price).lt(previousPrice);
 
 	return {
@@ -276,6 +276,10 @@ export function toTrade(trade: V2TradePerformedEvent, previousPrice?: string): T
 		buyer: { address: '', amount: trade.baseAmount },
 		seller: { address: '', amount: trade.quoteAmount },
 	};
+}
+
+export function toTrades(trades: V2Trade[]): Trade[] {
+	return trades.map((trade, index) => toTrade(trade, trades[index + 1]?.price));
 }
 
 const PERIOD_TO_MODE: Record<Period, V2CandleMode> = {

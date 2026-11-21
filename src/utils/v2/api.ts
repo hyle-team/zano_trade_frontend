@@ -1,7 +1,12 @@
 import Period from '@/interfaces/common/Period';
 import {
+	V2Admin,
+	V2AdminsPage,
 	V2Candle,
+	V2FeaturedPair,
+	V2FeaturedPairsPage,
 	V2IncomingProposal,
+	V2Me,
 	V2MatchOrder,
 	V2MyPairOrder,
 	V2Order,
@@ -16,6 +21,7 @@ import {
 	V2Response,
 	V2Side,
 	V2SwapProposalBase,
+	V2TradesPage,
 } from './types';
 import { V2Transport } from './transport';
 import { getCandlesQuery } from './mappers';
@@ -104,6 +110,11 @@ export const v2Api = (t: V2Transport) => ({
 			query: { pairId, cursor, count, side },
 		}),
 
+	getTrades: (pairId: string, cursor: string | null, count: number) =>
+		t<V2TradesPage>('GET', '/trades/get-all-by-cursor', {
+			query: { pairId, cursor, count },
+		}),
+
 	getCandles: (pairId: string, period: Period) =>
 		t<{ candles: V2Candle[] }>('GET', `/stats/get-candles-data/${enc(pairId)}`, {
 			query: getCandlesQuery(period),
@@ -180,6 +191,37 @@ export const v2Api = (t: V2Transport) => ({
 		t<{ id: string; status: string }>('POST', `/swap-proposals/${enc(swapProposalId)}/reject`, {
 			token,
 		}),
+
+	getMe: (token: string | null) => t<V2Me>('GET', '/users/me', { token }),
+
+	getAdmins: (token: string | null, count: number, offset: number) =>
+		t<V2AdminsPage>('GET', '/control/admins', { token, query: { count, offset } }),
+
+	addAdmin: (token: string | null, alias: string) =>
+		t<V2Admin>('POST', '/control/add-admin', { token, body: { alias } }),
+
+	deleteAdmin: (token: string | null, userId: string) =>
+		t<V2Admin>('DELETE', '/control/delete-admin', { token, body: { userId } }),
+
+	getFeaturedPairs: (token: string | null, count: number, offset: number) =>
+		t<V2FeaturedPairsPage>('GET', '/control/featured-pairs', {
+			token,
+			query: { count, offset },
+		}),
+
+	addFeaturedPair: (token: string | null, baseAssetId: string, quoteAssetId: string) =>
+		t<V2FeaturedPair>('POST', '/control/add-featured-pair', {
+			token,
+			body: { baseAssetId, quoteAssetId },
+		}),
+
+	getVolumeStats: (
+		token: string | null,
+		query: { address: string; pairId: string; from: number; to: number },
+	) => t<{ volume: string }>('GET', '/control/volume-stats', { token, query }),
+
+	deleteFeaturedPair: (token: string | null, pairId: string) =>
+		t<V2FeaturedPair>('DELETE', '/control/delete-featured-pair', { token, body: { pairId } }),
 });
 
 export type V2Api = ReturnType<typeof v2Api>;

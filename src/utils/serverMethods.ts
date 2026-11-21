@@ -19,8 +19,14 @@ import {
 	buildV2Path,
 	toV2Response,
 } from '@/utils/v2/transport';
-import { getAllPublicOrders, v2Api } from '@/utils/v2/api';
-import { toCandleRows, toPageOrderData, toPairData, toPairStats } from '@/utils/v2/mappers';
+import { V2_MAX_PAGE_COUNT, getAllPublicOrders, v2Api } from '@/utils/v2/api';
+import {
+	toCandleRows,
+	toPageOrderData,
+	toPairData,
+	toPairStats,
+	toTrades,
+} from '@/utils/v2/mappers';
 
 /**
  * Server-side counterparts of the `@/utils/methods` wrappers, used from
@@ -81,10 +87,12 @@ export async function getOrdersPage(
 }
 
 export async function getTrades(
-	_pairId: string,
-	_params: ForwardedForParam = {},
+	pairId: string,
+	{ xForwardedFor }: ForwardedForParam = {},
 ): Promise<ErrorRes | { success: true; data: Trade[] }> {
-	return { success: true, data: [] };
+	const res = await serverApi(xForwardedFor).getTrades(pairId, null, V2_MAX_PAGE_COUNT);
+	if (!res.success) return fail(res.error);
+	return { success: true, data: toTrades(res.result.trades) };
 }
 
 export async function getCandles(
@@ -131,9 +139,11 @@ export async function getFeaturedPairs(
 
 	if (!res.success) return fail(res.error);
 
+	const featured = res.result.pairs.filter((p) => p.isFeatured);
 	const zanoQuoted = res.result.pairs.filter((p) => p.quoteAsset.assetId === ZANO_ASSET_ID);
+	const pairs = featured.length > 0 ? featured : zanoQuoted;
 
-	return { success: true, data: zanoQuoted.slice(0, limit).map(toPairData) };
+	return { success: true, data: pairs.slice(0, limit).map(toPairData) };
 }
 
 export async function getStats({ xForwardedFor }: ForwardedForParam = {}): Promise<GetStatsRes> {
