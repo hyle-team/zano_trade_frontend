@@ -3,12 +3,12 @@ import UserData from './UserData';
 
 interface ApplyTip {
 	id: string;
-	left: number;
-	price: number;
+	left: string;
+	price: string;
 	user: UserData;
 	timestamp?: string;
 	type: OfferType;
-	total: number;
+	total: string;
 	connected_order_id: string;
 	transaction: boolean;
 	hex_raw_proposal?: string;
