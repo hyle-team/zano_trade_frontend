@@ -245,14 +245,20 @@ const AdminPanel: React.FC = () => {
 			return;
 		}
 
+		const from = !allDates && dateRange.first ? new Date(dateRange.first) : null;
+		const to = !allDates && dateRange.last ? new Date(dateRange.last) : null;
+
+		from?.setHours(0, 0, 0, 0);
+		to?.setHours(23, 59, 59, 999);
+
 		setLoading(true);
 		try {
 			const response = await getVolumeStats(
 				{
 					address: selectedAddress.trim(),
 					pairId: selectedPairID.trim(),
-					from: allDates ? 0 : (dateRange.first?.getTime() ?? 0),
-					to: allDates ? 999999999999999 : (dateRange.last?.getTime() ?? Date.now()),
+					from: from?.toISOString(),
+					to: to?.toISOString(),
 				},
 				state.token,
 			);

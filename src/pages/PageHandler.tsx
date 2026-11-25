@@ -6,8 +6,10 @@ import { useRouter } from 'next/router';
 import legacySocket from '@/utils/legacySocket';
 import { onAuthorizedEvents, subscribeAuthorizedEvents } from '@/utils/socket';
 import { GetConfigResData } from '@/interfaces/responses/config/GetConfigRes';
-import { checkAdmin, getZanoPrice } from '@/utils/methods';
+import { checkAdmin, getZanoPrice, refreshOnline } from '@/utils/methods';
 import { ZANO_ASSET_ID } from '@/utils/utils';
+
+const ONLINE_REFRESH_INTERVAL_MS = 10 * 60 * 1000;
 
 function PageHandler(props: { config: GetConfigResData }) {
 	const { state, dispatch } = useContext(Store);
@@ -63,6 +65,17 @@ function PageHandler(props: { config: GetConfigResData }) {
 			offEvents();
 			unsubscribe();
 		};
+	}, [state.token]);
+
+	useEffect(() => {
+		if (!state.token) return undefined;
+
+		const authParams = { token: state.token };
+		refreshOnline(authParams);
+
+		const intervalId = setInterval(() => refreshOnline(authParams), ONLINE_REFRESH_INTERVAL_MS);
+
+		return () => clearInterval(intervalId);
 	}, [state.token]);
 
 	useEffect(() => {

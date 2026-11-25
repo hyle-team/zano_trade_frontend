@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid';
 import Modal from '@/components/UI/Modal';
 import TokenIcon from '@/components/UI/TokenIcon';
 import { CheckIcon, SearchIcon } from '@/components/UI/Icons';
 import { Switch } from '@/components/UI/Switch/Switch';
-import { getPairsPage } from '@/utils/methods';
-import { PairSortOption } from '@/interfaces/enum/pair';
+import { getQuotePairsPage } from '@/utils/methods';
 import PairData from '@/interfaces/common/PairData';
 import { classes, ZANO_ASSET_ID } from '@/utils/utils';
 import { formatTokenAmount } from '@/utils/swap';
 import Spinner from '@/components/UI/Spinner';
+import Button from '@/components/UI/Button/Button';
 import styles from './styles.module.scss';
 
 interface AssetSelectModalProps {
@@ -20,99 +20,81 @@ interface AssetSelectModalProps {
 }
 
 const SEARCH_DEBOUNCE_MS = 300;
-const VISIBLE_STEP = 10;
+const SCROLL_END_OFFSET = 120;
 
 const AssetSelectModal = ({ open, onClose, selectedPairId, onSelect }: AssetSelectModalProps) => {
 	const [search, setSearch] = useState('');
 	const [debouncedSearch, setDebouncedSearch] = useState('');
 	const [whitelistedOnly, setWhitelistedOnly] = useState(true);
 	const [pairs, setPairs] = useState<PairData[]>([]);
-	const [page, setPage] = useState(1);
-	const [pagesAmount, setPagesAmount] = useState(1);
+	const [nextCursor, setNextCursor] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
-	const [visibleCount, setVisibleCount] = useState(VISIBLE_STEP);
 	const fetchIdRef = useRef('');
+	const loadingRef = useRef(false);
 	const listRef = useRef<HTMLDivElement>(null);
-	const sentinelRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const timeout = setTimeout(() => setDebouncedSearch(search.trim()), SEARCH_DEBOUNCE_MS);
 		return () => clearTimeout(timeout);
 	}, [search]);
 
-	useEffect(() => {
-		setPage(1);
-		setVisibleCount(VISIBLE_STEP);
-		listRef.current?.scrollTo({ top: 0 });
-	}, [debouncedSearch, whitelistedOnly]);
+	const loadPage = useCallback(
+		async (cursor: string | null) => {
+			const fetchId = nanoid();
+			fetchIdRef.current = fetchId;
 
-	useEffect(() => {
-		if (!open) setVisibleCount(VISIBLE_STEP);
-	}, [open]);
-
-	useEffect(() => {
-		if (!open) return;
-
-		const fetchId = nanoid();
-		fetchIdRef.current = fetchId;
-
-		(async () => {
+			loadingRef.current = true;
 			setLoading(true);
 
-			const pageRes = await getPairsPage(
-				page,
+			const pageRes = await getQuotePairsPage(
+				ZANO_ASSET_ID,
+				cursor,
 				debouncedSearch,
 				whitelistedOnly,
-				PairSortOption.VOLUME_HIGH_TO_LOW,
 			).catch(() => null);
 
 			if (fetchIdRef.current !== fetchId) return;
 
-			if (pageRes?.success) setPagesAmount(pageRes.hasMore ? page + 1 : page);
-
 			if (pageRes?.success) {
-				const zanoPairs = pageRes.data.filter(
-					(pair) => pair.second_currency?.asset_id === ZANO_ASSET_ID,
-				);
-
 				setPairs((prev) =>
-					page === 1
-						? zanoPairs
-						: [...prev, ...zanoPairs.filter((p) => !prev.some((e) => e.id === p.id))],
+					cursor === null
+						? pageRes.data
+						: [
+								...prev,
+								...pageRes.data.filter((p) => !prev.some((e) => e.id === p.id)),
+							],
 				);
-			} else if (page === 1) {
-				setPairs([]);
+				setNextCursor(pageRes.nextCursor);
+			} else {
+				if (cursor === null) setPairs([]);
+				setNextCursor(null);
 			}
 
+			loadingRef.current = false;
 			setLoading(false);
-		})();
-	}, [open, page, debouncedSearch, whitelistedOnly]);
-
-	const hasMore = page < pagesAmount;
-	const canShowMore = pairs.length > visibleCount || hasMore;
+		},
+		[debouncedSearch, whitelistedOnly],
+	);
 
 	useEffect(() => {
-		if (open && !loading && hasMore && pairs.length < visibleCount) {
-			setPage((p) => p + 1);
-		}
-	}, [open, loading, hasMore, pairs.length, visibleCount]);
+		if (!open) return;
 
-	useEffect(() => {
-		const sentinel = sentinelRef.current;
-		if (!open || !sentinel || !canShowMore) return;
+		listRef.current?.scrollTo({ top: 0 });
+		setPairs([]);
+		setNextCursor(null);
+		loadPage(null);
+	}, [open, loadPage]);
 
-		const observer = new IntersectionObserver(
-			(entries) => {
-				if (entries[0]?.isIntersecting) {
-					setVisibleCount((count) => count + VISIBLE_STEP);
-				}
-			},
-			{ root: listRef.current, rootMargin: '0px 0px 120px 0px' },
-		);
+	const hasMore = nextCursor !== null;
 
-		observer.observe(sentinel);
-		return () => observer.disconnect();
-	}, [open, canShowMore, pairs.length, visibleCount]);
+	const loadMore = () => {
+		if (!loadingRef.current && hasMore) loadPage(nextCursor);
+	};
+
+	const onListScroll = (e: React.UIEvent<HTMLDivElement>) => {
+		const list = e.currentTarget;
+		if (list.scrollTop + list.clientHeight >= list.scrollHeight - SCROLL_END_OFFSET) loadMore();
+	};
 
 	return (
 		<Modal open={open} onClose={onClose} title="Select asset">
@@ -138,8 +120,8 @@ const AssetSelectModal = ({ open, onClose, selectedPairId, onSelect }: AssetSele
 				</div>
 			</div>
 
-			<div ref={listRef} className={styles.list}>
-				{pairs.slice(0, visibleCount).map((pair) => {
+			<div ref={listRef} className={styles.list} onScroll={onListScroll}>
+				{pairs.map((pair) => {
 					const selected = String(pair.id) === String(selectedPairId);
 					const change = Number(pair.coefficient || 0);
 
@@ -222,7 +204,16 @@ const AssetSelectModal = ({ open, onClose, selectedPairId, onSelect }: AssetSele
 					</div>
 				)}
 
-				{!loading && canShowMore && <div ref={sentinelRef} className={styles.sentinel} />}
+				{!loading && hasMore && (
+					<Button
+						variant="ghost"
+						size="sm"
+						className={styles.loadMore}
+						onClick={loadMore}
+					>
+						Load more
+					</Button>
+				)}
 			</div>
 		</Modal>
 	);

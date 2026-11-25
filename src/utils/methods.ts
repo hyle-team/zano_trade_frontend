@@ -11,10 +11,8 @@ import GetPairRes from '@/interfaces/responses/dex/GetPairRes';
 import GetPageRes from '@/interfaces/responses/offers/GetPageRes';
 import GetOrdersPageRes from '@/interfaces/responses/orders/GetOrdersPageRes';
 import GetUserRes from '@/interfaces/responses/user/GetUserRes';
-import GetUserOrdersRes from '@/interfaces/responses/orders/GetUserOrdersRes';
 import GetCandlesRes from '@/interfaces/responses/candles/GetCandlesRes';
 import GetPairStatsRes from '@/interfaces/responses/orders/GetPairStatsRes';
-import GetUserOrdersPageRes from '@/interfaces/responses/orders/GetUserOrdersPageRes';
 import GetChatRes from '@/interfaces/responses/chats/GetChatRes';
 import GetAllChatsRes from '@/interfaces/responses/chats/GetAllChatsRes';
 import CreateOrderData from '@/interfaces/fetch-data/create-order/CreateOrderData';
@@ -22,13 +20,14 @@ import GetChatChunkRes from '@/interfaces/responses/chats/GetChatChunkRes';
 import axios from 'axios';
 import GetPairsPagesAmountRes from '@/interfaces/responses/dex/GetPairsPagesAmountRes';
 import { PairSortOption } from '@/interfaces/enum/pair';
-import { GetUserOrdersData } from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
-import GetUserOrdersAllPairsRes from '@/interfaces/responses/orders/GetUserOrdersAllPairsRes';
+import {
+	GetUserOrdersBodyStatus,
+	GetUserOrdersData,
+} from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
 import { CancelAllData } from '@/interfaces/fetch-data/cancel-all-orders/CancelAllData';
 import CancelAllRes from '@/interfaces/responses/orders/CancelAllRes';
 import AuthParams from '@/interfaces/common/AuthParams';
 import OrderRow from '@/interfaces/common/OrderRow';
-import UserPendingType from '@/interfaces/common/UserPendingType';
 import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
 import * as v2 from '@/utils/v2/client';
 
@@ -42,6 +41,10 @@ export async function getUser({ token }: AuthParams): Promise<ErrorRes | GetUser
 
 export async function checkAdmin({ token }: AuthParams): Promise<boolean> {
 	return v2.checkAdmin(token).catch(() => false);
+}
+
+export async function refreshOnline({ token }: AuthParams): Promise<boolean> {
+	return v2.refreshOnline(token).catch(() => false);
 }
 
 export async function getConfig(): Promise<ErrorRes | GetConfigRes> {
@@ -176,6 +179,15 @@ export async function getPairsPage(
 	return v2.getPairsPage(page, searchText, whitelistedOnly, sortOption);
 }
 
+export async function getQuotePairsPage(
+	quoteAssetId: string,
+	cursor: string | null,
+	searchText: string,
+	whitelistedOnly: boolean,
+): ReturnType<typeof v2.getQuotePairsPage> {
+	return v2.getQuotePairsPage(quoteAssetId, cursor, searchText, whitelistedOnly);
+}
+
 export async function getPairsPagesAmount(
 	searchText: string,
 	whitelistedOnly: boolean,
@@ -198,24 +210,56 @@ export async function getOrdersPage(pairId: string): Promise<ErrorRes | GetOrder
 	return v2.getOrdersPage(pairId);
 }
 
-export async function getUserOrdersPage(
+export async function getMyPairOrders(
+	pairId: string,
+	status: GetUserOrdersBodyStatus,
+	{ token }: AuthParams,
+): Promise<ErrorRes | { success: true; data: OrderRow[] }> {
+	return v2.getMyPairOrders(
+		pairId,
+		status === GetUserOrdersBodyStatus.FINISHED ? 'FINISHED' : 'ACTIVE',
+		token,
+	);
+}
+
+export async function getMyPairSwapState(
 	pairId: string,
 	{ token }: AuthParams,
-): Promise<ErrorRes | GetUserOrdersPageRes> {
-	return v2.getUserOrdersPage(pairId, token);
+): ReturnType<typeof v2.getMyPairSwapState> {
+	return v2.getMyPairSwapState(pairId, token);
 }
 
-export async function getUserOrders(
-	data: GetUserOrdersData,
+export async function getOrderMatchesPage(
+	order: OrderRow,
+	cursor: string | null,
 	{ token }: AuthParams,
-): Promise<ErrorRes | GetUserOrdersRes> {
-	return v2.getUserOrders(data, token);
+): ReturnType<typeof v2.getOrderMatchesPage> {
+	return v2.getOrderMatchesPage(order, cursor, token);
 }
 
-export async function getUserOrdersAllPairs({
-	token,
-}: AuthParams): Promise<ErrorRes | GetUserOrdersAllPairsRes> {
-	return v2.getUserOrdersAllPairs(token);
+export async function getOrderIncomingProposalsPage(
+	order: OrderRow,
+	cursor: string | null,
+	{ token }: AuthParams,
+): ReturnType<typeof v2.getOrderIncomingProposalsPage> {
+	return v2.getOrderIncomingProposalsPage(order, cursor, token);
+}
+
+export async function getOrderOutgoingProposalsPage(
+	order: OrderRow,
+	cursor: string | null,
+	{ token }: AuthParams,
+): ReturnType<typeof v2.getOrderOutgoingProposalsPage> {
+	return v2.getOrderOutgoingProposalsPage(order, cursor, token);
+}
+
+export async function getMyOrdersPage(
+	filterInfo: GetUserOrdersData['filterInfo'],
+	cursor: string | null,
+	count: number,
+	{ token }: AuthParams,
+): ReturnType<typeof v2.getMyOrdersPage> {
+	return v2.getMyOrdersPage(filterInfo, cursor, count, token);
 }
 
 export async function cancelOrder(
@@ -291,13 +335,6 @@ export async function getTrades(
 	pairId: string,
 ): Promise<ErrorRes | { success: true; data: Trade[] }> {
 	return v2.getTrades(pairId);
-}
-
-export async function getUserPendings(
-	{ token }: AuthParams,
-	pairId?: string,
-): Promise<ErrorRes | { success: true; data: UserPendingType[] }> {
-	return v2.getUserPendings(token, pairId);
 }
 
 export async function getZanoPrice() {

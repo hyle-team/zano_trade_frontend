@@ -208,7 +208,7 @@ function InputPanelItem(props: InputPanelItemProps) {
 								<Button
 									className={styles.applyAlert__button}
 									onClick={() => {
-										openOrdersTab('matches');
+										openOrdersTab('opened');
 										scrollToOrderList();
 										setHasImmediateMatch(false);
 									}}

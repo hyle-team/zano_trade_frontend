@@ -22,6 +22,7 @@ import {
 	V2Side,
 	V2SwapProposalBase,
 	V2TradesPage,
+	V2VolumeStats,
 } from './types';
 import { V2Transport } from './transport';
 import { getCandlesQuery } from './mappers';
@@ -194,6 +195,9 @@ export const v2Api = (t: V2Transport) => ({
 
 	getMe: (token: string | null) => t<V2Me>('GET', '/users/me', { token }),
 
+	refreshOnline: (token: string | null) =>
+		t<{ id: string; lastOnlineAt: string }>('POST', '/users/refresh-online', { token }),
+
 	getAdmins: (token: string | null, count: number, offset: number) =>
 		t<V2AdminsPage>('GET', '/control/admins', { token, query: { count, offset } }),
 
@@ -217,8 +221,8 @@ export const v2Api = (t: V2Transport) => ({
 
 	getVolumeStats: (
 		token: string | null,
-		query: { address: string; pairId: string; from: number; to: number },
-	) => t<{ volume: string }>('GET', '/control/volume-stats', { token, query }),
+		query: { address: string; pairId: string; from?: string; to?: string },
+	) => t<V2VolumeStats>('GET', '/control/volume-stats', { token, query }),
 
 	deleteFeaturedPair: (token: string | null, pairId: string) =>
 		t<V2FeaturedPair>('DELETE', '/control/delete-featured-pair', { token, body: { pairId } }),

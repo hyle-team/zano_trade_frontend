@@ -51,7 +51,6 @@
 	p {
 		@include label;
 	}
-
 }
 
 .list {
@@ -207,7 +206,8 @@
 	color: var(--primary-color);
 }
 
-.sentinel {
+.loadMore {
 	flex-shrink: 0;
-	height: 1px;
+	align-self: center;
+	margin: 8px auto;
 }

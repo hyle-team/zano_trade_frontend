@@ -1,14 +1,13 @@
 import MatrixAddress from '@/interfaces/common/MatrixAddress';
 import OrderRow from '@/interfaces/common/OrderRow';
 import PairData from '@/interfaces/common/PairData';
+import { OrderItemsKind } from '../components/OrderItemsModal/types';
 
 export interface BuildUserColumnsArgs {
 	firstCurrencyName: string;
 	secondCurrencyName: string;
 	secondAssetUsdPrice?: number;
-	matchesCountByOrderId: Record<string, number>;
-	requestsCountByOrderId: Record<string, number>;
-	offersCountByOrderId: Record<string, number>;
+	onOpenItems: (_kind: OrderItemsKind, _order: OrderRow) => void;
 	onAfter: () => Promise<void>;
 }
 

@@ -17,6 +17,7 @@ import {
 	V2CandleMode,
 	V2IncomingProposal,
 	V2MatchOrder,
+	V2MyPairOrder,
 	V2Order,
 	V2OutgoingProposal,
 	V2Pair,
@@ -89,7 +90,7 @@ export function toPairData(pair: V2Pair): PairData {
 		high: stats.high,
 		low: stats.low,
 		volume: stats.volume,
-		featured: pair.isFeatured,
+		featured: false,
 		whitelisted: pair.isWhitelisted,
 	};
 }
@@ -109,7 +110,16 @@ export function toOrderRow(order: V2Order): OrderRow {
 		left: order.left as unknown as number,
 		min_per_apply_amount: order.minPerApplyAmount as unknown as number | null,
 		max_per_apply_amount: order.maxPerApplyAmount as unknown as number | null,
-		isInstant: false,
+		isInstant: order.isInstant,
+	};
+}
+
+export function toMyPairOrderRow(order: V2MyPairOrder): OrderRow {
+	return {
+		...toOrderRow(order),
+		matches_count: order.matchesCount,
+		incoming_proposals_count: order.incomingPendingProposalsCount,
+		outgoing_proposals_count: order.outgoingPendingProposalsCount,
 	};
 }
 
@@ -168,7 +178,7 @@ export function matchToApplyTip(match: V2MatchOrder, myOrderId: string): ApplyTi
 		total: new Decimal(match.left).mul(match.price).toFixed() as unknown as number,
 		connected_order_id: myOrderId,
 		transaction: false,
-		isInstant: false,
+		isInstant: match.isInstant,
 		to_be_traded: match.toBeTraded,
 	};
 }
@@ -192,6 +202,14 @@ export function incomingProposalToApplyTip(
 		transaction: true,
 		hex_raw_proposal: proposal.hexRawProposal,
 		isInstant: false,
+		to_be_traded: {
+			baseAmount: proposal.baseAmount,
+			quoteAmount: proposal.quoteAmount,
+			price: proposal.price,
+			baseAmountInAtomics: proposal.baseAmountInAtomics,
+			quoteAmountInAtomics: proposal.quoteAmountInAtomics,
+			priceInAtomics: proposal.priceInAtomics,
+		},
 	};
 }
 

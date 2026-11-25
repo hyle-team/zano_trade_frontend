@@ -22,7 +22,7 @@ import { getAdvancedModeHref } from '@/components/dex/swap/ModeSwitch';
 import { Store } from '@/store/store-reducer';
 import { useOrderActions } from '@/hook/useOrderActions';
 import { getWalletErrorMessage } from '@/utils/walletErrors';
-import { getUserOrders } from '@/utils/methods';
+import { getMyPairOrders } from '@/utils/methods';
 import { classes, formatTimestamp, shortenAddress, ZANO_ASSET_ID } from '@/utils/utils';
 import { formatTokenAmount, getOrderSwapState, safeDecimal } from '@/utils/swap';
 import { GetUserOrdersBodyStatus } from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
@@ -161,15 +161,9 @@ const SwapOrderStatus = ({
 		let cancelled = false;
 
 		(async () => {
-			const result = await getUserOrders(
-				{
-					limit: 50,
-					offset: 0,
-					filterInfo: {
-						pairId: String(pairData.id),
-						status: GetUserOrdersBodyStatus.FINISHED,
-					},
-				},
+			const result = await getMyPairOrders(
+				String(pairData.id),
+				GetUserOrdersBodyStatus.FINISHED,
 				{ token: state.token },
 			).catch(() => null);
 
@@ -186,7 +180,7 @@ const SwapOrderStatus = ({
 
 			if (finished) {
 				setSnapshot((prev) => ({
-					...(prev ?? (finished as unknown as OrderRow)),
+					...(prev ?? finished),
 					left: finished.left,
 					status: finished.status,
 				}));

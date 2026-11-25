@@ -1,0 +1,32 @@
+@use '../../../../../styles/mixins' as *;
+
+.count {
+	@include reset-button;
+	cursor: default;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--font-dimmed-color);
+
+	&_active {
+		cursor: pointer;
+		display: inline-block;
+		vertical-align: top;
+		min-width: 40px;
+		padding: 8px 12px;
+		margin: -4px -12px -12px;
+		font-family: inherit;
+		line-height: inherit;
+		text-align: left;
+		color: var(--primary-color);
+		text-decoration: underline;
+		text-decoration-color: transparent;
+		text-underline-offset: 3px;
+		transition: text-decoration-color 0.2s ease;
+
+		&:hover,
+		&:focus-visible {
+			background: none;
+			text-decoration-color: currentColor;
+		}
+	}
+}

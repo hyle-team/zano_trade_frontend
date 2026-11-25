@@ -126,4 +126,12 @@ export function onAuthorizedEvents(handler: (_eventName: string, _payload: unkno
 	};
 }
 
+export function onReconnect(handler: () => void) {
+	socket.io.on('reconnect', handler);
+
+	return () => {
+		socket.io.off('reconnect', handler);
+	};
+}
+
 export default socket;

@@ -2,7 +2,6 @@ import { useContext } from 'react';
 import { Store } from '@/store/store-reducer';
 import { updateUser as updateUserAction } from '@/store/actions';
 import { GetUserResData } from '@/interfaces/responses/user/GetUserRes';
-import { getActionRequiredCount } from '@/utils/v2/client';
 import sha256 from 'sha256';
 
 function useUpdateUser() {
@@ -13,8 +12,6 @@ function useUpdateUser() {
 
 		if (!token || !wallet?.connected || !wallet.address) return false;
 
-		const exchangeNotifications = await getActionRequiredCount(token).catch(() => 0);
-
 		const user: GetUserResData = {
 			id: wallet.address,
 			alias: wallet.alias,
@@ -22,7 +19,7 @@ function useUpdateUser() {
 			favourite_currencies: [],
 			offers: [],
 			chats: [],
-			exchange_notifications: exchangeNotifications,
+			exchange_notifications: 0,
 		};
 
 		if (sha256(JSON.stringify(state.user)) !== sha256(JSON.stringify(user))) {

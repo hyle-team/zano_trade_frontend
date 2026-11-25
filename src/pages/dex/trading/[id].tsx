@@ -3,13 +3,12 @@ import Header from '@/components/default/Header/Header';
 import HorizontalSelect from '@/components/UI/HorizontalSelect/HorizontalSelect';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { cancelOrder } from '@/utils/methods';
+import { cancelAllOrders } from '@/utils/methods';
 import { getCandles, getOrdersPage, getPair, getPairStats, getTrades } from '@/utils/serverMethods';
 import { getForwardedFor } from '@/utils/serverFetch';
 import ContentPreloader from '@/components/UI/ContentPreloader/ContentPreloader';
 import PeriodState from '@/interfaces/states/pages/dex/trading/InputPanelItem/PeriodState';
 import OrderRow from '@/interfaces/common/OrderRow';
-import ApplyTip from '@/interfaces/common/ApplyTip';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import { PairStats } from '@/interfaces/responses/orders/GetPairStatsRes';
 import PairData from '@/interfaces/common/PairData';
@@ -29,7 +28,6 @@ import useFilteredData from '@/hook/useFilteredData';
 import useTradeInit from '@/hook/useTradeInit';
 import useMatrixAddresses from '@/hook/useMatrixAddresses';
 import takeOrderClick from '@/utils/takeOrderClick';
-import useUpdateUser from '@/hook/useUpdateUser';
 import { GuideProvider } from '@/store/guide-provider';
 import { Store } from '@/store/store-reducer';
 import { GetServerSidePropsContext } from 'next';
@@ -100,12 +98,10 @@ function Trading({
 	const [candles, setCandles] = useState<CandleRow[]>(initialCandles);
 	const [trades, setTrades] = useState<Trade[]>(initialTrades);
 
-	const fetchUser = useUpdateUser();
 	const [userOrders, setUserOrders] = useState<OrderRow[]>([]);
 	const [periodsState, setPeriodsState] = useState<PeriodState>(periods[4]);
 	const [myOrdersLoading, setMyOrdersLoading] = useState(true);
 	const [ordersBuySell, setOrdersBuySell] = useState(buySellValues[0]);
-	const [applyTips, setApplyTips] = useState<ApplyTip[]>([]);
 	const matrixAddresses = useMatrixAddresses(ordersHistory);
 	const [orderFormType, setOrderFormType] = useState(buySellValues[1]);
 
@@ -133,7 +129,6 @@ function Trading({
 		tradesLoading,
 	} = useTradingData({
 		periodsState,
-		setApplyTips,
 		setCandles,
 		setMyOrdersLoading,
 		setOrdersHistory,
@@ -144,12 +139,11 @@ function Trading({
 	});
 
 	useSocketListeners({
-		setUserOrders,
 		ordersHistory,
-		setApplyTips,
 		setOrdersHistory,
 		setPairStats,
 		updateOrders,
+		updateUserOrders,
 		setTrades,
 	});
 
@@ -179,17 +173,16 @@ function Trading({
 		setMyOrdersLoading(true);
 
 		try {
-			for (const order of userOrders) {
-				await cancelOrder(order.id, { token: state.token });
-			}
-
-			await updateUserOrders();
+			await cancelAllOrders(
+				{ filterInfo: { pairId: String(pairData?.id ?? '') } },
+				{ token: state.token },
+			);
 		} catch (err) {
 			console.error(err);
 		} finally {
-			setMyOrdersLoading(false);
+			await updateUserOrders();
 		}
-	}, [userOrders, updateUserOrders, state.token]);
+	}, [userOrders.length, pairData?.id, updateUserOrders, state.token]);
 
 	const { filteredOrdersHistory } = useFilteredData({
 		ordersBuySell,
@@ -199,7 +192,6 @@ function Trading({
 	const onAfter = async () => {
 		await updateOrders();
 		await updateUserOrders();
-		await fetchUser();
 		await fetchTrades();
 	};
 
@@ -306,13 +298,13 @@ function Trading({
 				<UserOrders
 					orderListRef={orderListRef}
 					userOrders={userOrders}
-					applyTips={applyTips}
 					myOrdersLoading={myOrdersLoading}
 					handleCancelAllOrders={handleCancelAllOrders}
 					matrixAddresses={matrixAddresses}
 					secondAssetUsdPrice={secondAssetUsdPrice}
 					pairData={pairData}
 					onAfter={onAfter}
+					onOpenMyOrders={updateUserOrders}
 					requestedTab={requestedOrdersTab}
 					onRequestedTabHandled={() => setRequestedOrdersTab(null)}
 				/>

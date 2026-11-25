@@ -139,11 +139,9 @@ export async function getFeaturedPairs(
 
 	if (!res.success) return fail(res.error);
 
-	const featured = res.result.pairs.filter((p) => p.isFeatured);
 	const zanoQuoted = res.result.pairs.filter((p) => p.quoteAsset.assetId === ZANO_ASSET_ID);
-	const pairs = featured.length > 0 ? featured : zanoQuoted;
 
-	return { success: true, data: pairs.slice(0, limit).map(toPairData) };
+	return { success: true, data: zanoQuoted.slice(0, limit).map(toPairData) };
 }
 
 export async function getStats({ xForwardedFor }: ForwardedForParam = {}): Promise<GetStatsRes> {

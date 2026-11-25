@@ -1,9 +1,9 @@
 import OrderRow from '@/interfaces/common/OrderRow';
 import ApplyTip from '@/interfaces/common/ApplyTip';
 import UserPendingType from '@/interfaces/common/UserPendingType';
-import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
 import MatrixAddress from '@/interfaces/common/MatrixAddress';
 import PairData from '@/interfaces/common/PairData';
+import { OrderItemsKind } from '../../components/OrderItemsModal/types';
 
 export type CardsType = 'orders' | 'matches' | 'offers' | 'requests' | 'history';
 
@@ -17,10 +17,8 @@ type Common = {
 export type UniversalCardsProps =
 	| (Common & {
 			type: 'orders';
-			data: OrderRow[] | UserOrderData[];
-			matchesCountByOrderId: Record<string, number>;
-			requestsCountByOrderId: Record<string, number>;
-			offersCountByOrderId: Record<string, number>;
+			data: OrderRow[];
+			onOpenItems: (_kind: OrderItemsKind, _order: OrderRow) => void;
 	  })
 	| (Common & {
 			type: 'matches' | 'offers';
@@ -36,5 +34,5 @@ export type UniversalCardsProps =
 	  })
 	| (Common & {
 			type: 'history';
-			data: UserOrderData[];
+			data: OrderRow[];
 	  });

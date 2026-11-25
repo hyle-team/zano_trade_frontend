@@ -11,7 +11,6 @@ import { PairSortOption } from '@/interfaces/enum/pair';
 import { PairStats } from '@/interfaces/responses/orders/GetPairStatsRes';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
-import { GetUserOrdersAllPairsResPair } from '@/interfaces/responses/orders/GetUserOrdersAllPairsRes';
 import {
 	GetUserOrdersBodyStatus,
 	GetUserOrdersData,
@@ -28,6 +27,7 @@ import {
 	V2OrderStatus,
 	V2Pair,
 	V2Response,
+	V2VolumeStats,
 } from './types';
 import { clientTransport } from './transport';
 import { V2_MAX_PAGE_COUNT, V2PairsSort, getAllPublicOrders, v2Api } from './api';
@@ -41,6 +41,7 @@ import {
 	toPageOrderData,
 	toPairData,
 	toPairStats,
+	toMyPairOrderRow,
 	toOrderRow,
 	toTrades,
 	toUserOrderData,
@@ -168,6 +169,32 @@ export async function getPairsPagesAmount(
 	return { success: true, data: res.hasMore ? 2 : 1 };
 }
 
+export async function getQuotePairsPage(
+	quoteAssetId: string,
+	cursor: string | null,
+	searchText: string,
+	whitelistedOnly: boolean,
+): Promise<ErrorRes | { success: true; data: PairData[]; nextCursor: string | null }> {
+	const res = await api.getPairs({
+		cursor,
+		count: V2_MAX_PAGE_COUNT,
+		whitelistedOnly,
+		searchText: searchText || quoteAssetId,
+		sort: 'VOLUME_24H_DESC',
+	});
+	if (!res.success) return fail(res);
+
+	res.result.pairs.forEach(rememberPair);
+
+	return {
+		success: true,
+		data: res.result.pairs
+			.filter((pair) => pair.quoteAsset.assetId === quoteAssetId)
+			.map(toPairData),
+		nextCursor: res.result.pairs.length < V2_MAX_PAGE_COUNT ? null : res.result.nextCursor,
+	};
+}
+
 export async function getPair(id: string): Promise<ErrorRes | { success: true; data: PairData }> {
 	const res = await getV2Pair(id, true);
 	if (!res.success) return fail(res);
@@ -210,7 +237,15 @@ export async function getTrades(
 const CREATE_ORDER_ERRORS: Record<string, string> = {
 	TOO_MANY_ORDERS_PER_PAIR_PER_SIDE: 'Too many orders',
 	PAIR_NOT_FOUND: 'Pair not found',
+	USER_OFFLINE: 'Your session is inactive. Please reconnect your wallet and try again.',
 };
+
+export async function refreshOnline(token: string | null): Promise<boolean> {
+	if (!token) return false;
+
+	const res = await api.refreshOnline(token);
+	return res.success;
+}
 
 export async function createOrder(
 	orderData: CreateOrderData,
@@ -226,14 +261,20 @@ export async function createOrder(
 			? toAtomics(orderData.minPerApplyAmount, baseAsset.decimalPoint).toFixed()
 			: null;
 
-	const res = await api.createOrder(token, {
+	const body = {
 		pairId: orderData.pairId,
 		side: typeToSide(orderData.type),
 		amountInAtomics: toAtomics(orderData.amount, baseAsset.decimalPoint).toFixed(),
 		priceInAtomics: toAtomics(orderData.price, quoteAsset.decimalPoint).toFixed(),
 		minPerApplyAmountInAtomics: minPerApply,
 		maxPerApplyAmountInAtomics: null,
-	});
+	};
+
+	let res = await api.createOrder(token, body);
+
+	if (!res.success && res.error.code === 'USER_OFFLINE' && (await refreshOnline(token))) {
+		res = await api.createOrder(token, body);
+	}
 
 	if (!res.success) {
 		return {
@@ -272,26 +313,8 @@ export async function cancelAllOrders(
 	return { success: true };
 }
 
-async function getAllMyOrdersByPair(token: string | null, pairId: string) {
-	const orders: V2MyPairOrder[] = [];
-	let cursor: string | null = null;
-
-	for (let page = 0; page < 5; page += 1) {
-		const res = await api.getMyOrdersByPair(token, {
-			pairId,
-			cursor,
-			count: V2_MAX_PAGE_COUNT,
-			status: 'ACTIVE',
-		});
-
-		if (!res.success) return res;
-
-		orders.push(...res.result.orders);
-		cursor = res.result.nextCursor;
-		if (!cursor) break;
-	}
-
-	return { success: true as const, result: orders };
+async function getMyPairOrdersRaw(token: string | null, pairId: string, status: V2OrderStatus) {
+	return api.getMyOrdersByPair(token, { pairId, count: V2_MAX_PAGE_COUNT, status });
 }
 
 async function collectApplyTips(token: string | null, orders: V2MyPairOrder[]) {
@@ -350,72 +373,121 @@ async function collectPendings(token: string | null, orders: V2MyPairOrder[]) {
 	return perOrder.flat();
 }
 
-export async function getUserOrdersPage(
+export async function getMyPairOrders(
+	pairId: string,
+	status: V2OrderStatus,
+	token: string | null,
+): Promise<ErrorRes | { success: true; data: OrderRow[] }> {
+	const res = await getMyPairOrdersRaw(token, pairId, status);
+	if (!res.success) return fail(res);
+	return { success: true, data: res.result.orders.map(toMyPairOrderRow) };
+}
+
+export async function getMyPairSwapState(
 	pairId: string,
 	token: string | null,
-): Promise<ErrorRes | { success: true; data: { orders: OrderRow[]; applyTips: ApplyTip[] } }> {
-	const ordersRes = await getAllMyOrdersByPair(token, pairId);
-	if (!ordersRes.success) return fail(ordersRes);
+): Promise<
+	| ErrorRes
+	| {
+			success: true;
+			data: {
+				orders: OrderRow[];
+				applyTips: ApplyTip[];
+				pendings: UserPendingType[];
+				assetIds: { baseAssetId: string; quoteAssetId: string } | null;
+			};
+	  }
+> {
+	const [res, pairRes] = await Promise.all([
+		getMyPairOrdersRaw(token, pairId, 'ACTIVE'),
+		getV2Pair(pairId).catch(() => null),
+	]);
 
-	const applyTips = await collectApplyTips(token, ordersRes.result);
+	if (!res.success) return fail(res);
+
+	const { orders } = res.result;
+	const [applyTips, pendings] = await Promise.all([
+		collectApplyTips(token, orders),
+		collectPendings(token, orders),
+	]);
 
 	return {
 		success: true,
-		data: { orders: ordersRes.result.map(toOrderRow), applyTips },
+		data: {
+			orders: orders.map(toMyPairOrderRow),
+			applyTips,
+			pendings,
+			assetIds: pairRes?.success
+				? {
+						baseAssetId: pairRes.result.baseAsset.assetId,
+						quoteAssetId: pairRes.result.quoteAsset.assetId,
+					}
+				: null,
+		},
 	};
 }
 
-async function getMyActivePairIds(token: string | null) {
-	const pairIds = new Set<string>();
-	let cursor: string | null = null;
+const ORDER_ITEMS_PAGE_SIZE = 20;
 
-	for (let page = 0; page < 5; page += 1) {
-		const res = await api.getMyOrders(token, {
-			cursor,
-			count: V2_MAX_PAGE_COUNT,
-			status: 'ACTIVE',
-		});
+export type CursorPage<T> = { items: T[]; nextCursor: string | null };
 
-		if (!res.success) return res;
+const toCursorPage = <T>(items: T[], nextCursor: string | null, count: number): CursorPage<T> => ({
+	items,
+	nextCursor: items.length < count ? null : nextCursor,
+});
 
-		res.result.orders.forEach((o) => pairIds.add(o.pairId));
-		cursor = res.result.nextCursor;
-		if (!cursor) break;
-	}
-
-	return { success: true as const, result: Array.from(pairIds) };
-}
-
-export async function getUserPendings(
+export async function getOrderMatchesPage(
+	order: OrderRow,
+	cursor: string | null,
 	token: string | null,
-	pairId?: string,
-): Promise<ErrorRes | { success: true; data: UserPendingType[] }> {
-	const pairIdsRes = pairId
-		? { success: true as const, result: [pairId] }
-		: await getMyActivePairIds(token);
+): Promise<ErrorRes | { success: true; data: CursorPage<ApplyTip> }> {
+	const res = await api.getMatches(token, order.id, cursor, ORDER_ITEMS_PAGE_SIZE);
+	if (!res.success) return fail(res);
 
-	if (!pairIdsRes.success) return fail(pairIdsRes);
-
-	const ordersPerPair = await Promise.all(
-		pairIdsRes.result.map((id) => getAllMyOrdersByPair(token, id).catch(() => null)),
-	);
-
-	const orders = ordersPerPair.flatMap((res) => (res?.success ? res.result : []));
-
-	return { success: true, data: await collectPendings(token, orders) };
+	return {
+		success: true,
+		data: toCursorPage(
+			res.result.orders.map((m) => matchToApplyTip(m, order.id)),
+			res.result.nextCursor,
+			ORDER_ITEMS_PAGE_SIZE,
+		),
+	};
 }
 
-export async function getActionRequiredCount(token: string | null): Promise<number> {
-	const pairIdsRes = await getMyActivePairIds(token).catch(() => null);
-	if (!pairIdsRes?.success) return 0;
+export async function getOrderIncomingProposalsPage(
+	order: OrderRow,
+	cursor: string | null,
+	token: string | null,
+): Promise<ErrorRes | { success: true; data: CursorPage<ApplyTip> }> {
+	const res = await api.getIncomingProposals(token, order.id, cursor, ORDER_ITEMS_PAGE_SIZE);
+	if (!res.success) return fail(res);
 
-	const ordersPerPair = await Promise.all(
-		pairIdsRes.result.map((id) => getAllMyOrdersByPair(token, id).catch(() => null)),
-	);
+	return {
+		success: true,
+		data: toCursorPage(
+			res.result.swapProposals.map((p) => incomingProposalToApplyTip(p, order.type)),
+			res.result.nextCursor,
+			ORDER_ITEMS_PAGE_SIZE,
+		),
+	};
+}
 
-	return ordersPerPair
-		.flatMap((res) => (res?.success ? res.result : []))
-		.reduce((sum, order) => sum + order.matchesCount + order.incomingPendingProposalsCount, 0);
+export async function getOrderOutgoingProposalsPage(
+	order: OrderRow,
+	cursor: string | null,
+	token: string | null,
+): Promise<ErrorRes | { success: true; data: CursorPage<UserPendingType> }> {
+	const res = await api.getOutgoingProposals(token, order.id, cursor, ORDER_ITEMS_PAGE_SIZE);
+	if (!res.success) return fail(res);
+
+	return {
+		success: true,
+		data: toCursorPage(
+			res.result.swapProposals.map((p) => outgoingProposalToPending(p, order.type)),
+			res.result.nextCursor,
+			ORDER_ITEMS_PAGE_SIZE,
+		),
+	};
 }
 
 const STATUS_TO_V2: Record<GetUserOrdersBodyStatus, V2OrderStatus> = {
@@ -423,85 +495,35 @@ const STATUS_TO_V2: Record<GetUserOrdersBodyStatus, V2OrderStatus> = {
 	[GetUserOrdersBodyStatus.FINISHED]: 'FINISHED',
 };
 
-const myOrdersCursors = new Map<string, Map<number, string | null>>();
-
-export async function getUserOrders(
-	{ limit, offset, filterInfo: { pairId, status, type, date } }: GetUserOrdersData,
+export async function getMyOrdersPage(
+	{ pairId, status, type, date }: GetUserOrdersData['filterInfo'],
+	cursor: string | null,
+	count: number,
 	token: string | null,
-): Promise<ErrorRes | { success: true; totalItemsCount: number; data: UserOrderData[] }> {
-	const count = Math.min(Math.max(limit, 1), V2_MAX_PAGE_COUNT);
-	const query = {
+): Promise<ErrorRes | { success: true; data: CursorPage<UserOrderData> }> {
+	const pageCount = Math.min(Math.max(count, 1), V2_MAX_PAGE_COUNT);
+	const res = await api.getMyOrders(token, {
+		cursor,
+		count: pageCount,
 		pairId,
 		side: type ? typeToSide(type) : undefined,
 		status: status ? STATUS_TO_V2[status] : undefined,
 		createdFrom: date ? new Date(date.from).toISOString() : undefined,
 		createdTo: date ? new Date(date.to).toISOString() : undefined,
-	};
+	});
 
-	const key = JSON.stringify({ ...query, count });
-	let cursors = myOrdersCursors.get(key);
-
-	if (offset === 0 || !cursors) {
-		cursors = new Map([[0, null]]);
-		myOrdersCursors.set(key, cursors);
-	}
-
-	const cursor = cursors.get(offset);
-
-	if (cursor === undefined && offset > 0) {
-		return { success: true, totalItemsCount: offset, data: [] };
-	}
-
-	const res = await api.getMyOrders(token, { ...query, cursor, count });
 	if (!res.success) return fail(res);
 
 	const { orders, nextCursor } = res.result;
-	const nextOffset = offset + orders.length;
-
-	if (nextCursor) cursors.set(nextOffset, nextCursor);
-
 	const pairs = await getPairsMap(orders.map((o) => o.pairId));
 
 	return {
 		success: true,
-		totalItemsCount: nextCursor ? nextOffset + 1 : nextOffset,
-		data: orders.map((o: V2Order) => toUserOrderData(o, pairs.get(o.pairId))),
-	};
-}
-
-export async function getUserOrdersAllPairs(
-	token: string | null,
-): Promise<ErrorRes | { success: true; data: GetUserOrdersAllPairsResPair[] }> {
-	const pairIds = new Set<string>();
-	let cursor: string | null = null;
-
-	for (let page = 0; page < 3; page += 1) {
-		const res = await api.getMyOrders(token, { cursor, count: V2_MAX_PAGE_COUNT });
-		if (!res.success) return fail(res);
-
-		res.result.orders.forEach((o) => pairIds.add(o.pairId));
-		cursor = res.result.nextCursor;
-		if (!cursor) break;
-	}
-
-	const pairs = await getPairsMap(Array.from(pairIds));
-
-	return {
-		success: true,
-		data: Array.from(pairIds).map((id) => {
-			const pair = pairs.get(id);
-			return {
-				id: id as unknown as number,
-				firstCurrency: {
-					id: (pair?.baseAsset.assetId ?? '') as unknown as number,
-					ticker: pair?.baseAsset.ticker ?? null,
-				},
-				secondCurrency: {
-					id: (pair?.quoteAsset.assetId ?? '') as unknown as number,
-					ticker: pair?.quoteAsset.ticker ?? null,
-				},
-			};
-		}),
+		data: toCursorPage(
+			orders.map((o: V2Order) => toUserOrderData(o, pairs.get(o.pairId))),
+			nextCursor,
+			pageCount,
+		),
 	};
 }
 
@@ -670,9 +692,9 @@ export async function deleteFeaturedPair(
 }
 
 export async function getVolumeStats(
-	query: { address: string; pairId: string; from: number; to: number },
+	query: { address: string; pairId: string; from?: string; to?: string },
 	token: string | null,
-): Promise<ErrorRes | { success: true; data: { volume: string } }> {
+): Promise<ErrorRes | { success: true; data: V2VolumeStats }> {
 	const res = await api.getVolumeStats(token, query);
 	if (!res.success) return controlFail(res);
 	return { success: true, data: res.result };

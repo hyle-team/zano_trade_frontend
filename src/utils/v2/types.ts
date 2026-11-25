@@ -39,7 +39,6 @@ export type V2Pair = {
 	quoteAsset: V2Asset;
 	stats: V2PairStats;
 	isWhitelisted: boolean;
-	isFeatured: boolean;
 };
 
 export type V2PairsPage = {
@@ -51,7 +50,6 @@ export type V2PairByAssets = {
 	id: string;
 	stats: V2PairStats;
 	isWhitelisted: boolean;
-	isFeatured: boolean;
 };
 
 export type V2User = {
@@ -72,6 +70,7 @@ export type V2Order = {
 	minPerApplyAmount: string | null;
 	maxPerApplyAmount: string | null;
 	createdAt: string;
+	isInstant: boolean;
 	amountInAtomics: string;
 	leftInAtomics: string;
 	priceInAtomics: string;
@@ -181,6 +180,11 @@ export type V2FeaturedPair = {
 	id: string;
 	baseAsset: V2Asset;
 	quoteAsset: V2Asset;
+};
+
+export type V2VolumeStats = {
+	volume: string;
+	volumeInAtomics: string;
 };
 
 export type V2FeaturedPairsPage = {

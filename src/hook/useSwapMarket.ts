@@ -1,21 +1,20 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { SocketEvent, onAuthorizedEvents, onPairEvents, subscribePair } from '@/utils/socket';
-import { Store } from '@/store/store-reducer';
 import {
-	getOrdersPage,
-	getPair,
-	getPairStats,
-	getUserOrdersPage,
-	getUserPendings,
-} from '@/utils/methods';
+	SocketEvent,
+	onAuthorizedEvents,
+	onPairEvents,
+	onReconnect,
+	subscribePair,
+} from '@/utils/socket';
+import { Store } from '@/store/store-reducer';
+import { getMyPairSwapState, getOrdersPage, getPair, getPairStats } from '@/utils/methods';
+import { filterValidSwapProposals } from '@/utils/swapProposalValidation';
 import PairData from '@/interfaces/common/PairData';
 import OrderRow from '@/interfaces/common/OrderRow';
 import ApplyTip from '@/interfaces/common/ApplyTip';
 import UserPendingType from '@/interfaces/common/UserPendingType';
 import { PairStats } from '@/interfaces/responses/orders/GetPairStatsRes';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
-
-const USER_DATA_POLL_INTERVAL = 15e3;
 
 interface UseSwapMarketParams {
 	pairId: string | null;
@@ -63,20 +62,20 @@ export function useSwapMarket({
 		const token = tokenRef.current;
 		if (!id || !token) return;
 
-		const [userPage, pendingRes] = await Promise.all([
-			getUserOrdersPage(id, { token }).catch(() => null),
-			getUserPendings({ token }, id).catch(() => null),
-		]);
-
+		const result = await getMyPairSwapState(id, { token }).catch(() => null);
 		if (pairIdRef.current !== id) return;
 
-		if (userPage?.success) {
-			setUserOrders(userPage.data?.orders || []);
-			setApplyTips(userPage.data?.applyTips || []);
-		}
+		if (result?.success) {
+			const validTips = await filterValidSwapProposals(
+				result.data.applyTips,
+				result.data.assetIds,
+			);
 
-		if (pendingRes?.success) {
-			setPendings(pendingRes.data || []);
+			if (pairIdRef.current !== id) return;
+
+			setUserOrders(result.data.orders);
+			setApplyTips(validTips);
+			setPendings(result.data.pendings);
 		}
 
 		setUserDataLoaded(true);
@@ -122,15 +121,12 @@ export function useSwapMarket({
 	useEffect(() => {
 		setUserOrders([]);
 		setApplyTips([]);
+		setPendings([]);
 		setUserDataLoaded(false);
 
 		if (!loggedIn || !pairId) return;
 
 		refreshUserData();
-
-		const interval = setInterval(refreshUserData, USER_DATA_POLL_INTERVAL);
-
-		return () => clearInterval(interval);
 	}, [pairId, loggedIn, state.wallet?.address]);
 
 	const refreshStats = useCallback(async () => {
@@ -147,7 +143,7 @@ export function useSwapMarket({
 		const unsubscribe = subscribePair(String(pairId));
 
 		const offPair = onPairEvents([String(pairId)], (eventName) => {
-			refreshAll();
+			refreshOrderBook();
 			if (eventName === SocketEvent.TRADE_PERFORMED_PUBLIC) refreshStats();
 		});
 
@@ -155,12 +151,19 @@ export function useSwapMarket({
 			refreshUserData();
 		});
 
+		const offReconnect = onReconnect(() => {
+			refreshOrderBook();
+			refreshStats();
+			refreshUserData();
+		});
+
 		return () => {
 			offPair();
 			offAuthorized();
+			offReconnect();
 			unsubscribe();
 		};
-	}, [pairId, refreshAll, refreshStats, refreshUserData]);
+	}, [pairId, refreshOrderBook, refreshStats, refreshUserData]);
 
 	return {
 		pairData,
