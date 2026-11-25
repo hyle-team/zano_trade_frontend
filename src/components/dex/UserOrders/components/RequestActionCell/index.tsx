@@ -27,7 +27,7 @@ export default function RequestActionCell({
 
 		try {
 			success = row.transaction
-				? await acceptProposal(row)
+				? await acceptProposal(row, pairData)
 				: await requestMatch(row, pairData ?? null);
 		} finally {
 			setLoading(false);
