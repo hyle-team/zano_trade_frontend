@@ -15,7 +15,7 @@ const FeaturedPairs = ({ pairs, selectedPairId, onSelect }: FeaturedPairsProps) 
 
 	return (
 		<section className={styles.featured}>
-			<h2 className={styles.featured__title}>Featured pairs</h2>
+			<h2 className={styles.featured__title}>Whitelisted Pairs</h2>
 
 			<div className={styles.table}>
 				<div className={styles.table__head}>
