@@ -221,6 +221,8 @@ export function useOrderForm({
 		totalValid,
 		minPerApplyAmountValid,
 		totalUsd,
+		priceDP,
+		amountDP,
 		rangeInputValue,
 		setRangeInputValue,
 		onPriceChange,

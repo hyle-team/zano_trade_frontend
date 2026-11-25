@@ -235,6 +235,8 @@ function Trading({
 							totalValid={orderForm.totalValid}
 							minPerApplyAmountValid={orderForm.minPerApplyAmountValid}
 							totalUsd={orderForm.totalUsd}
+							priceDecimalPoint={orderForm.priceDP}
+							amountDecimalPoint={orderForm.amountDP}
 							scrollToOrderList={scrollToOrdersList}
 							openOrdersTab={setRequestedOrdersTab}
 							onAfter={onAfter}
@@ -276,20 +278,20 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 	const xForwardedFor = getForwardedFor(ctx.req);
 
 	const [pairRes, statsRes, ordersRes, tradesRes, candlesRes] = await Promise.all([
-		getPair(pairId, { xForwardedFor }),
-		getPairStats(pairId, { xForwardedFor }),
-		getOrdersPage(pairId, { xForwardedFor }),
-		getTrades(pairId, { xForwardedFor }),
-		getCandles(pairId, '1h', { xForwardedFor }),
+		getPair(pairId, { xForwardedFor }).catch(() => null),
+		getPairStats(pairId, { xForwardedFor }).catch(() => null),
+		getOrdersPage(pairId, { xForwardedFor }).catch(() => null),
+		getTrades(pairId, { xForwardedFor }).catch(() => null),
+		getCandles(pairId, '1h', { xForwardedFor }).catch(() => null),
 	]);
 
 	return {
 		props: {
-			initialPair: pairRes.success ? pairRes.data : null,
-			initialStats: statsRes.success ? statsRes.data : null,
-			initialOrders: ordersRes.success ? ordersRes.data : [],
-			initialTrades: tradesRes.success ? tradesRes.data : [],
-			initialCandles: candlesRes.success ? candlesRes.data : [],
+			initialPair: pairRes?.success ? pairRes.data : null,
+			initialStats: statsRes?.success ? statsRes.data : null,
+			initialOrders: ordersRes?.success ? ordersRes.data : [],
+			initialTrades: tradesRes?.success ? tradesRes.data : [],
+			initialCandles: candlesRes?.success ? candlesRes.data : [],
 		},
 	};
 }

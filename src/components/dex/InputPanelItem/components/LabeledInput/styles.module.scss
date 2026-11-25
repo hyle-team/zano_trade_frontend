@@ -4,6 +4,9 @@
 	gap: 8px;
 
 	&__label {
+		display: flex;
+		align-items: center;
+		gap: 4px;
 		font-size: 12px;
 		font-family: 500;
 		line-height: 100%;
@@ -57,6 +60,12 @@
 			text-overflow: ellipsis;
 		}
 	}
+
+	&__error {
+		font-size: 12px;
+		line-height: 120%;
+		color: #ff6767;
+	}
 }
 
 @media screen and (max-width: 640px) {
@@ -79,6 +88,10 @@
 			> p {
 				font-size: 12px;
 			}
+		}
+
+		&__error {
+			font-size: 10px;
 		}
 	}
 }

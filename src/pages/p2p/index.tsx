@@ -105,11 +105,11 @@ function Home(props: HomeProps) {
 }
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-	const stats = await getStats({ xForwardedFor: getForwardedFor(ctx.req) });
+	const stats = await getStats({ xForwardedFor: getForwardedFor(ctx.req) }).catch(() => null);
 
 	return {
 		props: {
-			stats: stats.data,
+			stats: stats?.data ?? null,
 		},
 	};
 }

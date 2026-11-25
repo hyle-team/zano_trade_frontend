@@ -30,3 +30,6 @@ export const buySellValues: SelectValue[] = [
 		code: 'sell',
 	},
 ];
+
+export const MIN_FILL_AMOUNT_TOOLTIP =
+	'The minimum amount another user must trade to fill part of your order. Leave empty to allow trades of any size';

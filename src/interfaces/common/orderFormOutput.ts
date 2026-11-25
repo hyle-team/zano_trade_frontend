@@ -10,6 +10,8 @@ interface OrderFormOutput {
 	totalValid: boolean;
 	minPerApplyAmountValid: boolean;
 	totalUsd: string | undefined;
+	priceDP: number;
+	amountDP: number;
 	rangeInputValue: string;
 	setRangeInputValue: Dispatch<SetStateAction<string>>;
 	onPriceChange: (_inputValue: string) => void;

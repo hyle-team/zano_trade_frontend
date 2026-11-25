@@ -25,6 +25,8 @@ interface InputPanelItemProps {
 	totalValid: boolean;
 	minPerApplyAmountValid: boolean;
 	totalUsd: string | undefined;
+	priceDecimalPoint: number;
+	amountDecimalPoint: number;
 	scrollToOrderList: () => void;
 	openOrdersTab: (_tab: UserOrdersTabType) => void;
 	onAfter: () => Promise<void>;
