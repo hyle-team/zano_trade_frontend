@@ -150,13 +150,6 @@ export function useOrderActions() {
 				return handleCancelTransaction({ txId: tip.id });
 			}
 
-			if (getProposalInfoResult.error === 'WALLET_RPC_ERROR_-4') {
-				alertErr(
-					'Proposal valid but not found for active wallet. Double-check current wallet.',
-				);
-				return false;
-			}
-
 			alertErr('Companion responded with an error');
 			return false;
 		}
