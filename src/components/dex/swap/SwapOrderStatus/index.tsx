@@ -466,7 +466,9 @@ const SwapOrderStatus = ({
 							variant="primary"
 							block
 							loading={busyAction === 'accept'}
-							onClick={() => runAction('accept', () => acceptProposal(proposal))}
+							onClick={() =>
+								runAction('accept', () => acceptProposal(proposal, pairData))
+							}
 						>
 							Accept swap
 						</Button>

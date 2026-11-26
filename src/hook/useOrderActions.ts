@@ -2,10 +2,11 @@ import Decimal from 'decimal.js';
 import { useContext } from 'react';
 import {
 	AcceptIonicSwapResponse,
+	GetIonicSwapProposalInfoResponse,
 	GetIonicSwapProposalInfoResponseInfo,
+	GetWalletDataResponse,
 	InitializeIonicSwapParams,
 	InitializeIonicSwapResponse,
-	ZanoWebError,
 } from 'zano_web3/web';
 
 import { Store } from '@/store/store-reducer';
@@ -18,7 +19,7 @@ import {
 	confirmTransaction,
 } from '@/utils/methods';
 import { updateAutoClosedNotification } from '@/store/actions';
-import { notationToString } from '@/utils/utils';
+import { notationToString, shortenAddress } from '@/utils/utils';
 import { zanoWallet } from '@/utils/zanoWallet';
 import { getWalletErrorMessage } from '@/utils/walletErrors';
 import ApplyTip from '@/interfaces/common/ApplyTip';
@@ -36,7 +37,7 @@ export function useOrderActions() {
 		setTimeout(() => {
 			setAlertState(null);
 			setAlertSubtitle('');
-		}, 3000);
+		}, 5000);
 	};
 
 	const closeNotification = (id: string) => {
@@ -47,6 +48,38 @@ export function useOrderActions() {
 		const message = getWalletErrorMessage(error);
 		if (!message) console.error(error);
 		alertErr(message ?? 'Zano Companion responded with an error');
+	};
+
+	const ensureAccountWalletOpened = async (): Promise<boolean> => {
+		const accountAddress = state.wallet?.address;
+
+		if (!state.wallet?.connected || !accountAddress) {
+			alertErr('Connect your wallet first');
+			return false;
+		}
+
+		let getWalletResult: GetWalletDataResponse;
+
+		try {
+			getWalletResult = await zanoWallet.getWallet();
+		} catch (error) {
+			handleWalletError(error);
+			return false;
+		}
+
+		if (!getWalletResult.success) {
+			handleWalletError(getWalletResult.error);
+			return false;
+		}
+
+		if (getWalletResult.data.address !== accountAddress) {
+			alertErr(
+				`Zano Companion has another wallet opened. Switch to ${shortenAddress(accountAddress)} and try again.`,
+			);
+			return false;
+		}
+
+		return true;
 	};
 
 	const handleCancelTransaction = async ({ txId }: { txId: string }): Promise<boolean> => {
@@ -130,19 +163,17 @@ export function useOrderActions() {
 			return false;
 		}
 
-		let getProposalInfoResult;
+		if (!(await ensureAccountWalletOpened())) {
+			return false;
+		}
+
+		let getProposalInfoResult: GetIonicSwapProposalInfoResponse;
 
 		try {
 			getProposalInfoResult = await zanoWallet.getIonicSwapProposalInfo(tip.hex_raw_proposal);
 		} catch (error) {
-			if (error instanceof ZanoWebError) {
-				if (error.code === 'ZANO_WALLET_NOT_AVAILABLE') {
-					alertErr('Companion is offline');
-					return false;
-				}
-			}
-
-			throw error;
+			handleWalletError(error);
+			return false;
 		}
 
 		if (!getProposalInfoResult.success) {
@@ -150,14 +181,7 @@ export function useOrderActions() {
 				return handleCancelTransaction({ txId: tip.id });
 			}
 
-			if (getProposalInfoResult.error === 'WALLET_RPC_ERROR_-4') {
-				alertErr(
-					'Proposal valid but not found for active wallet. Double-check current wallet.',
-				);
-				return false;
-			}
-
-			alertErr('Companion responded with an error');
+			handleWalletError(getProposalInfoResult.error);
 			return false;
 		}
 
@@ -176,23 +200,19 @@ export function useOrderActions() {
 		try {
 			confirmSwapResult = await zanoWallet.acceptIonicSwap(tip.hex_raw_proposal);
 		} catch (error) {
-			if (error instanceof ZanoWebError) {
-				if (error.code === 'ZANO_WALLET_NOT_AVAILABLE') {
-					alertErr('Companion is offline');
-					return false;
-				}
-			}
-
-			throw error;
+			handleWalletError(error);
+			return false;
 		}
 
 		if (!confirmSwapResult.success) {
-			if (confirmSwapResult.error === 'WALLET_RPC_ERROR_-7') {
-				alertErr('Insufficient funds');
+			if (confirmSwapResult.error === 'WALLET_RPC_ERROR_-4') {
+				alertErr(
+					'The swap could not be completed. The counterparty funds may no longer be available.',
+				);
 				return false;
 			}
 
-			alertErr('Companion responded with an error');
+			handleWalletError(confirmSwapResult.error);
 			return false;
 		}
 
@@ -207,6 +227,10 @@ export function useOrderActions() {
 	}
 
 	async function requestMatch(tip: ApplyTip, pairData: PairData | null): Promise<ActionResult> {
+		if (!(await ensureAccountWalletOpened())) {
+			return false;
+		}
+
 		if (tip.id) closeNotification(tip.id);
 
 		const firstCurrencyId = pairData?.first_currency.asset_id;
