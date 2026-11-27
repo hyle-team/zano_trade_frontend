@@ -1,5 +1,6 @@
 import React from 'react';
 import { classes, formatTimestamp, notationToString } from '@/utils/utils';
+import OrderRow from '@/interfaces/common/OrderRow';
 import TotalUsdCell from '@/components/dex/TotalUsdCell';
 import EmptyMessage from '@/components/UI/EmptyMessage';
 import AliasCell from '@/components/dex/AliasCell';
@@ -7,16 +8,16 @@ import { UniversalCardsProps } from './types';
 import styles from '../styles.module.scss';
 import RequestActionCell from '../../components/RequestActionCell';
 import CancelActionCell from '../../components/CancelActionCell';
+import ItemsCountCell from '../../components/ItemsCountCell';
+import { OrderItemsKind } from '../../components/OrderItemsModal/types';
 
 const OffersRow = ({
-	matches,
-	requests,
-	offers,
+	order,
+	onOpenItems,
 	mobile,
 }: {
-	matches: number;
-	requests: number;
-	offers: number;
+	order: OrderRow;
+	onOpenItems: (_kind: OrderItemsKind, _order: OrderRow) => void;
 	mobile?: boolean;
 }) => (
 	<div
@@ -29,36 +30,27 @@ const OffersRow = ({
 	>
 		<div className={styles.card__col}>
 			<p className={styles.card__label}>Matches</p>
-			<p
-				className={classes(
-					styles.card__value,
-					matches > 0 ? styles.primary : styles.secondary,
-				)}
-			>
-				{matches}
-			</p>
+			<ItemsCountCell
+				className={styles.card__value}
+				count={order.matches_count ?? 0}
+				onClick={() => onOpenItems('matches', order)}
+			/>
 		</div>
 		<div className={styles.card__col}>
 			<p className={styles.card__label}>Requests</p>
-			<p
-				className={classes(
-					styles.card__value,
-					requests > 0 ? styles.primary : styles.secondary,
-				)}
-			>
-				{requests}
-			</p>
+			<ItemsCountCell
+				className={styles.card__value}
+				count={order.incoming_proposals_count ?? 0}
+				onClick={() => onOpenItems('requests', order)}
+			/>
 		</div>
 		<div className={styles.card__col}>
 			<p className={styles.card__label}>Offers</p>
-			<p
-				className={classes(
-					styles.card__value,
-					offers > 0 ? styles.primary : styles.secondary,
-				)}
-			>
-				{offers}
-			</p>
+			<ItemsCountCell
+				className={styles.card__value}
+				count={order.outgoing_proposals_count ?? 0}
+				onClick={() => onOpenItems('offers', order)}
+			/>
 		</div>
 	</div>
 );
@@ -70,6 +62,14 @@ const AliasRow = ({ label = 'Alias', children }: { label?: string; children: Rea
 	</div>
 );
 
+const EMPTY_MESSAGES: Record<UniversalCardsProps['type'], string> = {
+	orders: 'No orders',
+	matches: 'No suitables',
+	requests: 'No requests',
+	offers: 'No offers',
+	history: 'No data',
+};
+
 export default function UniversalCards(props: UniversalCardsProps) {
 	const { firstCurrencyName, secondCurrencyName, secondAssetUsdPrice, data, onAfter, type } =
 		props;
@@ -77,7 +77,7 @@ export default function UniversalCards(props: UniversalCardsProps) {
 	if (!data?.length)
 		return (
 			<div className={styles.cards}>
-				<EmptyMessage text="No data" />
+				<EmptyMessage text={EMPTY_MESSAGES[type]} />
 			</div>
 		);
 
@@ -175,16 +175,9 @@ export default function UniversalCards(props: UniversalCardsProps) {
 				let Actions: React.ReactNode = null;
 
 				if (props.type === 'orders') {
-					const id = String(row.id);
-					const matches = props.matchesCountByOrderId[id] ?? 0;
-					const requests = props.requestsCountByOrderId[id] ?? 0;
-					const offers = props.offersCountByOrderId[id] ?? 0;
-
-					MiddleBlock = (
-						<OffersRow matches={matches} requests={requests} offers={offers} />
-					);
+					MiddleBlock = <OffersRow order={row} onOpenItems={props.onOpenItems} />;
 					BottomRowLeft = (
-						<OffersRow matches={matches} requests={requests} offers={offers} mobile />
+						<OffersRow order={row} onOpenItems={props.onOpenItems} mobile />
 					);
 					Actions = (
 						<div className={styles.card__actions}>
@@ -220,11 +213,7 @@ export default function UniversalCards(props: UniversalCardsProps) {
 								onAfter={onAfter}
 							/>
 							{props.type === 'offers' && (
-								<CancelActionCell
-									type="reject"
-									id={row.connected_order_id}
-									onAfter={onAfter}
-								/>
+								<CancelActionCell type="reject" id={row.id} onAfter={onAfter} />
 							)}
 						</div>
 					);
@@ -245,9 +234,8 @@ export default function UniversalCards(props: UniversalCardsProps) {
 					Actions = (
 						<div className={styles.card__actions}>
 							<CancelActionCell
-								id={String(
-									row.creator === 'sell' ? row.sell_order_id : row.buy_order_id,
-								)}
+								type="cancel_tx"
+								id={String(row.id)}
 								onAfter={onAfter}
 							/>
 						</div>

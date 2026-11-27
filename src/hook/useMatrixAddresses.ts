@@ -13,7 +13,7 @@ const useMatrixAddresses = (ordersHistory: PageOrderData[]) => {
 
 			const data = await getMatrixAddresses(filteredAddresses);
 
-			setMatrixAddresses(data.addresses);
+			setMatrixAddresses(data?.addresses ?? []);
 		};
 
 		fetchConnections();

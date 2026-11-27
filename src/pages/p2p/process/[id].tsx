@@ -1,6 +1,6 @@
 import styles from '@/styles/Process.module.scss';
 import Header from '@/components/default/Header/Header';
-import { Footer } from '@/zano_ui/src';
+import SiteFooter from '@/components/default/SiteFooter';
 import ProcessContent from './components/ProcessContent/ProcessContent';
 
 function Process() {
@@ -10,7 +10,7 @@ function Process() {
 			<main className={styles.main}>
 				<ProcessContent />
 			</main>
-			<Footer className="no-svg-style" />
+			<SiteFooter />
 		</>
 	);
 }

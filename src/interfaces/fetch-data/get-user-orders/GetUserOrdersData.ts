@@ -12,7 +12,7 @@ export type GetUserOrdersData = {
 	limit: number;
 	offset: number;
 	filterInfo: {
-		pairId?: number;
+		pairId?: string;
 		status?: GetUserOrdersBodyStatus;
 		type?: GetUserOrdersBodyType;
 		date?: {

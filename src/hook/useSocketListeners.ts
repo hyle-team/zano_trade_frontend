@@ -1,87 +1,87 @@
-import ApplyTip from '@/interfaces/common/ApplyTip';
-import OrderRow from '@/interfaces/common/OrderRow';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
 import { PairStats } from '@/interfaces/responses/orders/GetPairStatsRes';
-import { getUserOrdersPage } from '@/utils/methods';
-import socket from '@/utils/socket';
-import { Store } from '@/store/store-reducer';
+import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
+import { getPairStats } from '@/utils/methods';
+import socket, {
+	SocketEvent,
+	onAuthorizedEvents,
+	onPairEvents,
+	onReconnect,
+	subscribePair,
+} from '@/utils/socket';
+import { toTrade } from '@/utils/v2/mappers';
+import { V2TradePerformedEvent } from '@/utils/v2/types';
 import { useRouter } from 'next/router';
-import { Dispatch, SetStateAction, useContext, useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
+
+const MAX_LIVE_TRADES = 100;
 
 interface useSocketListenersParams {
-	setUserOrders: Dispatch<SetStateAction<OrderRow[]>>;
-	setApplyTips: Dispatch<SetStateAction<ApplyTip[]>>;
 	setPairStats: Dispatch<SetStateAction<PairStats | null>>;
 	setOrdersHistory: Dispatch<SetStateAction<PageOrderData[]>>;
 	ordersHistory: PageOrderData[];
 	updateOrders: () => Promise<void>;
+	updateUserOrders: () => Promise<void>;
+	setTrades?: Dispatch<SetStateAction<Trade[]>>;
 }
 
 export const useSocketListeners = ({
-	setUserOrders,
-	setApplyTips,
 	setPairStats,
-	setOrdersHistory,
-	ordersHistory,
 	updateOrders,
+	updateUserOrders,
+	setTrades,
 }: useSocketListenersParams) => {
-	const { state } = useContext(Store);
 	const router = useRouter();
 	const pairId = typeof router.query.id === 'string' ? router.query.id : '';
 
-	async function socketUpdateOrders() {
-		const result = await getUserOrdersPage(pairId, { token: state.token });
+	const updateOrdersRef = useRef(updateOrders);
+	updateOrdersRef.current = updateOrders;
 
-		if (result.success) {
-			setUserOrders(result?.data?.orders || []);
-			setApplyTips(result?.data?.applyTips || []);
-		}
+	const updateUserOrdersRef = useRef(updateUserOrders);
+	updateUserOrdersRef.current = updateUserOrders;
+
+	async function socketUpdateStats() {
+		const result = await getPairStats(pairId).catch(() => null);
+		if (result?.success) setPairStats(result.data);
 	}
 
 	useEffect(() => {
-		socket.emit('in-trading', { id: router.query.id });
+		if (!pairId) return undefined;
 
-		return () => {
-			socket.emit('out-trading', { id: router.query.id });
-		};
-	}, []);
+		const unsubscribe = subscribePair(pairId);
 
-	useEffect(() => {
-		socket.on('new-order', async (data) => {
-			setOrdersHistory([data.orderData, ...ordersHistory]);
-			await socketUpdateOrders();
+		const offPair = onPairEvents([pairId], async (eventName) => {
+			await updateOrdersRef.current();
+			if (eventName === SocketEvent.TRADE_PERFORMED_PUBLIC) await socketUpdateStats();
 		});
 
-		socket.on('delete-order', async () => {
-			await updateOrders();
-			await socketUpdateOrders();
+		const offAuthorized = onAuthorizedEvents(() => {
+			updateUserOrdersRef.current();
 		});
 
-		return () => {
-			socket.off('new-order');
-			socket.off('delete-order');
-		};
-	}, [ordersHistory]);
+		function onTrade(trade: V2TradePerformedEvent) {
+			if (!setTrades || String(trade?.pairId) !== pairId) return;
 
-	useEffect(() => {
-		function onUpdateStats({ pairStats }: { pairStats: PairStats }) {
-			setPairStats(pairStats);
+			setTrades((prev) => {
+				if (prev.some((t) => String(t.id) === String(trade.id))) return prev;
+				return [toTrade(trade, prev[0]?.price), ...prev].slice(0, MAX_LIVE_TRADES);
+			});
 		}
 
-		socket.on('update-pair-stats', onUpdateStats);
+		socket.on(SocketEvent.TRADE_PERFORMED_PUBLIC, onTrade);
 
-		return () => {
-			socket.off('update-pair-stats', onUpdateStats);
-		};
-	}, []);
-
-	useEffect(() => {
-		socket.on('update-orders', async () => {
-			await socketUpdateOrders();
+		const offReconnect = onReconnect(() => {
+			updateOrdersRef.current();
+			updateUserOrdersRef.current();
+			socketUpdateStats();
 		});
 
 		return () => {
-			socket.off('update-orders');
+			offPair();
+			offAuthorized();
+			offReconnect();
+			socket.off(SocketEvent.TRADE_PERFORMED_PUBLIC, onTrade);
+			unsubscribe();
 		};
-	}, []);
+	}, [pairId]);
 };

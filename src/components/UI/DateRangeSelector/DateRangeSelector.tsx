@@ -1,11 +1,13 @@
 import CalendarIcon from '@/assets/images/UI/callendar.svg';
 import CalendarArrowIcon from '@/assets/images/UI/calendar_arrow.svg';
-import { useRef, useState, useEffect, ReactNode } from 'react';
+import { useRef, useState, useEffect, ReactNode, CSSProperties } from 'react';
 import { nanoid } from 'nanoid';
 import { toStandardDateString } from '@/utils/utils';
 import DateRangeSelectorProps from '@/interfaces/props/components/UI/DateRangeSelector/DateRangeSelectorProps';
 import Button from '../Button/Button';
 import styles from './DateRangeSelector.module.scss';
+
+const CALENDAR_WIDTH = 446;
 
 function DateRangeSelector(props: DateRangeSelectorProps) {
 	const months = [
@@ -30,6 +32,19 @@ function DateRangeSelector(props: DateRangeSelectorProps) {
 	const [pageDate, setPageDate] = useState(new Date());
 
 	const [selectorShown, setSelectorState] = useState(false);
+	const [calendarStyle, setCalendarStyle] = useState<CSSProperties>();
+
+	function getCalendarStyle(): CSSProperties | undefined {
+		const rect = selectorRef.current?.getBoundingClientRect();
+		if (!rect) return undefined;
+
+		const gutter = 16;
+		const width = Math.min(CALENDAR_WIDTH, window.innerWidth - gutter * 2);
+		const centeredLeft = rect.left + rect.width / 2 - width / 2;
+		const left = Math.min(Math.max(centeredLeft, gutter), window.innerWidth - gutter - width);
+
+		return { width, left: left - rect.left, transform: 'none' };
+	}
 
 	const selectedDateState = props.value;
 	const setDateState = props.setValue || (() => undefined);
@@ -202,11 +217,12 @@ function DateRangeSelector(props: DateRangeSelectorProps) {
 	return (
 		<div
 			ref={selectorRef}
-			className={`${styles.selector__wrapper} ${props.disabled ? styles.disabled : ''}`}
+			className={`${styles.selector__wrapper} ${props.disabled ? styles.disabled : ''} ${props.className || ''}`}
 		>
 			<div
 				className={`${styles.selector__header} ${props.className || ''}`}
 				onClick={() => {
+					if (!selectorShown) setCalendarStyle(getCalendarStyle());
 					setSelectorState(!selectorShown);
 					setPageDate(selectedDateState.first || new Date());
 				}}
@@ -220,7 +236,7 @@ function DateRangeSelector(props: DateRangeSelectorProps) {
 				<CalendarIcon className="dimmed" />
 			</div>
 			{selectorShown && (
-				<div className={styles.selector__calendar}>
+				<div className={styles.selector__calendar} style={calendarStyle}>
 					<div className={styles.selector__calendar__title}>
 						<h5>
 							{months[pageDate.getMonth()]} {pageDate.getFullYear()}

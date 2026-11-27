@@ -3,11 +3,11 @@ import type OrderRow from '@/interfaces/common/OrderRow';
 import type { ColumnDef } from '@/components/default/GenericTable/types';
 import ApplyTip from '@/interfaces/common/ApplyTip';
 import UserPendingType from '@/interfaces/common/UserPendingType';
-import { UserOrderData } from '@/interfaces/responses/orders/GetUserOrdersRes';
 import CancelActionCell from '../components/CancelActionCell';
 import AliasCell from '../../AliasCell';
 import TotalUsdCell from '../../TotalUsdCell';
 import RequestActionCell from '../components/RequestActionCell';
+import ItemsCountCell from '../components/ItemsCountCell';
 import {
 	BuildApplyTipsColumnsArgs,
 	BuildMyRequestsColumnsArgs,
@@ -19,9 +19,7 @@ export function buildUserColumns({
 	firstCurrencyName,
 	secondCurrencyName,
 	secondAssetUsdPrice,
-	matchesCountByOrderId,
-	offersCountByOrderId,
-	requestsCountByOrderId,
+	onOpenItems,
 	onAfter,
 }: BuildUserColumnsArgs): ColumnDef<OrderRow>[] {
 	return [
@@ -33,7 +31,8 @@ export function buildUserColumns({
 				<p
 					style={
 						{
-							'--direction-color': row.type === 'buy' ? '#16D1D6' : '#FF6767',
+							'--direction-color':
+								row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
 						} as React.CSSProperties
 					}
 				>
@@ -48,7 +47,7 @@ export function buildUserColumns({
 			cell: (row) => (
 				<p
 					style={{
-						color: row.type === 'buy' ? '#16D1D6' : '#FF6767',
+						color: row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
 						textTransform: 'capitalize',
 					}}
 				>
@@ -94,58 +93,34 @@ export function buildUserColumns({
 			key: 'matches',
 			header: 'Matches',
 			width: '70px',
-			cell: (row) => {
-				const count = matchesCountByOrderId[row.id] ?? 0;
-
-				return (
-					<p
-						style={{
-							fontWeight: 500,
-							color: count > 0 ? '#1F8FEB' : '#B6B6C4',
-						}}
-					>
-						{count}
-					</p>
-				);
-			},
+			cell: (row) => (
+				<ItemsCountCell
+					count={row.matches_count ?? 0}
+					onClick={() => onOpenItems('matches', row)}
+				/>
+			),
 		},
 		{
 			key: 'requests',
 			header: 'Requests',
 			width: '70px',
-			cell: (row) => {
-				const count = requestsCountByOrderId[row.id] ?? 0;
-
-				return (
-					<p
-						style={{
-							fontWeight: 500,
-							color: count > 0 ? '#1F8FEB' : '#B6B6C4',
-						}}
-					>
-						{count}
-					</p>
-				);
-			},
+			cell: (row) => (
+				<ItemsCountCell
+					count={row.incoming_proposals_count ?? 0}
+					onClick={() => onOpenItems('requests', row)}
+				/>
+			),
 		},
 		{
 			key: 'offers',
 			header: 'Offers',
 			width: '70px',
-			cell: (row) => {
-				const count = offersCountByOrderId[row.id] ?? 0;
-
-				return (
-					<p
-						style={{
-							fontWeight: 500,
-							color: count > 0 ? '#1F8FEB' : '#B6B6C4',
-						}}
-					>
-						{count}
-					</p>
-				);
-			},
+			cell: (row) => (
+				<ItemsCountCell
+					count={row.outgoing_proposals_count ?? 0}
+					onClick={() => onOpenItems('offers', row)}
+				/>
+			),
 		},
 		{
 			key: 'time',
@@ -231,11 +206,7 @@ export function buildApplyTipsColumns({
 						onAfter={onAfter}
 					/>
 					{type === 'offers' && (
-						<CancelActionCell
-							type="reject"
-							id={row.connected_order_id}
-							onAfter={onAfter}
-						/>
+						<CancelActionCell type="reject" id={row.id} onAfter={onAfter} />
 					)}
 				</div>
 			),
@@ -309,7 +280,7 @@ export function buildOrderHistoryColumns({
 	firstCurrencyName,
 	secondCurrencyName,
 	secondAssetUsdPrice,
-}: BuildOrderHistoryColumnsArgs): ColumnDef<UserOrderData>[] {
+}: BuildOrderHistoryColumnsArgs): ColumnDef<OrderRow>[] {
 	return [
 		{
 			key: 'pair',
@@ -319,7 +290,8 @@ export function buildOrderHistoryColumns({
 				<p
 					style={
 						{
-							'--direction-color': row.type === 'buy' ? '#16D1D6' : '#FF6767',
+							'--direction-color':
+								row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
 						} as React.CSSProperties
 					}
 				>
@@ -334,7 +306,7 @@ export function buildOrderHistoryColumns({
 			cell: (row) => (
 				<p
 					style={{
-						color: row.type === 'buy' ? '#16D1D6' : '#FF6767',
+						color: row.type === 'buy' ? 'var(--green-color)' : 'var(--red-color)',
 						textTransform: 'capitalize',
 					}}
 				>

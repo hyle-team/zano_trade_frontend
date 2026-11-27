@@ -46,12 +46,13 @@ interface ContextState {
 	wallet: WalletState | null;
 	user: UserState;
 	token: string | null;
+	isAdmin: boolean | null;
 	config: GetConfigResData | null;
 	assetsRates: Map<string, number>;
 	__triggers: {
 		offers: number;
 	};
-	closed_notifications: number[];
+	closed_notifications: string[];
 	alertState: AlertType;
 	alertSubtitle: string;
 }
@@ -70,6 +71,10 @@ type ContextAction =
 			payload: string | null;
 	  }
 	| {
+			type: 'IS_ADMIN_UPDATED';
+			payload: boolean | null;
+	  }
+	| {
 			type: 'CONFIG_UPDATED';
 			payload: GetConfigResData | null;
 	  }
@@ -82,7 +87,7 @@ type ContextAction =
 	  }
 	| {
 			type: 'CLOSED_NOTIFICATIONS_UPDATED';
-			payload: number[];
+			payload: string[];
 	  }
 	| {
 			type: 'ALERT_STATE_UPDATED';

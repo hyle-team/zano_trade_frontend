@@ -1,15 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { InfoIcon } from '@/components/UI/Icons';
 import { classes } from '@/utils/utils';
 import styles from './styles.module.scss';
 import { InfoTooltipProps } from './types';
-
-const InfoIcon = () => (
-	<svg className="stroked" width="16" height="16" viewBox="0 0 24 24" fill="none">
-		<circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
-		<path d="M12 11v5M12 8h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-	</svg>
-);
 
 const TOOLTIP_WIDTH = 280;
 const VIEWPORT_GAP = 8;

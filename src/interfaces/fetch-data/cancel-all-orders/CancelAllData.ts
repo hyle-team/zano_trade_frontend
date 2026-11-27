@@ -5,7 +5,7 @@ export enum CancelAllBodyOrderType {
 
 export type CancelAllData = {
 	filterInfo: {
-		pairId?: number;
+		pairId?: string;
 		type?: CancelAllBodyOrderType;
 		date?: {
 			// UNIX timestamps in milliseconds

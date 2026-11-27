@@ -5,6 +5,7 @@ const initialState: ContextState = {
 	wallet: null,
 	user: null,
 	token: null,
+	isAdmin: null,
 	config: null,
 	assetsRates: new Map<string, number>(),
 	__triggers: {
@@ -25,6 +26,9 @@ const reducer = (state: ContextState, action: ContextAction): ContextState => {
 
 		case 'TOKEN_UPDATED':
 			return { ...state, token: action.payload };
+
+		case 'IS_ADMIN_UPDATED':
+			return { ...state, isAdmin: action.payload };
 
 		case 'CONFIG_UPDATED':
 			return { ...state, config: action.payload };

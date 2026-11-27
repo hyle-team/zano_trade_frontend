@@ -9,10 +9,12 @@ import NextApp, { AppContext, AppProps } from 'next/app';
 import { ThemeProvider } from 'next-themes';
 import axios, { AxiosError } from 'axios';
 import { GetConfigResData } from '@/interfaces/responses/config/GetConfigRes';
-import inter from '@/utils/font';
+import inter, { figtree } from '@/utils/font';
 import { API_URL } from '@/constants';
 import NProgress from 'nprogress';
 import { Router } from 'next/router';
+import HeroBlurs from '@/components/default/HeroBlurs';
+import GlobalAlert from '@/components/default/GlobalAlert';
 import PageHandler from './PageHandler';
 import NotificationPopups from './NotificationPopups';
 import 'nprogress/nprogress.css';
@@ -50,6 +52,10 @@ function App(data: AppProps & { config?: GetConfigResData }) {
 		<>
 			<style jsx global>
 				{`
+					:root {
+						--font-figtree: ${figtree.style.fontFamily};
+					}
+
 					* {
 						font-family: ${inter.style.fontFamily};
 					}
@@ -84,9 +90,11 @@ function App(data: AppProps & { config?: GetConfigResData }) {
 			</Head>
 			<StoreProvider>
 				<ThemeProvider themes={['dark', 'light']} defaultTheme="dark">
+					<HeroBlurs />
 					<Component {...pageProps} />
 					<PageHandler config={data.config as GetConfigResData} />
 					<NotificationPopups />
+					<GlobalAlert />
 				</ThemeProvider>
 			</StoreProvider>
 		</>

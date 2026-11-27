@@ -1,12 +1,11 @@
 import {
 	getCandles,
+	getMyPairOrders,
 	getOrdersPage,
 	getPair,
 	getPairStats,
-	getUserOrdersPage,
 	getTrades,
 } from '@/utils/methods';
-import useUpdateUser from '@/hook/useUpdateUser';
 import { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import CandleRow from '@/interfaces/common/CandleRow';
 import { PageOrderData } from '@/interfaces/responses/orders/GetOrdersPageRes';
@@ -14,10 +13,12 @@ import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
 import PairData from '@/interfaces/common/PairData';
 import { PairStats } from '@/interfaces/responses/orders/GetPairStatsRes';
 import OrderRow from '@/interfaces/common/OrderRow';
-import ApplyTip from '@/interfaces/common/ApplyTip';
+import { GetUserOrdersBodyStatus } from '@/interfaces/fetch-data/get-user-orders/GetUserOrdersData';
 import { useRouter } from 'next/router';
 import PeriodState from '@/interfaces/states/pages/dex/trading/InputPanelItem/PeriodState';
 import { Store } from '@/store/store-reducer';
+
+const MIN_CANDLES_LOADING_MS = 700;
 
 interface UseTradingDataParams {
 	periodsState: PeriodState;
@@ -27,7 +28,6 @@ interface UseTradingDataParams {
 	setPairData: Dispatch<SetStateAction<PairData | null>>;
 	setPairStats: Dispatch<SetStateAction<PairStats | null>>;
 	setUserOrders: Dispatch<SetStateAction<OrderRow[]>>;
-	setApplyTips: Dispatch<SetStateAction<ApplyTip[]>>;
 	setMyOrdersLoading: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -39,30 +39,35 @@ export function useTradingData({
 	setPairData,
 	setPairStats,
 	setUserOrders,
-	setApplyTips,
 	setMyOrdersLoading,
 }: UseTradingDataParams) {
 	const { state } = useContext(Store);
-	const fetchUser = useUpdateUser();
 	const router = useRouter();
 	const isFirstLoad = useRef(true);
 	const prevPeriod = useRef<string | null>(null);
 
 	const [candlesLoaded, setCandlesLoaded] = useState(true);
+	const candlesRequestId = useRef(0);
 	const [ordersLoading, setOrdersLoading] = useState(false);
 	const [tradesLoading, setTradesLoading] = useState(false);
 	const pairId = typeof router.query.id === 'string' ? router.query.id : '';
-	const loggedIn = !!state.wallet?.connected;
+	const userOrdersRequestId = useRef(0);
 
 	async function fetchCandles() {
+		candlesRequestId.current += 1;
+		const requestId = candlesRequestId.current;
+
 		setCandlesLoaded(false);
 		setCandles([]);
-		const result = await getCandles(pairId, periodsState.code);
-		if (result.success) {
-			setCandles(result.data);
-		} else {
-			setCandles([]);
-		}
+
+		const [result] = await Promise.all([
+			getCandles(pairId, periodsState.code).catch(() => null),
+			new Promise((resolve) => setTimeout(resolve, MIN_CANDLES_LOADING_MS)),
+		]);
+
+		if (requestId !== candlesRequestId.current) return;
+
+		setCandles(result?.success ? result.data : []);
 		setCandlesLoaded(true);
 	}
 
@@ -74,13 +79,20 @@ export function useTradingData({
 	}
 
 	async function updateUserOrders() {
-		setMyOrdersLoading(true);
-		const result = await getUserOrdersPage(pairId, { token: state.token });
-		await fetchUser();
+		if (!state.token) return;
 
-		if (!result.success) return;
-		setUserOrders(result?.data?.orders || []);
-		setApplyTips(result?.data?.applyTips || []);
+		userOrdersRequestId.current += 1;
+		const requestId = userOrdersRequestId.current;
+
+		setMyOrdersLoading(true);
+
+		const result = await getMyPairOrders(pairId, GetUserOrdersBodyStatus.ACTIVE, {
+			token: state.token,
+		}).catch(() => null);
+
+		if (requestId !== userOrdersRequestId.current) return;
+
+		if (result?.success) setUserOrders(result.data);
 		setMyOrdersLoading(false);
 	}
 
@@ -145,12 +157,6 @@ export function useTradingData({
 			await fetchTrades();
 		})();
 	}, [pairId]);
-
-	useEffect(() => {
-		if (!loggedIn) return;
-		setUserOrders([]);
-		updateUserOrders();
-	}, [state.wallet?.connected && state.wallet?.address]);
 
 	return {
 		fetchCandles,

@@ -9,7 +9,7 @@ import ProfileWidget from '@/components/UI/ProfileWidget/ProfileWidget';
 import { DragEvent, useContext, useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid';
 import { intToStrFixedLen } from '@/utils/utils';
-import socket from '@/utils/socket';
+import socket from '@/utils/legacySocket';
 import MessengerProps from '@/interfaces/props/pages/p2p/process/components/Messenger/MessengerProps';
 import MessageProps from '@/interfaces/props/pages/p2p/process/components/Messenger/MessageProps';
 import { getChatChunk } from '@/utils/methods';

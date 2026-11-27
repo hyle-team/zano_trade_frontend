@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 		console.log('ID found:', idFound);
 
-		if (typeof idFound === 'number') {
+		if (typeof idFound === 'string' && idFound) {
 			return {
 				redirect: {
 					destination: `/dex/trading/${idFound}`,

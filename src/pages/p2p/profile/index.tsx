@@ -11,7 +11,7 @@ import CategoriesState from '@/interfaces/states/pages/p2p/profile/CategoriesSta
 import FiltersState, { BuySell } from '@/interfaces/states/pages/p2p/profile/FiltersState';
 import { UserChatData } from '@/interfaces/responses/user/GetUserRes';
 import OffersStateElement from '@/interfaces/states/pages/p2p/profile/OffersState';
-import { Footer } from '@/zano_ui/src';
+import SiteFooter from '@/components/default/SiteFooter';
 import ProfileTable from './ProfileTable/ProfileTable';
 
 function Profile() {
@@ -213,7 +213,7 @@ function Profile() {
 					/>
 				</div>
 			</main>
-			<Footer className="no-svg-style" />
+			<SiteFooter />
 		</>
 	);
 }

@@ -10,6 +10,23 @@ import { Trade } from '@/interfaces/responses/trades/GetTradeRes';
 import Period from '@/interfaces/common/Period';
 import { PairSortOption } from '@/interfaces/enum/pair';
 import { serverFetch } from '@/utils/serverFetch';
+import { ZANO_ASSET_ID } from '@/utils/utils';
+import { V2Error } from '@/utils/v2/types';
+import {
+	V2RequestOptions,
+	V2Transport,
+	buildV2Headers,
+	buildV2Path,
+	toV2Response,
+} from '@/utils/v2/transport';
+import { V2_MAX_PAGE_COUNT, getAllPublicOrders, v2Api } from '@/utils/v2/api';
+import {
+	toCandleRows,
+	toPageOrderData,
+	toPairData,
+	toPairStats,
+	toTrades,
+} from '@/utils/v2/mappers';
 
 /**
  * Server-side counterparts of the `@/utils/methods` wrappers, used from
@@ -23,52 +40,59 @@ interface ForwardedForParam {
 	xForwardedFor?: string;
 }
 
+const serverTransport =
+	(xForwardedFor?: string): V2Transport =>
+	async <T>(method: string, path: string, options?: V2RequestOptions) => {
+		const res = await serverFetch(`${API_URL}${buildV2Path(path, options?.query)}`, {
+			method,
+			headers: buildV2Headers(options),
+			body: options?.body !== undefined ? JSON.stringify(options.body) : undefined,
+			xForwardedFor,
+		});
+
+		const data = await res.json().catch(() => null);
+
+		return toV2Response<T>(data, res.status);
+	};
+
+const serverApi = (xForwardedFor?: string) => v2Api(serverTransport(xForwardedFor));
+
+const fail = (error: V2Error): ErrorRes => ({ success: false, data: error.code });
+
 export async function getPair(
 	id: string,
 	{ xForwardedFor }: ForwardedForParam = {},
 ): Promise<ErrorRes | GetPairRes> {
-	return serverFetch(`${API_URL}/api/dex/get-pair`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ id }),
-		xForwardedFor,
-	}).then((res) => res.json());
+	const res = await serverApi(xForwardedFor).getPair(id);
+	if (!res.success) return fail(res.error);
+	return { success: true, data: toPairData(res.result) };
 }
 
 export async function getPairStats(
 	pairId: string,
 	{ xForwardedFor }: ForwardedForParam = {},
 ): Promise<ErrorRes | GetPairStatsRes> {
-	return serverFetch(`${API_URL}/api/orders/get-pair-stats`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ pairId }),
-		xForwardedFor,
-	}).then((res) => res.json());
+	const res = await serverApi(xForwardedFor).getPair(pairId);
+	if (!res.success) return fail(res.error);
+	return { success: true, data: toPairStats(res.result.stats) };
 }
 
 export async function getOrdersPage(
 	pairId: string,
 	{ xForwardedFor }: ForwardedForParam = {},
 ): Promise<ErrorRes | GetOrdersPageRes> {
-	return serverFetch(`${API_URL}/api/orders/get-page`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ pairId }),
-		xForwardedFor,
-	}).then((res) => res.json());
+	const res = await getAllPublicOrders(serverApi(xForwardedFor), pairId);
+	if (!res.success) return fail(res.error);
+	return { success: true, data: res.result.map(toPageOrderData) };
 }
 
 export async function getTrades(
 	pairId: string,
 	{ xForwardedFor }: ForwardedForParam = {},
 ): Promise<ErrorRes | { success: true; data: Trade[] }> {
-	return serverFetch(`${API_URL}/api/orders/get-trades`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ pairId }),
-		xForwardedFor,
-	}).then((res) => res.json());
+	const res = await serverApi(xForwardedFor).getTrades(pairId, null, V2_MAX_PAGE_COUNT);
+	if (!res.success) return fail(res.error);
+	return { success: true, data: toTrades(res.result.trades) };
 }
 
 export async function getCandles(
@@ -76,27 +100,48 @@ export async function getCandles(
 	period: Period,
 	{ xForwardedFor }: ForwardedForParam = {},
 ): Promise<ErrorRes | GetCandlesRes> {
-	return serverFetch(`${API_URL}/api/orders/get-candles`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ pairId, period }),
-		xForwardedFor,
-	}).then((res) => res.json());
+	const res = await serverApi(xForwardedFor).getCandles(pairId, period);
+	if (!res.success) return fail(res.error);
+	return { success: true, data: toCandleRows(res.result.candles) };
 }
 
+const PAIRS_PAGE_SIZE = 50;
+const FEATURED_PAIRS_SCAN_COUNT = 100;
+
 export async function getPairsPage(
-	page: number,
+	_page: number,
 	searchText: string,
 	whitelistedOnly: boolean,
 	sortOption: PairSortOption,
 	{ xForwardedFor }: ForwardedForParam = {},
 ): Promise<ErrorRes | GetPairsPageRes> {
-	return serverFetch(`${API_URL}/api/dex/get-pairs-page`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ page, searchText, whitelistedOnly, sortOption }),
-		xForwardedFor,
-	}).then((res) => res.json());
+	const res = await serverApi(xForwardedFor).getPairs({
+		count: PAIRS_PAGE_SIZE,
+		whitelistedOnly,
+		searchText: searchText || undefined,
+		sort:
+			sortOption === PairSortOption.VOLUME_LOW_TO_HIGH ? 'VOLUME_24H_ASC' : 'VOLUME_24H_DESC',
+	});
+
+	if (!res.success) return fail(res.error);
+	return { success: true, data: res.result.pairs.map(toPairData) };
+}
+
+export async function getFeaturedPairs(
+	limit: number,
+	{ xForwardedFor }: ForwardedForParam = {},
+): Promise<ErrorRes | GetPairsPageRes> {
+	const res = await serverApi(xForwardedFor).getPairs({
+		count: FEATURED_PAIRS_SCAN_COUNT,
+		whitelistedOnly: true,
+		sort: 'VOLUME_24H_DESC',
+	});
+
+	if (!res.success) return fail(res.error);
+
+	const zanoQuoted = res.result.pairs.filter((p) => p.quoteAsset.assetId === ZANO_ASSET_ID);
+
+	return { success: true, data: zanoQuoted.slice(0, limit).map(toPairData) };
 }
 
 export async function getStats({ xForwardedFor }: ForwardedForParam = {}): Promise<GetStatsRes> {
@@ -109,13 +154,7 @@ export async function findPairID(
 	first: string,
 	second: string,
 	{ xForwardedFor }: ForwardedForParam = {},
-): Promise<number | undefined> {
-	return serverFetch(`${API_URL}/api/dex/find-pair`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ first, second }),
-		xForwardedFor,
-	})
-		.then((res) => res.json() as Promise<{ data?: string }>)
-		.then((data) => parseInt(data?.data ?? '', 10) || undefined);
+): Promise<string | undefined> {
+	const res = await serverApi(xForwardedFor).getPairByAssets(first, second);
+	return res.success ? res.result.id : undefined;
 }
