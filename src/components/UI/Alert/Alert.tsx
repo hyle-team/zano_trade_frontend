@@ -86,7 +86,15 @@ function Alert(props: AlertProps) {
 		return <></>;
 	}
 
-	return <Popup noPointer={true} Content={PopupContent} settings={{}} close={props.close} />;
+	return (
+		<Popup
+			noPointer={true}
+			Content={PopupContent}
+			settings={{}}
+			close={props.close}
+			classList={[styles.ui__layer]}
+		/>
+	);
 }
 
 export default Alert;

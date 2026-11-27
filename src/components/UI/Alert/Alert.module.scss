@@ -1,5 +1,9 @@
 @use '../../../styles/mixins' as *;
 
+div.ui__layer {
+	z-index: 99999;
+}
+
 .ui__alert {
 	position: fixed;
 	top: 20px;
