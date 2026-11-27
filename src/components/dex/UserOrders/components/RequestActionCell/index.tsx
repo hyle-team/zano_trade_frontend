@@ -13,7 +13,7 @@ export default function RequestActionCell({
 	userOrders,
 }: RequestActionCellProps) {
 	const [loading, setLoading] = useState(false);
-	const { acceptProposal, requestMatch } = useOrderActions();
+	const { acceptProposal, requestMatch, alertErr } = useOrderActions();
 
 	const _connectedOrder =
 		connectedOrder ?? userOrders?.find((o) => o.id === row.connected_order_id);
@@ -27,8 +27,11 @@ export default function RequestActionCell({
 
 		try {
 			success = row.transaction
-				? await acceptProposal(row)
+				? await acceptProposal(row, pairData)
 				: await requestMatch(row, pairData ?? null);
+		} catch (error) {
+			console.error(error);
+			alertErr('Unexpected error occurred. Please try again later.');
 		} finally {
 			setLoading(false);
 		}
